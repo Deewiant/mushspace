@@ -4,6 +4,7 @@
 #define MUSHSPACE_COORDS_H
 
 #pragma push_macro("INCLUDEE")
+#undef INCLUDEE
 #define INCLUDEE "coords_impl.h"
 #include "includer.h"
 

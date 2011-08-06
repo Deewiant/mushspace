@@ -4,6 +4,7 @@
 #define MUSHSPACE_BAKAABB_H
 
 #pragma push_macro("INCLUDEE")
+#undef INCLUDEE
 #define INCLUDEE "bakaabb_impl.h"
 #include "includer.h"
 

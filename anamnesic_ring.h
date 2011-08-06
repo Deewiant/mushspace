@@ -4,6 +4,7 @@
 #define MUSHSPACE_ANAMNESIC_RING_H
 
 #pragma push_macro("INCLUDEE")
+#undef INCLUDEE
 #define INCLUDEE "anamnesic_ring_impl.h"
 #include "includer.h"
 

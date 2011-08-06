@@ -4,6 +4,7 @@
 #define MUSHSPACE_TYPENAMES_H
 
 #pragma push_macro("INCLUDEE")
+#undef INCLUDEE
 #define INCLUDEE "typenames_impl.h"
 #include "includer.h"
 
