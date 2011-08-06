@@ -1,0 +1,10 @@
+# File created: 2011-08-06 16:04:23
+
+CC = clang -Wall -Wextra -fPIC
+CFLAGS = -g
+
+: foreach *.c |> $(CC) $(CFLAGS) -std=c99 -c %f -o %o |> %B.o
+: *.o         |> $(CC) $(CFLAGS) -shared %f -o %o |> libmushspace.so
+: *.o         |> ar rcs %o %f |> libmushspace.a
+
+.gitignore
