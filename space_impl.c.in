@@ -1,0 +1,28 @@
+// File created: 2011-08-06 15:45:41
+
+#include "space_impl.h"
+
+#include <stdbool.h>
+
+#include "anamnesic_ring.h"
+#include "aabb.h"
+#include "bakaabb.h"
+#include "coords.h"
+#include "staticaabb.h"
+#include "stats.h"
+
+struct mushspace {
+	mush_anamnesic_ring recent_buf;
+	bool just_placed_big;
+	mushcoords big_sequence_start, first_placed_big;
+
+	void (*invalidatees)(void*);
+
+	mushcoords last_beg, last_end;
+
+	mush_aabb    *boxen;
+	mush_bakaabb *bak;
+	mush_stats   *stats;
+
+	mush_staticaabb static_box;
+};

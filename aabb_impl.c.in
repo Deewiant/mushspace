@@ -1,0 +1,39 @@
+// File created: 2011-08-06 17:57:52
+
+#include "aabb_impl.h"
+
+#include <assert.h>
+
+#define mush_aabb_make        MUSHSPACE_CAT(mush_aabb,_make)
+#define mush_aabb_make_unsafe MUSHSPACE_CAT(mush_aabb,_make_unsafe)
+#define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
+
+mush_aabb mush_aabb_make(mushcoords b, mushcoords e) {
+	for (unsigned i = 0; i < MUSHSPACE_DIM; ++i)
+		assert (b.v[i] <= e.v[i]);
+
+	mush_aabb aabb = mush_aabb_make_unsafe(b, e);
+	mush_aabb_finalize(&aabb);
+	return aabb;
+}
+
+mush_aabb mush_aabb_make_unsafe(mushcoords b, mushcoords e) {
+	return (mush_aabb){.beg = b, .end = e};
+}
+
+void mush_aabb_finalize(mush_aabb* aabb) {
+	aabb->size = aabb->end.x - aabb->beg.x + 1;
+
+#if MUSHSPACE_DIM >= 2
+	aabb->width = aabb->size;
+	aabb->size *= aabb->end.y - aabb->beg.y + 1;
+#endif
+#if MUSHSPACE_DIM >= 3
+	aabb->area  = aabb->size;
+	aabb->size *= aabb->end.z - aabb->beg.z + 1;
+#endif
+}
+
+#undef mush_aabb_make
+#undef mush_aabb_make_unsafe
+#undef mush_aabb_finalize
