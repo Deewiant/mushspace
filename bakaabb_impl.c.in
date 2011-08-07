@@ -1,0 +1,8 @@
+// File created: 2011-08-07 17:31:12
+
+#include "bakaabb_impl.h"
+
+void mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
+	tommy_hashdyn_init(&bak->data);
+	bak->beg = bak->end = c;
+}
