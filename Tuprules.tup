@@ -3,16 +3,19 @@
 CC = gcc
 
 ifeq ($(CC),gcc)
-SRCFLAGS = -Wall -Wextra -pedantic -std=c1x
-GENFLAGS = -fPIC
+SRCFLAGS     = -Wall -Wextra -pedantic
+GENFLAGS     = -fPIC
+MUSHSRCFLAGS = -std=c1x
 
 NATIVEFLAGS          = -march=native
 OPTFLAGS             = -flto -O3
 DEBFLAGS-@(OPTIMIZE) = -g
 endif
 ifeq ($(CC),clang)
-SRCFLAGS = -Wall -Wextra -std=c99
-GENFLAGS = -fPIC
+SRCFLAGS     = -Wall -Wextra
+GENFLAGS     = -fPIC
+MUSHSRCFLAGS = -std=c99
+LIBSRCFLAGS  = -pedantic
 
 NATIVEFLAGS          = -march=native
 OPTFLAGS             = -O4
@@ -24,5 +27,6 @@ OPTFLAGS-@(OPTIMIZE)  = $(OPTFLAGS)
 
 BOTHFLAGS = $(DEBFLAGS-n) $(OPTFLAGS-y) $(NATIVEFLAGS-y)
 
-CFLAGS    = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS)
+CFLAGS    = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS) $(MUSHSRCFLAGS)
 LINKFLAGS = $(GENFLAGS) $(BOTHFLAGS)
+LIBCFLAGS = $(GENFLAGS) $(OPTFLAGS) $(NATIVEFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
