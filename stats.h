@@ -3,7 +3,10 @@
 #ifndef MUSHSPACE_STATS_H
 #define MUSHSPACE_STATS_H
 
+#include <stdint.h>
+
 typedef struct mush_stats {
+	uint64_t lookups;
 } mush_stats;
 
 #endif
