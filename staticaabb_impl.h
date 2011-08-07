@@ -54,5 +54,8 @@ typedef struct mush_staticaabb {
 } mush_staticaabb;
 
 #define mush_staticaabb_contains MUSHSPACE_CAT(mush_staticaabb,_contains)
+#define mush_staticaabb_get      MUSHSPACE_CAT(mush_staticaabb,_get)
 
 bool mush_staticaabb_contains(mushcoords);
+
+mushcell mush_staticaabb_get(mush_staticaabb*, mushcoords);
