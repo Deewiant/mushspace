@@ -1,5 +1,6 @@
 // File created: 2011-08-06 17:42:46
 
+#undef MUSHCOORDS
 #undef mushspace
 #undef mushcoords
 #undef MUSHSPACE_CAT
@@ -11,6 +12,8 @@
 #define MUSHSPACE_CAT(a,b)  MUSHSPACE_CATHELPER(a,b)
 #define MUSHSPACE_NAME(x)   MUSHSPACE_CAT(MUSHSPACE_CAT(x,MUSHSPACE_DIM),\
                                           MUSHSPACE_STRUCT_SUFFIX)
+
+#define MUSHCOORDS MUSHSPACE_CAT(MUSHCOORDS,MUSHSPACE_DIM)
 
 #define mushspace  MUSHSPACE_NAME(mushspace)
 #define mushcoords MUSHSPACE_NAME(mushcoords)
