@@ -41,6 +41,8 @@ mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp) {
 		space->bak   = NULL;
 		space->stats = NULL;
 
+		mush_anamnesic_ring_init(&space->recent_buf);
+
 		memset(space->static_box.array, ' ', sizeof space->static_box.array);
 	}
 	return space;
