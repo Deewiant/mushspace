@@ -54,3 +54,10 @@ void MUSHSPACE_CAT(mushspace,_free)(mushspace* space) {
 	free(space->boxen);
 	free(space->stats);
 }
+
+mushcell mushspace_get(mushspace* space, mushcoords c) {
+	++space->stats->lookups;
+	if (mush_staticaabb_contains(c))
+		return mush_staticaabb_get(&space->static_box, c);
+	return ' ';
+}
