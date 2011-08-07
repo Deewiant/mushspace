@@ -3,6 +3,7 @@
 #include "space_impl.h"
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "anamnesic_ring.h"
 #include "aabb.h"
@@ -35,6 +36,8 @@ mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp) {
 		space->boxen = NULL;
 		space->bak   = NULL;
 		space->stats = NULL;
+
+		memset(space->static_box.array, ' ', sizeof space->static_box.array);
 	}
 	return space;
 }
