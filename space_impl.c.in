@@ -32,14 +32,14 @@ struct mushspace {
 
 size_t MUSHSPACE_CAT(mushspace,_size)(void) { return sizeof(mushspace); }
 
-mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp) {
+mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mush_stats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (space) {
 		space->box_count = 0;
 
 		space->boxen = NULL;
 		space->bak   = NULL;
-		space->stats = NULL;
+		space->stats = stats ? stats : malloc(sizeof *space->stats);
 
 		mush_anamnesic_ring_init(&space->recent_buf);
 
@@ -52,8 +52,4 @@ void MUSHSPACE_CAT(mushspace,_free)(mushspace* space) {
 	for (size_t i = space->box_count; i--;)
 		free(space->boxen[i].data);
 	free(space->boxen);
-}
-
-void MUSHSPACE_CAT(mushspace,_set_stats)(mushspace* space, mush_stats* stats) {
-	space->stats = stats;
 }
