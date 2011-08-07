@@ -30,13 +30,11 @@ struct mushspace {
 size_t MUSHSPACE_CAT(mushspace,_size)(void) { return sizeof(mushspace); }
 
 mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp) {
-	mushspace space;
-	space.boxen = NULL;
-	space.bak   = NULL;
-	space.stats = NULL;
-
-	mushspace *p = vp ? vp : malloc(sizeof *p);
-	if (p)
-		*p = space;
-	return p;
+	mushspace *space = vp ? vp : malloc(sizeof *space);
+	if (space) {
+		space->boxen = NULL;
+		space->bak   = NULL;
+		space->stats = NULL;
+	}
+	return space;
 }
