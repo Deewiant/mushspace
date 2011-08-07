@@ -1,7 +1,8 @@
 // File created: 2011-08-06 17:33:31
 
-#include "typenames.h"
+#include <stdbool.h>
 
+#include "typenames.h"
 #include "cell.h"
 
 typedef union mushcoords {
@@ -19,3 +20,7 @@ typedef union mushcoords {
 #pragma pack(pop)
 	mushcell v[MUSHSPACE_DIM];
 } mushcoords;
+
+#define mushcoords_contains MUSHSPACE_CAT(mushcoords,_contains)
+
+bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
