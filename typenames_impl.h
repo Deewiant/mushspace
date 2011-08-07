@@ -23,5 +23,6 @@
 #define mush_staticaabb MUSHSPACE_NAME(mush_staticaabb)
 
 #define mush_anamnesic_ring MUSHSPACE_NAME(mush_anamnesic_ring)
+#define mush_memory         MUSHSPACE_NAME(mush_memory)
 
 #endif
