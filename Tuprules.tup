@@ -1,0 +1,28 @@
+# File created: 2011-08-07 16:12:35
+
+CC = gcc
+
+ifeq ($(CC),gcc)
+SRCFLAGS = -Wall -Wextra -pedantic -std=c1x
+GENFLAGS = -fPIC
+
+NATIVEFLAGS          = -march=native
+OPTFLAGS             = -flto -O3
+DEBFLAGS-@(OPTIMIZE) = -g
+endif
+ifeq ($(CC),clang)
+SRCFLAGS = -Wall -Wextra -std=c99
+GENFLAGS = -fPIC
+
+NATIVEFLAGS          = -march=native
+OPTFLAGS             = -O4
+DEBFLAGS-@(OPTIMIZE) = -g
+endif
+
+NATIVEFLAGS-@(NATIVE) = $(NATIVEFLAGS)
+OPTFLAGS-@(OPTIMIZE)  = $(OPTFLAGS)
+
+BOTHFLAGS = $(DEBFLAGS-n) $(OPTFLAGS-y) $(NATIVEFLAGS-y)
+
+CFLAGS    = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS)
+LINKFLAGS = $(GENFLAGS) $(BOTHFLAGS)

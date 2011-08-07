@@ -1,10 +1,9 @@
 # File created: 2011-08-06 16:04:23
 
-CC = gcc -Wall -Wextra -fPIC -pedantic
-CFLAGS = -g
+include_rules
 
-: foreach *.c |> $(CC) $(CFLAGS) -std=c1x -c %f -o %o |> %B.o
-: *.o         |> $(CC) $(CFLAGS) -shared %f -o %o |> libmushspace.so
+: foreach *.c |> $(CC) $(CFLAGS) -c %f -o %o |> %B.o
+: *.o         |> $(CC) $(LINKFLAGS) -shared %f -o %o |> libmushspace.so
 : *.o         |> ar rcs %o %f |> libmushspace.a
 
 .gitignore
