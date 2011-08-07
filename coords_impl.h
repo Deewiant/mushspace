@@ -23,4 +23,8 @@ typedef union mushcoords {
 
 #define mushcoords_contains MUSHSPACE_CAT(mushcoords,_contains)
 
+#define mushcoords_sub MUSHSPACE_CAT(mushcoords,_sub)
+
 bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
+
+mushcoords mushcoords_sub(mushcoords, mushcoords);

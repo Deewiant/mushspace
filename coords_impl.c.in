@@ -12,3 +12,13 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 #endif
 	return true;
 }
+
+#define DEFINE_OP(NAME, OP) \
+	mushcoords mushcoords_##NAME(mushcoords a, mushcoords b) { \
+		mushcoords x = a; \
+		for (unsigned i = 0; i < MUSHSPACE_DIM; ++i) \
+			x.v[i] OP##= b.v[i]; \
+		return x; \
+	}
+
+DEFINE_OP(sub, -)
