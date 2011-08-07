@@ -1,0 +1,7 @@
+// File created: 2011-08-07 18:12:26
+
+#include "staticaabb_impl.h"
+
+bool mush_staticaabb_contains(mushcoords c) {
+	return mushcoords_contains(c, STATICAABB_BEG, STATICAABB_END);
+}

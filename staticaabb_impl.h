@@ -1,7 +1,8 @@
 // File created: 2011-08-06 17:54:41
 
-#include "typenames.h"
+#include <stdbool.h>
 
+#include "typenames.h"
 #include "coords.h"
 
 #if MUSHSPACE_93
@@ -51,3 +52,7 @@ typedef struct mush_staticaabb {
 #endif
 
 } mush_staticaabb;
+
+#define mush_staticaabb_contains MUSHSPACE_CAT(mush_staticaabb,_contains)
+
+bool mush_staticaabb_contains(mushcoords);
