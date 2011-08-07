@@ -21,6 +21,8 @@ struct mushspace {
 
 	mushcoords last_beg, last_end;
 
+	size_t box_count;
+
 	mush_aabb    *boxen;
 	mush_bakaabb *bak;
 	mush_stats   *stats;
@@ -33,6 +35,8 @@ size_t MUSHSPACE_CAT(mushspace,_size)(void) { return sizeof(mushspace); }
 mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (space) {
+		space->box_count = 0;
+
 		space->boxen = NULL;
 		space->bak   = NULL;
 		space->stats = NULL;
@@ -40,6 +44,12 @@ mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp) {
 		memset(space->static_box.array, ' ', sizeof space->static_box.array);
 	}
 	return space;
+}
+
+void MUSHSPACE_CAT(mushspace,_free)(mushspace* space) {
+	for (size_t i = space->box_count; i--;)
+		free(space->boxen[i].data);
+	free(space->boxen);
 }
 
 void MUSHSPACE_CAT(mushspace,_set_stats)(mushspace* space, mush_stats* stats) {
