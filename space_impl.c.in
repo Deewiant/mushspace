@@ -41,3 +41,7 @@ mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp) {
 	}
 	return space;
 }
+
+void MUSHSPACE_CAT(mushspace,_set_stats)(mushspace* space, mush_stats* stats) {
+	space->stats = stats;
+}
