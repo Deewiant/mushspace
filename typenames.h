@@ -3,9 +3,9 @@
 #ifndef MUSHSPACE_TYPENAMES_H
 #define MUSHSPACE_TYPENAMES_H
 
-#pragma push_macro("INCLUDEE")
-#undef INCLUDEE
-#define INCLUDEE "typenames_impl.h"
-#include "includer.h"
+#define MUSHSPACE_CATHELPER(a,b) a##b
+#define MUSHSPACE_CAT(a,b)  MUSHSPACE_CATHELPER(a,b)
+#define MUSHSPACE_NAME(x)   MUSHSPACE_CAT(MUSHSPACE_CAT(x,MUSHSPACE_DIM),\
+                                          MUSHSPACE_STRUCT_SUFFIX)
 
 #endif

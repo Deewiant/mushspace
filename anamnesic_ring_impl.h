@@ -7,6 +7,9 @@
 #include "aabb.h"
 #include "coords.h"
 
+#define mush_anamnesic_ring MUSHSPACE_NAME(mush_anamnesic_ring)
+#define mush_memory         MUSHSPACE_NAME(mush_memory)
+
 #define MUSH_ANAMNESIC_RING_SIZE 3
 
 typedef struct mush_memory {

@@ -7,5 +7,6 @@
 #undef INCLUDEE
 #define INCLUDEE "anamnesic_ring_impl.h"
 #include "includer.h"
+#pragma pop_macro("INCLUDEE")
 
 #endif

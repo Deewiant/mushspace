@@ -4,10 +4,6 @@
 
 #include <assert.h>
 
-#define mush_aabb_make        MUSHSPACE_CAT(mush_aabb,_make)
-#define mush_aabb_make_unsafe MUSHSPACE_CAT(mush_aabb,_make_unsafe)
-#define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
-
 mush_aabb mush_aabb_make(mushcoords b, mushcoords e) {
 	for (unsigned i = 0; i < MUSHSPACE_DIM; ++i)
 		assert (b.v[i] <= e.v[i]);
@@ -33,7 +29,3 @@ void mush_aabb_finalize(mush_aabb* aabb) {
 	aabb->size *= aabb->end.z - aabb->beg.z + 1;
 #endif
 }
-
-#undef mush_aabb_make
-#undef mush_aabb_make_unsafe
-#undef mush_aabb_finalize

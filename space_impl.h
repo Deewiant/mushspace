@@ -2,9 +2,11 @@
 
 #include <stdlib.h>
 
-#include "typenames.h"
 #include "coords.h"
 #include "stats.h"
+#include "typenames.h"
+
+#define mushspace MUSHSPACE_NAME(mushspace)
 
 typedef struct mushspace mushspace;
 

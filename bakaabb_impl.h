@@ -2,8 +2,10 @@
 
 #include "lib/tommyds/tommyhashdyn.h"
 
-#include "typenames.h"
 #include "coords.h"
+#include "typenames.h"
+
+#define mush_bakaabb MUSHSPACE_NAME(mush_bakaabb)
 
 typedef struct mush_bakaabb {
 	tommy_hashdyn data;

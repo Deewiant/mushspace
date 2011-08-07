@@ -32,7 +32,6 @@
 #define MUSHSPACE_DIM 2
 #include INCLUDEE
 
-#pragma pop_macro("INCLUDEE")
 #pragma pop_macro("MUSHSPACE_STRUCT_SUFFIX")
 #pragma pop_macro("MUSHSPACE_93")
 #pragma pop_macro("MUSHSPACE_DIM")

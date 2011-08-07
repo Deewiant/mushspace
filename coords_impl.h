@@ -2,8 +2,10 @@
 
 #include <stdbool.h>
 
-#include "typenames.h"
 #include "cell.h"
+#include "typenames.h"
+
+#define mushcoords MUSHSPACE_NAME(mushcoords)
 
 typedef union mushcoords {
 #pragma pack(push)
@@ -20,6 +22,11 @@ typedef union mushcoords {
 #pragma pack(pop)
 	mushcell v[MUSHSPACE_DIM];
 } mushcoords;
+
+#define MUSHCOORDS MUSHSPACE_CAT(MUSHCOORDS,MUSHSPACE_DIM)
+#define MUSHCOORDS1(a,b,c) (mushcoords){{.x = a}}
+#define MUSHCOORDS2(a,b,c) (mushcoords){{.x = a, .y = b}}
+#define MUSHCOORDS3(a,b,c) (mushcoords){{.x = a, .y = b, .z = c}}
 
 #define mushcoords_contains MUSHSPACE_CAT(mushcoords,_contains)
 

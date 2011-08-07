@@ -3,11 +3,10 @@
 #ifndef MUSHSPACE_STATICAABB_H
 #define MUSHSPACE_STATICAABB_H
 
-#include "coords.h"
-
 #pragma push_macro("INCLUDEE")
 #undef INCLUDEE
 #define INCLUDEE "staticaabb_impl.h"
 #include "includer.h"
+#pragma pop_macro("INCLUDEE")
 
 #endif

@@ -2,8 +2,10 @@
 
 #include <stdbool.h>
 
-#include "typenames.h"
 #include "coords.h"
+#include "typenames.h"
+
+#define mush_staticaabb MUSHSPACE_NAME(mush_staticaabb)
 
 #if MUSHSPACE_93
 	#undef STATICAABB_SIZE_X

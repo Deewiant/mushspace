@@ -5,9 +5,13 @@
 
 #define INCLUDEE "space_impl.h"
 #include "includer.h"
+#undef INCLUDEE
 
-#define MUSHSPACE_UNDEFINE
-#include "typenames.h"
-#undef MUSHSPACE_UNDEFINE
+// Drop some possibly-confusing names from the namespace.
+#undef mushcoords
+#undef mushcoords_contains
+#undef mushcoords_sub
+#undef mushspace
+#undef mushspace_get
 
 #endif
