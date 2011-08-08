@@ -13,5 +13,8 @@ typedef struct mush_bakaabb {
 } mush_bakaabb;
 
 #define mush_bakaabb_init MUSHSPACE_CAT(mush_bakaabb,_init)
+#define mush_bakaabb_get  MUSHSPACE_CAT(mush_bakaabb,_get)
 
 void mush_bakaabb_init(mush_bakaabb*, mushcoords);
+
+mushcell mush_bakaabb_get(mush_bakaabb*, mushcoords);
