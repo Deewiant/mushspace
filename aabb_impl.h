@@ -25,9 +25,11 @@ typedef struct mush_aabb {
 #define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
 
 #define mush_aabb_contains    MUSHSPACE_CAT(mush_aabb,_contains)
+#define mush_aabb_get         MUSHSPACE_CAT(mush_aabb,_get)
 
 mush_aabb mush_aabb_make       (mushcoords, mushcoords);
 mush_aabb mush_aabb_make_unsafe(mushcoords, mushcoords);
 void      mush_aabb_finalize   (mush_aabb*);
 
 bool     mush_aabb_contains(const mush_aabb*, mushcoords);
+mushcell mush_aabb_get     (const mush_aabb*, mushcoords);
