@@ -68,6 +68,9 @@ mushcell mushspace_get(mushspace* space, mushcoords c) {
 	if (mushspace_find_box(space, c, &box))
 		return mush_aabb_get(box, c);
 
+	if (space->bak)
+		return mush_bakaabb_get(space->bak, c);
+
 	return ' ';
 }
 
