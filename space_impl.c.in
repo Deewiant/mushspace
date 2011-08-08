@@ -30,6 +30,10 @@ struct mushspace {
 	mush_staticaabb static_box;
 };
 
+#define mushspace_find_box MUSHSPACE_CAT(mushspace,_find_box)
+static bool mushspace_find_box(
+	const mushspace*, mushcoords, const mush_aabb**);
+
 size_t MUSHSPACE_CAT(mushspace,_size)(void) { return sizeof(mushspace); }
 
 mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mush_stats* stats) {
@@ -59,5 +63,22 @@ mushcell mushspace_get(mushspace* space, mushcoords c) {
 	++space->stats->lookups;
 	if (mush_staticaabb_contains(c))
 		return mush_staticaabb_get(&space->static_box, c);
+
+	const mush_aabb* box;
+	if (mushspace_find_box(space, c, &box))
+		return mush_aabb_get(box, c);
+
 	return ' ';
+}
+
+static bool mushspace_find_box(
+	const mushspace* space, mushcoords c, const mush_aabb** box)
+{
+	for (size_t i = 0; i < space->box_count; ++i) {
+		if (mush_aabb_contains(&space->boxen[i], c)) {
+			*box = &space->boxen[i];
+			return true;
+		}
+	}
+	return false;
 }
