@@ -29,3 +29,7 @@ void mush_aabb_finalize(mush_aabb* aabb) {
 	aabb->size *= aabb->end.z - aabb->beg.z + 1;
 #endif
 }
+
+bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
+	return mushcoords_contains(c, aabb->beg, aabb->end);
+}

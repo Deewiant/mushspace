@@ -24,6 +24,10 @@ typedef struct mush_aabb {
 #define mush_aabb_make_unsafe MUSHSPACE_CAT(mush_aabb,_make_unsafe)
 #define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
 
+#define mush_aabb_contains    MUSHSPACE_CAT(mush_aabb,_contains)
+
 mush_aabb mush_aabb_make       (mushcoords, mushcoords);
 mush_aabb mush_aabb_make_unsafe(mushcoords, mushcoords);
 void      mush_aabb_finalize   (mush_aabb*);
+
+bool     mush_aabb_contains(const mush_aabb*, mushcoords);
