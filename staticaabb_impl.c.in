@@ -31,3 +31,8 @@ mushcell mush_staticaabb_get(const mush_staticaabb* aabb, mushcoords p) {
 	assert (mush_staticaabb_contains(p));
 	return aabb->array[mush_staticaabb_get_idx(p)];
 }
+
+void mush_staticaabb_put(mush_staticaabb* aabb, mushcoords p, mushcell c) {
+	assert (mush_staticaabb_contains(p));
+	aabb->array[mush_staticaabb_get_idx(p)] = c;
+}
