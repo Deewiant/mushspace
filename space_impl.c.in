@@ -85,3 +85,65 @@ static bool mushspace_find_box(
 	}
 	return false;
 }
+
+#if MUSHSPACE_93
+static void mushspace_bef93load_string(mushspace*, const char*, size_t len);
+#endif
+
+void MUSHSPACE_CAT(mushspace,_load_string)(
+	mushspace* space, const char* str, size_t len
+#if !MUSHSPACE_93
+	, mushcoords* end, mushcoords target, bool binary
+#endif
+	)
+{
+#if MUSHSPACE_93
+	mushspace_bef93load_string(space, str, len);
+#else
+#endif
+}
+
+#if MUSHSPACE_93
+static bool mushspace_bef93newline(bool* got_cr, mushcoords* pos) {
+	*got_cr = false;
+	pos->x = 0;
+	return ++pos->y >= 25;
+}
+static void mushspace_bef93load_string(
+	mushspace* space, const char* str, size_t len)
+{
+	bool got_cr = false;
+	mushcoords pos = MUSHCOORDS(0,0,0);
+
+	for (size_t i = 0; i < len; ++i) {
+		char c = str[i];
+
+		switch (c) {
+		case '\r': got_cr = true; break;
+		case '\n': if (mushspace_bef93newline(&got_cr, &pos)) return; break;
+		default:
+			if (got_cr && mushspace_bef93newline(&got_cr, &pos))
+				return;
+
+			if (c != ' ')
+				mush_staticaabb_put(&space->static_box, pos, c);
+
+			if (++pos.x < 80)
+				break;
+
+			// Skip to and past EOL after column 80.
+			while (++i < len) {
+				c = str[i];
+				switch (c) {
+				case '\r': got_cr = true; break;
+				default:   if (!got_cr) break;
+				case '\n': if (mushspace_bef93newline(&got_cr, &pos)) return;
+				           goto skipped;
+				}
+			}
+skipped:
+			break;
+		}
+	}
+}
+#endif
