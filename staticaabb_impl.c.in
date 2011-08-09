@@ -27,7 +27,7 @@ bool mush_staticaabb_contains(mushcoords c) {
 	return mushcoords_contains(c, STATICAABB_BEG, STATICAABB_END);
 }
 
-mushcell mush_staticaabb_get(mush_staticaabb* aabb, mushcoords c) {
-	assert (mush_staticaabb_contains(c));
-	return aabb->array[mush_staticaabb_get_idx(c)];
+mushcell mush_staticaabb_get(const mush_staticaabb* aabb, mushcoords p) {
+	assert (mush_staticaabb_contains(p));
+	return aabb->array[mush_staticaabb_get_idx(p)];
 }

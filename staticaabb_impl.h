@@ -60,4 +60,4 @@ typedef struct mush_staticaabb {
 
 bool mush_staticaabb_contains(mushcoords);
 
-mushcell mush_staticaabb_get(mush_staticaabb*, mushcoords);
+mushcell mush_staticaabb_get(const mush_staticaabb*, mushcoords);
