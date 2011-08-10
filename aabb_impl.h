@@ -23,6 +23,7 @@ typedef struct mush_aabb {
 #define mush_aabb_make        MUSHSPACE_CAT(mush_aabb,_make)
 #define mush_aabb_make_unsafe MUSHSPACE_CAT(mush_aabb,_make_unsafe)
 #define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
+#define mush_aabb_alloc       MUSHSPACE_CAT(mush_aabb,_alloc)
 
 #define mush_aabb_volume_on MUSHSPACE_CAT(mush_aabb,_volume_on)
 
@@ -41,6 +42,7 @@ typedef struct mush_aabb {
 void mush_aabb_make       (mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_make_unsafe(mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_finalize   (mush_aabb*);
+bool mush_aabb_alloc      (mush_aabb*);
 
 size_t mush_aabb_volume_on(const mush_aabb*, mushucell axis);
 

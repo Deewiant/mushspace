@@ -3,6 +3,7 @@
 #include "aabb_impl.h"
 
 #include <assert.h>
+#include <string.h>
 
 void mush_aabb_make(mush_aabb* aabb, mushcoords b, mushcoords e) {
 	for (unsigned i = 0; i < MUSHSPACE_DIM; ++i)
@@ -27,6 +28,14 @@ void mush_aabb_finalize(mush_aabb* aabb) {
 	aabb->area  = aabb->size;
 	aabb->size *= aabb->end.z - aabb->beg.z + 1;
 #endif
+}
+
+bool mush_aabb_alloc(mush_aabb* aabb) {
+	aabb->data = malloc(aabb->size);
+	if (!aabb->data)
+		return false;
+	memset(aabb->data, ' ', aabb->size);
+	return true;
 }
 
 size_t mush_aabb_volume_on(const mush_aabb* aabb, mushucell axis) {
