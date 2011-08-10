@@ -24,8 +24,9 @@ typedef struct mush_aabb {
 #define mush_aabb_make_unsafe MUSHSPACE_CAT(mush_aabb,_make_unsafe)
 #define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
 
-#define mush_aabb_contains    MUSHSPACE_CAT(mush_aabb,_contains)
-#define mush_aabb_get         MUSHSPACE_CAT(mush_aabb,_get)
+#define mush_aabb_get           MUSHSPACE_CAT(mush_aabb,_get)
+#define mush_aabb_contains      MUSHSPACE_CAT(mush_aabb,_contains)
+#define mush_aabb_safe_contains MUSHSPACE_CAT(mush_aabb,_safe_contains)
 
 #define mush_aabb_get_idx           MUSHSPACE_CAT(mush_aabb,_get_idx)
 #define mush_aabb_get_idx_no_offset MUSHSPACE_CAT(mush_aabb,_get_idx_no_offset)
@@ -34,8 +35,11 @@ void mush_aabb_make       (mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_make_unsafe(mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_finalize   (mush_aabb*);
 
-bool     mush_aabb_contains(const mush_aabb*, mushcoords);
 mushcell mush_aabb_get     (const mush_aabb*, mushcoords);
+bool     mush_aabb_contains(const mush_aabb*, mushcoords);
+
+// Works even if the AABB is an unsafe box with beg > end.
+bool mush_aabb_safe_contains(const mush_aabb*, mushcoords);
 
 size_t mush_aabb_get_idx          (const mush_aabb*, mushcoords);
 size_t mush_aabb_get_idx_no_offset(const mush_aabb*, mushcoords);

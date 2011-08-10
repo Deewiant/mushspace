@@ -29,12 +29,24 @@ void mush_aabb_finalize(mush_aabb* aabb) {
 #endif
 }
 
-bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
-	return mushcoords_contains(c, aabb->beg, aabb->end);
-}
 mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
 	assert (mush_aabb_contains(aabb, c));
 	return aabb->data[mush_aabb_get_idx(aabb, c)];
+}
+bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
+	return mushcoords_contains(c, aabb->beg, aabb->end);
+}
+
+bool mush_aabb_safe_contains(const mush_aabb* aabb, mushcoords c) {
+	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+		if (aabb->beg.v[i] > aabb->end.v[i]) {
+			if (!(c.v[i] >= aabb->beg.v[i] || c.v[i] <= aabb->end.v[i]))
+				return false;
+		} else
+			if (!(c.v[i] >= aabb->beg.v[i] && c.v[i] <= aabb->end.v[i]))
+				return false;
+	}
+	return true;
 }
 
 size_t mush_aabb_get_idx(const mush_aabb* aabb, mushcoords c) {
