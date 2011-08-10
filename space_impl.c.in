@@ -60,7 +60,7 @@ void MUSHSPACE_CAT(mushspace,_free)(mushspace* space) {
 }
 
 mushcell mushspace_get(mushspace* space, mushcoords c) {
-	++space->stats->lookups;
+	mushstats_add(space->stats, MushStat_lookups, 1);
 	if (mush_staticaabb_contains(c))
 		return mush_staticaabb_get(&space->static_box, c);
 
