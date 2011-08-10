@@ -1,6 +1,7 @@
 // File created: 2011-08-06 17:54:41
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "coords.h"
 #include "typenames.h"
@@ -59,7 +60,14 @@ typedef struct mush_staticaabb {
 #define mush_staticaabb_get      MUSHSPACE_CAT(mush_staticaabb,_get)
 #define mush_staticaabb_put      MUSHSPACE_CAT(mush_staticaabb,_put)
 
+#define mush_staticaabb_get_idx MUSHSPACE_CAT(mush_staticaabb,_get_idx)
+#define mush_staticaabb_get_idx_no_offset \
+	MUSHSPACE_CAT(mush_staticaabb,_get_idx_no_offset)
+
 bool mush_staticaabb_contains(mushcoords);
 
 mushcell mush_staticaabb_get(const mush_staticaabb*, mushcoords);
 void     mush_staticaabb_put(      mush_staticaabb*, mushcoords, mushcell);
+
+size_t mush_staticaabb_get_idx          (mushcoords);
+size_t mush_staticaabb_get_idx_no_offset(mushcoords);
