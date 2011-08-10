@@ -34,8 +34,20 @@ typedef union mushcoords {
 
 #define mushcoords_max_into MUSHSPACE_CAT(mushcoords,_max_into)
 
+#define mushcoords_get_end_of_contiguous_range \
+	MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
+
 bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
 
 mushcoords mushcoords_sub(mushcoords, mushcoords);
 
 void mushcoords_max_into(mushcoords*, mushcoords);
+
+mushcoords mushcoords_get_end_of_contiguous_range(
+	mushcoords  end_pt,
+	mushcoords* from,
+	mushcoords  to,
+	mushcoords  orig_beg,
+	bool*       reached_to,
+	mushcoords  tessell_beg,
+	mushcoords  area_beg);
