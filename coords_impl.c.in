@@ -13,12 +13,12 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 	return true;
 }
 
-#define DEFINE_OP(NAME, OP) \
+#define DEFINE_OP(NAME) \
 	mushcoords mushcoords_##NAME(mushcoords a, mushcoords b) { \
 		mushcoords x = a; \
 		for (unsigned i = 0; i < MUSHSPACE_DIM; ++i) \
-			x.v[i] OP##= b.v[i]; \
+			x.v[i] = mushcell_##NAME(x.v[i], b.v[i]); \
 		return x; \
 	}
 
-DEFINE_OP(sub, -)
+DEFINE_OP(sub)
