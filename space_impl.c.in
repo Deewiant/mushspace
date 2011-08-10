@@ -25,7 +25,7 @@ struct mushspace {
 
 	mush_aabb    *boxen;
 	mush_bakaabb *bak;
-	mush_stats   *stats;
+	mushstats    *stats;
 
 	mush_staticaabb static_box;
 };
@@ -36,7 +36,7 @@ static bool mushspace_find_box(
 
 size_t MUSHSPACE_CAT(mushspace,_size)(void) { return sizeof(mushspace); }
 
-mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mush_stats* stats) {
+mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (space) {
 		space->box_count = 0;

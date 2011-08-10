@@ -5,8 +5,8 @@
 
 #include <stdint.h>
 
-typedef struct mush_stats {
+typedef struct mushstats {
 	uint64_t lookups;
-} mush_stats;
+} mushstats;
 
 #endif

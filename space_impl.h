@@ -14,7 +14,7 @@ typedef struct mushspace mushspace;
 #define mushspace_get MUSHSPACE_CAT(mushspace,_get)
 
 size_t     MUSHSPACE_CAT(mushspace,_size)    (void);
-mushspace *MUSHSPACE_CAT(mushspace,_allocate)(void*, mush_stats*);
+mushspace *MUSHSPACE_CAT(mushspace,_allocate)(void*, mushstats*);
 void       MUSHSPACE_CAT(mushspace,_free)    (mushspace*);
 
 mushcell mushspace_get(mushspace*, mushcoords);
