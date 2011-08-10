@@ -22,17 +22,16 @@ static size_t mush_aabb_get_idx(const mush_aabb* aabb, mushcoords c) {
 	return mush_aabb_get_idx_no_offset(aabb, mushcoords_sub(c, aabb->beg));
 }
 
-mush_aabb mush_aabb_make(mushcoords b, mushcoords e) {
+void mush_aabb_make(mush_aabb* aabb, mushcoords b, mushcoords e) {
 	for (unsigned i = 0; i < MUSHSPACE_DIM; ++i)
 		assert (b.v[i] <= e.v[i]);
 
-	mush_aabb aabb = mush_aabb_make_unsafe(b, e);
-	mush_aabb_finalize(&aabb);
-	return aabb;
+	mush_aabb_make_unsafe(aabb, b, e);
+	mush_aabb_finalize(aabb);
 }
 
-mush_aabb mush_aabb_make_unsafe(mushcoords b, mushcoords e) {
-	return (mush_aabb){.beg = b, .end = e};
+void mush_aabb_make_unsafe(mush_aabb* aabb, mushcoords b, mushcoords e) {
+	*aabb = (mush_aabb){.beg = b, .end = e};
 }
 
 void mush_aabb_finalize(mush_aabb* aabb) {
