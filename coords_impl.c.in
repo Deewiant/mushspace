@@ -22,3 +22,8 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 	}
 
 DEFINE_OP(sub)
+
+void mushcoords_max_into(mushcoords* a, mushcoords b) {
+	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i)
+		a->v[i] = mushcell_max(a->v[i], b.v[i]);
+}

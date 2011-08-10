@@ -32,6 +32,10 @@ typedef union mushcoords {
 
 #define mushcoords_sub MUSHSPACE_CAT(mushcoords,_sub)
 
+#define mushcoords_max_into MUSHSPACE_CAT(mushcoords,_max_into)
+
 bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
 
 mushcoords mushcoords_sub(mushcoords, mushcoords);
+
+void mushcoords_max_into(mushcoords*, mushcoords);
