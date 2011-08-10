@@ -29,6 +29,18 @@ void mush_aabb_finalize(mush_aabb* aabb) {
 #endif
 }
 
+size_t mush_aabb_volume_on(const mush_aabb* aabb, mushucell axis) {
+	assert (axis < MUSHSPACE_DIM);
+#if MUSHSPACE_DIM >= 2
+	if (axis == 1) return aabb->width;
+#if MUSHSPACE_DIM >= 3
+	if (axis == 2) return aabb->area;
+#endif
+#endif
+	(void)aabb; (void)axis;
+	return 1;
+}
+
 mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
 	assert (mush_aabb_contains(aabb, c));
 	return aabb->data[mush_aabb_get_idx(aabb, c)];
