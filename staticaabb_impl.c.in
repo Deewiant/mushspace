@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 bool mush_staticaabb_contains(mushcoords c) {
-	return mushcoords_contains(c, STATICAABB_BEG, STATICAABB_END);
+	return mushcoords_contains(c, MUSH_STATICAABB_BEG, MUSH_STATICAABB_END);
 }
 
 mushcell mush_staticaabb_get(const mush_staticaabb* aabb, mushcoords p) {
@@ -20,14 +20,15 @@ void mush_staticaabb_put(mush_staticaabb* aabb, mushcoords p, mushcell c) {
 }
 
 size_t mush_staticaabb_get_idx(mushcoords c) {
-	return mush_staticaabb_get_idx_no_offset(mushcoords_sub(c, STATICAABB_BEG));
+	return mush_staticaabb_get_idx_no_offset(
+		mushcoords_sub(c, MUSH_STATICAABB_BEG));
 }
 size_t mush_staticaabb_get_idx_no_offset(mushcoords c) {
 	size_t i = c.x;
 #if MUSHSPACE_DIM >= 2
-	i += STATICAABB_SIZE.x * c.y;
+	i += MUSH_STATICAABB_SIZE.x * c.y;
 #if MUSHSPACE_DIM >= 3
-	i += STATICAABB_SIZE.y * c.z;
+	i += MUSH_STATICAABB_SIZE.y * c.z;
 #endif
 #endif
 	return i;
