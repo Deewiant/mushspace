@@ -77,3 +77,10 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 #endif
 	return i;
 }
+
+bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
+	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i)
+		if (a->beg.v[i] > b->end.v[i] || b->beg.v[i] > a->end.v[i])
+			return false;
+	return true;
+}
