@@ -14,4 +14,10 @@ typedef unsigned long mushucell;
 mushcell mushcell_max(mushcell, mushcell);
 mushcell mushcell_min(mushcell, mushcell);
 
+// Deal with signed overflow/underflow by wrapping around the way Gawd
+// intended.
+mushcell mushcell_add(mushcell, mushcell);
+mushcell mushcell_sub(mushcell, mushcell);
+mushcell mushcell_inc(mushcell);
+
 #endif
