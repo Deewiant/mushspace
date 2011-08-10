@@ -11,4 +11,7 @@ typedef unsigned long mushucell;
 #define MUSHCELL_MIN LONG_MIN
 #define MUSHCELL_MAX LONG_MAX
 
+mushcell mushcell_max(mushcell, mushcell);
+mushcell mushcell_min(mushcell, mushcell);
+
 #endif
