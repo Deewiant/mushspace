@@ -35,6 +35,9 @@ typedef struct mush_aabb {
 
 #define mush_aabb_overlaps MUSHSPACE_CAT(mush_aabb,_overlaps)
 
+#define mush_aabb_tessellate  MUSHSPACE_CAT(mush_aabb,_tessellate)
+#define mush_aabb_tessellate1 MUSHSPACE_CAT(mush_aabb,_tessellate1)
+
 void mush_aabb_make       (mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_make_unsafe(mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_finalize   (mush_aabb*);
@@ -51,3 +54,9 @@ size_t mush_aabb_get_idx          (const mush_aabb*, mushcoords);
 size_t mush_aabb_get_idx_no_offset(const mush_aabb*, mushcoords);
 
 bool mush_aabb_overlaps(const mush_aabb*, const mush_aabb*);
+
+void mush_aabb_tessellate(
+	mushcoords, const mush_aabb*, size_t, mushcoords*, mushcoords*);
+
+void mush_aabb_tessellate1(
+	mushcoords, mushcoords, mushcoords, mushcoords*, mushcoords*);

@@ -84,3 +84,67 @@ bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
 			return false;
 	return true;
 }
+
+// Modifies the given beg/end pair to give a box which contains the given
+// coordinates but doesn't overlap with any of the given boxes. The coordinates
+// should, of course, be already contained between the beg and end.
+void mush_aabb_tessellate(
+	mushcoords pos, const mush_aabb* bs, size_t len,
+	mushcoords* beg, mushcoords* end)
+{
+	assert (mushcoords_contains(pos, *beg, *end));
+
+	for (size_t i = 0; i < len; ++i)
+		mush_aabb_tessellate1(pos, bs[i].beg, bs[i].end, beg, end);
+}
+
+// Since the algorithm is currently just a fold over the boxes, this simpler
+// version exists to avoid heap allocation in some cases.
+void mush_aabb_tessellate1(
+	mushcoords pos, mushcoords avoid_beg, mushcoords avoid_end,
+	mushcoords* beg, mushcoords* end)
+{
+	assert (mushcoords_contains(pos, *beg, *end));
+
+	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+		// This could be improved, consider for instance the bottommost box in
+		// the following graphic and its current tessellation:
+		//
+		// +-------+    +--*--*-+
+		// |       |    |X .  . |
+		// |       |    |  .  . |
+		// |     +---   *..*..+---
+		// |     |      |  .  |
+		// |  +--|      *..+--|
+		// |  |  |      |  |  |
+		// |  |  |      |  |  |
+		// +--|  |      +--|  |
+		//
+		// (Note that this isn't actually a tessellation: all points will get
+		// a rectangle containing the rectangle at X.)
+		//
+		// Any of the following three would be an improvement (and they would
+		// actually be tessellations):
+		//
+		// +--*--*-+    +-------+    +-----*-+
+		// |  .  . |    |       |    |     . |
+		// |  .  . |    |       |    |     . |
+		// |  .  +---   *.....+---   |     +---
+		// |  .  |      |     |      |     |
+		// |  +--|      *..+--|      *..+--|
+		// |  |  |      |  |  |      |  |  |
+		// |  |  |      |  |  |      |  |  |
+		// +--|  |      +--|  |      +--|  |
+
+		mushcell ab = avoid_beg.v[i],
+		         ae = avoid_end.v[i],
+		         p  = pos.v[i];
+		if (ae < p) beg->v[i] = mushcell_max(beg->v[i], ae+1);
+		if (ab > p) end->v[i] = mushcell_min(end->v[i], ab-1);
+	}
+
+	mush_aabb box, abox;
+	mush_aabb_make_unsafe(&box, *beg, *end);
+	mush_aabb_make_unsafe(&abox, avoid_beg, avoid_end);
+	assert (!mush_aabb_overlaps(&box, &abox));
+}
