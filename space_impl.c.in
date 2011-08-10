@@ -30,9 +30,17 @@ struct mushspace {
 	mush_staticaabb static_box;
 };
 
-#define mushspace_find_box MUSHSPACE_CAT(mushspace,_find_box)
+#define mushspace_find_box  MUSHSPACE_CAT(mushspace,_find_box)
+#define mushspace_place_box MUSHSPACE_CAT(mushspace,_place_box)
+
 static bool mushspace_find_box(
 	const mushspace*, mushcoords, const mush_aabb**);
+
+#if MUSHSPACE_93
+static int mushspace_bef93load_string(mushspace*, const char*, size_t len);
+#else
+static bool mushspace_place_box(mushspace*, mush_aabb*);
+#endif
 
 size_t MUSHSPACE_CAT(mushspace,_size)(void) { return sizeof(mushspace); }
 
@@ -86,8 +94,20 @@ static bool mushspace_find_box(
 	return false;
 }
 
-#if MUSHSPACE_93
-static int mushspace_bef93load_string(mushspace*, const char*, size_t len);
+#if !MUSHSPACE_93
+static bool mushspace_place_box(mushspace* space, mush_aabb* aabb) {
+
+	if (!mush_aabb_alloc(aabb))
+		return false;
+
+	mush_aabb *boxen = realloc(space->boxen, ++space->box_count * sizeof *aabb);
+	if (!boxen)
+		return false;
+
+	space->boxen = boxen;
+	space->boxen[space->box_count-1] = *aabb;
+	return true;
+}
 #endif
 
 int MUSHSPACE_CAT(mushspace,_load_string)(
