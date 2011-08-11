@@ -9,8 +9,10 @@
 
 typedef struct mushstats {
 #ifdef ENABLE_STATS
-	uint64_t lookups;
-	uint64_t assignments;
+	uint64_t
+		lookups,
+		assignments,
+		boxes_incorporated;
 #else
 	char unused;
 #endif
@@ -19,6 +21,7 @@ typedef struct mushstats {
 typedef enum {
 	MushStat_lookups,
 	MushStat_assignments,
+	MushStat_boxes_incorporated,
 } MushStat;
 
 void mushstats_add(mushstats*, MushStat, uint64_t);
