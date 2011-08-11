@@ -94,6 +94,10 @@ bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
 	return true;
 }
 
+bool mush_aabb_contains_box(const mush_aabb* a, const mush_aabb* b) {
+	return mush_aabb_contains(a, b->beg) && mush_aabb_contains(a, b->end);
+}
+
 // Modifies the given beg/end pair to give a box which contains the given
 // coordinates but doesn't overlap with any of the given boxes. The coordinates
 // should, of course, be already contained between the beg and end.
