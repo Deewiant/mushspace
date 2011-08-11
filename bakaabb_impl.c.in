@@ -9,7 +9,7 @@
 
 #define mush_bakaabb_hash MUSHSPACE_CAT(mush_bakaabb,_hash)
 
-static uint32_t mush_bakaabb_hash(mushcoords);
+static size_t mush_bakaabb_hash(mushcoords);
 
 KHASH_INIT(mushcoords, mushcoords, mushcell, true,
            mush_bakaabb_hash, mushcoords_equal)
@@ -24,7 +24,8 @@ mushcell mush_bakaabb_get(mush_bakaabb* bak, mushcoords c) {
 	return kh_value(hash, kh_get(mushcoords, hash, c));
 }
 
-static uint32_t mush_bakaabb_hash(mushcoords c) {
+static size_t mush_bakaabb_hash(mushcoords c) {
+#if SIZE_MAX == 0xffffffff
 	// MurmurHash3_x86_32
 	uint32_t h = 0;
 
@@ -55,4 +56,7 @@ static uint32_t mush_bakaabb_hash(mushcoords c) {
 	h ^= h >> 16;
 
 	return h;
+#else
+#error No hash function for a size_t of this size!
+#endif
 }

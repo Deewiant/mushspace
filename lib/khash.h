@@ -87,9 +87,9 @@ int main() {
 #define AC_CATH(A,B) A##B
 #define AC_CAT(A,B) AC_CATH(A,B)
 
-typedef uint32_t khint_t;
-typedef khint_t khiter_t;
+typedef size_t khint_t, khiter_t;
 
+#if SIZE_MAX <= 0xffffffff
 #define __ac_HASH_PRIME_SIZE 32
 static const uint32_t __ac_prime_list[__ac_HASH_PRIME_SIZE] =
 {
@@ -101,6 +101,36 @@ static const uint32_t __ac_prime_list[__ac_HASH_PRIME_SIZE] =
   100663319ul,  201326611ul,  402653189ul,  805306457ul,  1610612741ul,
   3221225473ul, 4294967291ul
 };
+#elif SIZE_MAX <= 0xffffffffffffffff
+#define __ac_HASH_PRIME_SIZE 64
+static const uint64_t __ac_prime_list[__ac_HASH_PRIME_SIZE] =
+{
+  0ull,                   3ull,                   11ull,
+  23ull,                  53ull,                  97ull,
+  193ull,                 389ull,                 769ull,
+  1543ull,                3079ull,                6151ull,
+  12289ull,               24593ull,               49157ull,
+  98317ull,               196613ull,              393241ull,
+  786433ull,              1572869ull,             3145739ull,
+  6291469ull,             12582917ull,            25165843ull,
+  50331653ull,            100663319ull,           201326611ull,
+  402653189ull,           805306457ull,           1610612741ull,
+  3221225473ull,          6442450939ull,          12884901877ull,
+  25769803751ull,         51539607503ull,         103079215007ull,
+  206158430017ull,        412316860027ull,        824633720047ull,
+  1649267440087ull,       3298534880167ull,       6597069760331ull,
+  13194139520663ull,      26388279041353ull,      52776558082697ull,
+  105553116165401ull,     211106232330821ull,     422212464661667ull,
+  844424929323337ull,     1688849858646677ull,    3377699717293357ull,
+  6755399434586741ull,    13510798869173477ull,   27021597738346961ull,
+  54043195476693911ull,   108086390953387817ull,  216172781906775641ull,
+  432345563813551279ull,  864691127627102579ull,  1729382255254205147ull,
+  3458764510508410273ull, 6917529021016820543ull, 13835058042033641131ull,
+  18446744073709551557ull
+};
+#else
+#error No prime numbers bigger than 1<<64-1 exist!
+#endif
 
 #define __ac_isempty(flag, i) ((flag[i>>4]>>((i&0xfU)<<1))&2)
 #define __ac_isdel(flag, i) ((flag[i>>4]>>((i&0xfU)<<1))&1)
