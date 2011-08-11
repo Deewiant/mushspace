@@ -169,7 +169,7 @@ static const double __ac_HASH_UPPER = 0.77;
 			h->size = h->n_occupied = 0;                                   \
 		}                                                                 \
 	}                                                                    \
-	static inline khint_t AC_CAT(kh_get_,name)(khash_t(name) *h, khkey_t key) \
+	static inline khint_t AC_CAT(kh_get_,name)(const khash_t(name) *h, khkey_t key) \
 	{                                                                    \
 		if (h->n_buckets) {                                               \
 			khint_t inc, k, i, last;                                       \
