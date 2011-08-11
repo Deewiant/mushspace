@@ -15,4 +15,4 @@ typedef struct mush_bakaabb {
 
 void mush_bakaabb_init(mush_bakaabb*, mushcoords);
 
-mushcell mush_bakaabb_get(mush_bakaabb*, mushcoords);
+mushcell mush_bakaabb_get(const mush_bakaabb*, mushcoords);

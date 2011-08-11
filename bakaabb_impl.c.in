@@ -19,8 +19,8 @@ void mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
 	bak->beg = bak->end = c;
 }
 
-mushcell mush_bakaabb_get(mush_bakaabb* bak, mushcoords c) {
-	khash_t(mushcoords) *hash = bak->data;
+mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
+	const khash_t(mushcoords) *hash = bak->data;
 	return kh_value(hash, kh_get(mushcoords, hash, c));
 }
 
