@@ -26,6 +26,18 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 
 DEFINE_OP(sub)
 
+bool mushcoords_equal(mushcoords a, mushcoords b) {
+	// Yes, peeling the loop is worth it.
+	return a.v[0] == b.v[0]
+#if MUSHSPACE_DIM >= 2
+	    && a.v[1] == b.v[1]
+#if MUSHSPACE_DIM >= 3
+	    && a.v[2] == b.v[2]
+#endif
+#endif
+	;
+}
+
 void mushcoords_max_into(mushcoords* a, mushcoords b) {
 	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i)
 		a->v[i] = mushcell_max(a->v[i], b.v[i]);

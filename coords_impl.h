@@ -30,7 +30,8 @@ typedef union mushcoords {
 
 #define mushcoords_contains MUSHSPACE_CAT(mushcoords,_contains)
 
-#define mushcoords_sub MUSHSPACE_CAT(mushcoords,_sub)
+#define mushcoords_sub   MUSHSPACE_CAT(mushcoords,_sub)
+#define mushcoords_equal MUSHSPACE_CAT(mushcoords,_equal)
 
 #define mushcoords_max_into MUSHSPACE_CAT(mushcoords,_max_into)
 
@@ -39,7 +40,8 @@ typedef union mushcoords {
 
 bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
 
-mushcoords mushcoords_sub(mushcoords, mushcoords);
+mushcoords mushcoords_sub  (mushcoords, mushcoords);
+bool       mushcoords_equal(mushcoords, mushcoords);
 
 void mushcoords_max_into(mushcoords*, mushcoords);
 
