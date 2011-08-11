@@ -3,18 +3,32 @@
 #include "bakaabb_impl.h"
 
 #include <assert.h>
+#include <stdint.h>
 
-#include "lib/tommyds/tommyhashdyn.h"
+#include "lib/khash.h"
 
-#define mush_bakaabb_hash    MUSHSPACE_CAT(mush_bakaabb,_hash)
-#define mush_bakaabb_compare MUSHSPACE_CAT(mush_bakaabb,_compare)
+#define mush_bakaabb_hash MUSHSPACE_CAT(mush_bakaabb,_hash)
 
-static tommy_hash_t mush_bakaabb_hash(mushcoords c) {
+static uint32_t mush_bakaabb_hash(mushcoords);
+
+KHASH_INIT(mushcoords, mushcoords, mushcell, true,
+           mush_bakaabb_hash, mushcoords_equal)
+
+void mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
+	bak->data = kh_init(mushcoords);
+	bak->beg = bak->end = c;
+}
+
+mushcell mush_bakaabb_get(mush_bakaabb* bak, mushcoords c) {
+	khash_t(mushcoords) *hash = bak->data;
+	return kh_value(hash, kh_get(mushcoords, hash, c));
+}
+
+static uint32_t mush_bakaabb_hash(mushcoords c) {
 	// MurmurHash3_x86_32
 	uint32_t h = 0;
 
-	assert (sizeof(tommy_hash_t) == sizeof h);
-	assert (sizeof c % sizeof(tommy_hash_t) == 0);
+	assert ((sizeof c) % 4 == 0);
 
 	const uint8_t *data = (const uint8_t*)&c;
 	static const int nblocks = (sizeof c) / 4;
@@ -41,25 +55,4 @@ static tommy_hash_t mush_bakaabb_hash(mushcoords c) {
 	h ^= h >> 16;
 
 	return h;
-}
-
-static int mush_bakaabb_compare(const void* a, const void *b) {
-	const mushcoords *m = a, *n = b;
-
-	for (unsigned i = MUSHSPACE_DIM; i--;)
-		if (m->v[i] != n->v[i])
-			return m->v[i] < n->v[i] ? -1 : 1;
-	return 0;
-}
-
-void mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
-	bak->data = malloc(sizeof(tommy_hashdyn));
-	tommy_hashdyn_init(bak->data);
-	bak->beg = bak->end = c;
-}
-
-mushcell mush_bakaabb_get(mush_bakaabb* bak, mushcoords c) {
-	const mushcell *p = tommy_hashdyn_search(bak->data, mush_bakaabb_compare,
-	                                         &c, mush_bakaabb_hash(c));
-	return *p;
 }

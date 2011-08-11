@@ -1,7 +1,0 @@
-# File created: 2011-08-07 16:04:21
-
-include_rules
-
-: foreach *.c |> $(CC) $(LIBCFLAGS) -c %f -o %o |> %B.o
-
-.gitignore
