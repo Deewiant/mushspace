@@ -7,6 +7,8 @@
 
 #include "lib/khash.h"
 
+struct mush_bakaabb_iter { khiter_t k; };
+
 #define mush_bakaabb_hash MUSHSPACE_CAT(mush_bakaabb,_hash)
 
 static size_t mush_bakaabb_hash(mushcoords);
@@ -27,6 +29,44 @@ mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
 size_t mush_bakaabb_size(const mush_bakaabb* bak) {
 	const khash_t(mushcoords) *hash = bak->data;
 	return kh_size(hash);
+}
+
+mush_bakaabb_iter* mush_bakaabb_it_start(const mush_bakaabb* bak) {
+	mush_bakaabb_iter* it = malloc(sizeof *it);
+	if (it) {
+		const khash_t(mushcoords) *hash = bak->data;
+		*it = (mush_bakaabb_iter){ kh_begin(hash) };
+	}
+	return it;
+}
+void mush_bakaabb_it_stop(mush_bakaabb_iter* it) { free(it); }
+
+bool mush_bakaabb_it_done(const mush_bakaabb_iter* it, const mush_bakaabb* bak)
+{
+	const khash_t(mushcoords) *hash = bak->data;
+	return it->k != kh_end(hash);
+}
+
+void mush_bakaabb_it_next(mush_bakaabb_iter* it, const mush_bakaabb* bak) {
+	(void)bak;
+	++it->k;
+}
+void mush_bakaabb_it_remove(mush_bakaabb_iter* it, mush_bakaabb* bak) {
+	khash_t(mushcoords) *hash = bak->data;
+	kh_del(mushcoords, hash, it->k);
+}
+
+mushcoords mush_bakaabb_it_pos(
+	const mush_bakaabb_iter* it, const mush_bakaabb* bak)
+{
+	const khash_t(mushcoords) *hash = bak->data;
+	return kh_key(hash, it->k);
+}
+mushcell mush_bakaabb_it_val(
+	const mush_bakaabb_iter* it, const mush_bakaabb* bak)
+{
+	const khash_t(mushcoords) *hash = bak->data;
+	return kh_value(hash, it->k);
 }
 
 static size_t mush_bakaabb_hash(mushcoords c) {
