@@ -34,6 +34,7 @@ struct mushspace {
 
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_place_box         MUSHSPACE_CAT(mushspace,_place_box)
+#define mushspace_really_place_box  MUSHSPACE_CAT(mushspace,_really_place_box)
 #define mushspace_map_no_place      MUSHSPACE_CAT(mushspace,_map_no_place)
 #define mushspace_map_in_static     MUSHSPACE_CAT(mushspace,_map_in_static)
 #define mushspace_map_in_box        MUSHSPACE_CAT(mushspace,_map_in_box)
@@ -56,7 +57,8 @@ static bool mushspace_find_box(
 #if MUSHSPACE_93
 static int mushspace_bef93load_string(mushspace*, const char*, size_t len);
 #else
-static bool mushspace_place_box(mushspace*, mush_aabb*);
+static bool       mushspace_place_box       (mushspace*, mush_aabb*);
+static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
 
 static void mushspace_map_no_place(
 	mushspace*, const mush_aabb*, void*,
@@ -171,16 +173,105 @@ static bool mushspace_find_box(
 #if !MUSHSPACE_93
 static bool mushspace_place_box(mushspace* space, mush_aabb* aabb) {
 
+	// Split the box up along any axes it wraps around on.
+	mush_aabb aabbs[1 << MUSHSPACE_DIM];
+	aabbs[0] = *aabb;
+	size_t a = 1;
+
+	for (size_t b = 0; b < a; ++b) {
+		mush_aabb *box = &aabbs[b];
+		for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+			if (box->beg.v[i] <= box->end.v[i])
+				continue;
+
+			mushcoords end = box->end;
+			end.v[i] = MUSHCELL_MAX;
+			mush_aabb_make_unsafe(&aabbs[a++], box->beg, end);
+			box->beg.v[i] = MUSHCELL_MIN;
+		}
+	}
+
+	// Then do the actual placement.
+	for (size_t b = 0; b < a; ++b) {
+		mush_aabb *box = &aabbs[b];
+
+		if (   mush_staticaabb_contains(box->beg)
+		    && mush_staticaabb_contains(box->end))
+		{
+incorporated:
+			mushstats_add(space->stats, MushStat_boxes_incorporated, 1);
+			continue;
+		}
+
+		for (size_t i = 0; i < space->box_count; ++i)
+			if (mush_aabb_contains_box(&space->boxen[i], box))
+				goto incorporated;
+
+		mush_aabb_finalize(box);
+		box = mushspace_really_place_box(space, box);
+		if (box == NULL)
+			return false;
+
+		// If it crossed bak, we need to fix things up and move any occupied
+		// cells from bak (which is below all boxen) to the appropriate box
+		// (which may not be *box, if it has any overlaps).
+		if (!space->bak || !mush_bakaabb_size(space->bak))
+			continue;
+
+		mush_aabb bak_box;
+		mush_aabb_make_unsafe(&bak_box, space->bak->beg, space->bak->end);
+		if (!mush_aabb_overlaps(box, &bak_box))
+			continue;
+
+		assert (box == &space->boxen[space->box_count-1]);
+
+		bool overlaps = false;
+		for (size_t b = 0; b < space->box_count-1; ++b) {
+			if (mush_aabb_overlaps(box, &space->boxen[b])) {
+				overlaps = true;
+				break;
+			}
+		}
+
+		mush_bakaabb_iter *it = mush_bakaabb_it_start(space->bak);
+		if (!it)
+			return false;
+
+		while (!mush_bakaabb_it_done(it, space->bak)) {
+			mushcoords c = mush_bakaabb_it_pos(it, space->bak);
+			if (!mush_aabb_contains(box, c)) {
+				mush_bakaabb_it_next(it, space->bak);
+				continue;
+			}
+
+			mushcell v = mush_bakaabb_it_val(it, space->bak);
+
+			mush_bakaabb_it_remove(it, space->bak);
+
+			if (overlaps)
+				mushspace_put(space, c, v);
+			else
+				mush_aabb_put(box, c, v);
+		}
+		mush_bakaabb_it_stop(it);
+	}
+	return true;
+}
+
+// Returns the placed box, which may be bigger than the given box. Returns NULL
+// if memory allocation failed.
+static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
+{
 	if (!mush_aabb_alloc(aabb))
-		return false;
+		return NULL;
 
 	mush_aabb *boxen = realloc(space->boxen, ++space->box_count * sizeof *aabb);
 	if (!boxen)
-		return false;
+		return NULL;
 
 	space->boxen = boxen;
 	space->boxen[space->box_count-1] = *aabb;
-	return true;
+	return &space->boxen[space->box_count-1];
 }
 
 static void mushspace_map_no_place(
