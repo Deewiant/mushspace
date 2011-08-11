@@ -24,6 +24,11 @@ mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
 	return kh_value(hash, kh_get(mushcoords, hash, c));
 }
 
+size_t mush_bakaabb_size(const mush_bakaabb* bak) {
+	const khash_t(mushcoords) *hash = bak->data;
+	return kh_size(hash);
+}
+
 static size_t mush_bakaabb_hash(mushcoords c) {
 #if SIZE_MAX == 0xffffffff
 	// MurmurHash3_x86_32

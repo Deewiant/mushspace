@@ -1,5 +1,7 @@
 // File created: 2011-08-06 17:55:19
 
+#include <stdlib.h>
+
 #include "coords.h"
 #include "typenames.h"
 
@@ -12,7 +14,10 @@ typedef struct mush_bakaabb {
 
 #define mush_bakaabb_init MUSHSPACE_CAT(mush_bakaabb,_init)
 #define mush_bakaabb_get  MUSHSPACE_CAT(mush_bakaabb,_get)
+#define mush_bakaabb_size MUSHSPACE_CAT(mush_bakaabb,_size)
 
 void mush_bakaabb_init(mush_bakaabb*, mushcoords);
 
 mushcell mush_bakaabb_get(const mush_bakaabb*, mushcoords);
+
+size_t mush_bakaabb_size(const mush_bakaabb*);
