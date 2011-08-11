@@ -4,6 +4,8 @@
 
 #include <assert.h>
 
+#include "lib/tommyds/tommyhashdyn.h"
+
 #define mush_bakaabb_hash    MUSHSPACE_CAT(mush_bakaabb,_hash)
 #define mush_bakaabb_compare MUSHSPACE_CAT(mush_bakaabb,_compare)
 
@@ -51,12 +53,13 @@ static int mush_bakaabb_compare(const void* a, const void *b) {
 }
 
 void mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
-	tommy_hashdyn_init(&bak->data);
+	bak->data = malloc(sizeof(tommy_hashdyn));
+	tommy_hashdyn_init(bak->data);
 	bak->beg = bak->end = c;
 }
 
 mushcell mush_bakaabb_get(mush_bakaabb* bak, mushcoords c) {
-	const mushcell *p = tommy_hashdyn_search(&bak->data, mush_bakaabb_compare,
+	const mushcell *p = tommy_hashdyn_search(bak->data, mush_bakaabb_compare,
 	                                         &c, mush_bakaabb_hash(c));
 	return *p;
 }

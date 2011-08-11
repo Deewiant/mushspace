@@ -1,14 +1,12 @@
 // File created: 2011-08-06 17:55:19
 
-#include "lib/tommyds/tommyhashdyn.h"
-
 #include "coords.h"
 #include "typenames.h"
 
 #define mush_bakaabb MUSHSPACE_NAME(mush_bakaabb)
 
 typedef struct mush_bakaabb {
-	tommy_hashdyn data;
+	void *data;
 	mushcoords beg, end;
 } mush_bakaabb;
 
