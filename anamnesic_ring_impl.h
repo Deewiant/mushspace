@@ -13,7 +13,7 @@
 #define MUSH_ANAMNESIC_RING_SIZE 3
 
 typedef struct mush_memory {
-	mush_aabb box, final_box;
+	mush_aabb box, placed;
 	mushcoords c;
 } mush_memory;
 
