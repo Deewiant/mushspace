@@ -149,7 +149,7 @@ mushcell mushspace_get(mushspace* space, mushcoords c) {
 		return mush_staticaabb_get(&space->static_box, c);
 
 	const mush_aabb* box;
-	if (mushspace_find_box(space, c, &box))
+	if ((box = mushspace_find_box(space, c)))
 		return mush_aabb_get(box, c);
 
 	if (space->bak)
@@ -158,16 +158,11 @@ mushcell mushspace_get(mushspace* space, mushcoords c) {
 	return ' ';
 }
 
-static bool mushspace_find_box(
-	const mushspace* space, mushcoords c, const mush_aabb** box)
-{
-	for (size_t i = 0; i < space->box_count; ++i) {
-		if (mush_aabb_contains(&space->boxen[i], c)) {
-			*box = &space->boxen[i];
-			return true;
-		}
-	}
-	return false;
+static mush_aabb* mushspace_find_box(const mushspace* space, mushcoords c) {
+	for (size_t i = 0; i < space->box_count; ++i)
+		if (mush_aabb_contains(&space->boxen[i], c))
+			return &space->boxen[i];
+	return NULL;
 }
 
 #if !MUSHSPACE_93
@@ -601,9 +596,8 @@ static bool mushspace_get_next_in(
 {
 restart:
 	{
-		const mush_aabb *tmp;
 		assert (!mush_staticaabb_contains(*pos));
-		assert (!mushspace_find_box(space, *pos, &tmp));
+		assert (!mushspace_find_box(space, *pos));
 	}
 
 	const size_t box_count = space->box_count;
@@ -677,10 +671,9 @@ restart:
 			return true;
 
 		// If we ended up in some other box, that's also fine.
-		const mush_aabb *box;
 		if (mush_staticaabb_contains(*pos))
 			return true;
-		if (mushspace_find_box(space, *pos, &box))
+		if (mushspace_find_box(space, *pos))
 			return true;
 
 		// Otherwise, go again with the new *pos.
