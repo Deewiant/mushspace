@@ -24,7 +24,17 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 		return x; \
 	}
 
-DEFINE_OP(sub)
+#define DEFINE_CLAMPED_OP(NAME) \
+	mushcoords mushcoords_##NAME##s_clamped(mushcoords a, mushcell b) { \
+		mushcoords x = a; \
+		for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) \
+			x.v[i] = mushcell_##NAME##_clamped(x.v[i], b); \
+		return x; \
+	}
+
+DEFINE_OP        (sub)
+DEFINE_CLAMPED_OP(add)
+DEFINE_CLAMPED_OP(sub)
 
 bool mushcoords_equal(mushcoords a, mushcoords b) {
 	// Yes, peeling the loop is worth it.
