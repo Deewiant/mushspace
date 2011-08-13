@@ -47,7 +47,7 @@ void mush_aabb_make_unsafe(mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_finalize   (mush_aabb*);
 bool mush_aabb_alloc      (mush_aabb*);
 
-size_t mush_aabb_volume_on(const mush_aabb*, mushucell axis);
+size_t mush_aabb_volume_on(const mush_aabb*, mushdim axis);
 
 bool mush_aabb_contains(const mush_aabb*, mushcoords);
 

@@ -260,7 +260,7 @@ static bool mushspace_place_box(
 
 	for (size_t b = 0; b < a; ++b) {
 		mush_aabb *box = &aabbs[b];
-		for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 			if (box->beg.v[i] <= box->end.v[i])
 				continue;
 
@@ -406,9 +406,9 @@ static bool mushspace_get_box_along_recent_line_for(
 	// Find the axis along which the first two recent placements are aligned, if
 	// any, and note whether it was along the positive or negative direction.
 	bool positive;
-	mushucell axis = MUSHSPACE_DIM;
+	mushdim axis = MUSHSPACE_DIM;
 
-	for (mushucell d = 0; d < MUSHSPACE_DIM; ++d) {
+	for (mushdim d = 0; d < MUSHSPACE_DIM; ++d) {
 		mushcell diff = mushcell_sub(recents[1].c.v[d], recents[0].c.v[d]);
 
 		if (axis == MUSHSPACE_DIM) {
@@ -434,10 +434,10 @@ static bool mushspace_get_box_along_recent_line_for(
 
 		const mushcell *a = recents[i].c.v, *b = recents[i+1].c.v;
 
-		for (mushucell d = 0; d < axis; ++d)
+		for (mushdim d = 0; d < axis; ++d)
 			if (mushcell_sub(b[d], a[d]))
 				return false;
-		for (mushucell d = axis+1; d < MUSHSPACE_DIM; ++d)
+		for (mushdim d = axis+1; d < MUSHSPACE_DIM; ++d)
 			if (mushcell_sub(b[d], a[d]))
 				return false;
 
@@ -490,9 +490,9 @@ static bool mushspace_extend_big_sequence_start_for(
 	// Where B are boxes, s is space->big_sequence_start, and c is c.
 
 	bool positive;
-	mushucell axis = MUSHSPACE_DIM;
+	mushdim axis = MUSHSPACE_DIM;
 
-	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (axis == MUSHSPACE_DIM) {
 			if (   c.v[i] >  last->end.v[i]
 			    && c.v[i] <= last->end.v[i] + BIG_SEQ_MAX_SPACING)
@@ -552,9 +552,9 @@ static bool mushspace_extend_first_placed_big_for(
 	return false;
 #else
 	bool positive;
-	mushucell axis = MUSHSPACE_DIM;
+	mushdim axis = MUSHSPACE_DIM;
 
-	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (axis == MUSHSPACE_DIM) {
 			if (   c.v[i] >  space->first_placed_big.v[i]
 			    && c.v[i] <= space->first_placed_big.v[i] + BIG_SEQ_MAX_SPACING)
@@ -953,7 +953,7 @@ restart:
 
 	mushcell best_coord, best_wrapped;
 
-	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
 		// Go through every box, starting from the static one.
 
@@ -986,7 +986,7 @@ restart:
 		// first place. (See assertions.) Hence skipped is always at least one.
 		++*skipped;
 
-		mushucell j;
+		mushdim j;
 #if MUSHSPACE_DIM >= 2
 		for (j = 0; j < MUSHSPACE_DIM-1; ++j)
 			*skipped +=   mushcell_sub(aabb->end.v[j], old.v[j])
@@ -1126,7 +1126,7 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 
 		uint8_t found_past = 0, found_before = 0;
 
-		for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 			if (aabb.beg.v[i] < target.v[i]) found_past   |= 1 << i;
 			else                             found_before |= 1 << i;
 		}
@@ -1134,7 +1134,7 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 		for (size_t b = 1; b < aabbs_len; ++b) {
 			const mush_aabb *box = &aabbs[b];
 
-			for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+			for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 				const uint8_t axis = 1 << i;
 
 				if (box->beg.v[i] < target.v[i]) {
@@ -1288,7 +1288,7 @@ static mush_aabb* mushspace_get_aabbs(
 			found_nonspace_for = found_nonspace_for_anyone = a;
 			last_nonspace = pos;
 
-			if (get_beg) for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+			if (get_beg) for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 				if (get_beg & 1 << i) {
 					aabbs[a].beg.v[i] = mushcell_min(aabbs[a].beg.v[i], pos.v[i]);
 					get_beg &= ~(1 << i);
@@ -1372,7 +1372,7 @@ static mush_aabb* mushspace_get_aabbs(
 			// The box has been initialized, so make sure it's valid and put it in
 			// place.
 
-			for (mushucell j = 0; j < MUSHSPACE_DIM; ++j)
+			for (mushdim j = 0; j < MUSHSPACE_DIM; ++j)
 				assert (box->beg.v[j] <= box->end.v[j]);
 
 			if (i != n)

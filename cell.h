@@ -4,9 +4,15 @@
 #define MUSHSPACE_CELL_H
 
 #include <limits.h>
+#include <stdint.h>
 
 typedef          long mushcell;
 typedef unsigned long mushucell;
+
+// For things that range from 0 to MUSHSPACE_DIM or thereabouts.
+//
+// This doesn't, strictly speaking, belong here, but oh well.
+typedef uint8_t mushdim;
 
 #define MUSHCELL_MIN LONG_MIN
 #define MUSHCELL_MAX LONG_MAX

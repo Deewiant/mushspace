@@ -1,6 +1,6 @@
 // File created: 2011-08-07 18:12:26
 
-#include "staticaabb_impl.h"
+#include "staticaabb.h"
 
 #include <assert.h>
 #include <stdlib.h>

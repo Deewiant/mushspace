@@ -19,7 +19,7 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 #define DEFINE_OP(NAME) \
 	mushcoords mushcoords_##NAME(mushcoords a, mushcoords b) { \
 		mushcoords x = a; \
-		for (unsigned i = 0; i < MUSHSPACE_DIM; ++i) \
+		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) \
 			x.v[i] = mushcell_##NAME(x.v[i], b.v[i]); \
 		return x; \
 	}
@@ -27,7 +27,7 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 #define DEFINE_CLAMPED_OP(NAME) \
 	mushcoords mushcoords_##NAME##s_clamped(mushcoords a, mushcell b) { \
 		mushcoords x = a; \
-		for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) \
+		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) \
 			x.v[i] = mushcell_##NAME##_clamped(x.v[i], b); \
 		return x; \
 	}
@@ -49,7 +49,7 @@ bool mushcoords_equal(mushcoords a, mushcoords b) {
 }
 
 void mushcoords_max_into(mushcoords* a, mushcoords b) {
-	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i)
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		a->v[i] = mushcell_max(a->v[i], b.v[i]);
 }
 

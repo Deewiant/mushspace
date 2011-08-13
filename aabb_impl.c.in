@@ -6,7 +6,7 @@
 #include <string.h>
 
 void mush_aabb_make(mush_aabb* aabb, mushcoords b, mushcoords e) {
-	for (unsigned i = 0; i < MUSHSPACE_DIM; ++i)
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		assert (b.v[i] <= e.v[i]);
 
 	mush_aabb_make_unsafe(aabb, b, e);
@@ -38,7 +38,7 @@ bool mush_aabb_alloc(mush_aabb* aabb) {
 	return true;
 }
 
-size_t mush_aabb_volume_on(const mush_aabb* aabb, mushucell axis) {
+size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
 	assert (axis < MUSHSPACE_DIM);
 #if MUSHSPACE_DIM >= 2
 	if (axis == 1) return aabb->width;
@@ -65,7 +65,7 @@ bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
 }
 
 bool mush_aabb_safe_contains(const mush_aabb* aabb, mushcoords c) {
-	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (aabb->beg.v[i] > aabb->end.v[i]) {
 			if (!(c.v[i] >= aabb->beg.v[i] || c.v[i] <= aabb->end.v[i]))
 				return false;
@@ -94,7 +94,7 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 }
 
 bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
-	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i)
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		if (a->beg.v[i] > b->end.v[i] || b->beg.v[i] > a->end.v[i])
 			return false;
 	return true;
@@ -125,7 +125,7 @@ void mush_aabb_tessellate1(
 {
 	assert (mushcoords_contains(pos, *beg, *end));
 
-	for (mushucell i = 0; i < MUSHSPACE_DIM; ++i) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		// This could be improved, consider for instance the bottommost box in
 		// the following graphic and its current tessellation:
 		//
