@@ -54,6 +54,12 @@ mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
 	assert (mush_aabb_contains(aabb, c));
 	return aabb->data[mush_aabb_get_idx(aabb, c)];
 }
+
+void mush_aabb_put(mush_aabb* aabb, mushcoords p, mushcell c) {
+	assert (mush_aabb_contains(aabb, p));
+	aabb->data[mush_aabb_get_idx(aabb, p)] = c;
+}
+
 bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
 	return mushcoords_contains(c, aabb->beg, aabb->end);
 }
