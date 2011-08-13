@@ -2,7 +2,11 @@
 
 #include "stats.h"
 
-void mushstats_add(mushstats* stats, MushStat stat, uint64_t val) {
+void mushstats_add(
+#ifndef MUSH_ENABLE_STATS
+	const
+#endif
+	mushstats* stats, MushStat stat, uint64_t val) {
 #ifdef MUSH_ENABLE_STATS
 	switch (stat) {
 	case MushStat_lookups:            stats->lookups            += val; break;
