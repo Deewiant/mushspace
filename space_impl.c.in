@@ -44,11 +44,12 @@ struct mushspace {
 
 	mushcoords last_beg, last_end;
 
+	mushstats *stats;
+
 	size_t box_count;
 
 	mush_aabb    *boxen;
 	mush_bakaabb *bak;
-	mushstats    *stats;
 
 	mush_staticaabb static_box;
 };
