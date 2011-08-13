@@ -20,6 +20,9 @@ void mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
 	bak->data = kh_init(mushcoords);
 	bak->beg = bak->end = c;
 }
+void mush_bakaabb_free(mush_bakaabb* bak) {
+	kh_destroy(mushcoords, bak->data);
+}
 
 mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
 	const khash_t(mushcoords) *hash = bak->data;
