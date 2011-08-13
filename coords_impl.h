@@ -5,7 +5,7 @@
 #include "cell.h"
 #include "typenames.h"
 
-#define mushcoords MUSHSPACE_NAME(mushcoords)
+#define mushcoords MUSHSPACE_CAT(mushcoords,MUSHSPACE_DIM)
 
 typedef union mushcoords {
 #pragma pack(push)

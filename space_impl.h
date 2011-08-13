@@ -32,7 +32,7 @@ void     mushspace_put(mushspace*, mushcoords, mushcell);
 //                   cause this error.
 int MUSHSPACE_CAT(mushspace,_load_string)
 	( mushspace*, const char*, size_t len
-#if !MUSHSPACE_93
+#ifndef MUSHSPACE_93
 	, mushcoords* end, mushcoords target, bool binary
 #endif
 	);

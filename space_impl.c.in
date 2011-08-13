@@ -87,9 +87,6 @@ const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
 
 static mush_aabb* mushspace_find_box(const mushspace*, mushcoords);
 
-#if MUSHSPACE_93
-static int mushspace_bef93load_string(mushspace*, const char*, size_t len);
-#else
 static bool mushspace_place_box(
 	mushspace*, mush_aabb*, mushcoords*, mush_aabb**);
 
@@ -169,7 +166,6 @@ static void mushspace_load_arr(mushcell*, size_t, void*,
                                size_t, size_t, size_t, size_t, uint8_t*,
                                mushstats*);
 static void mushspace_load_blank(size_t, void*);
-#endif
 
 mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
@@ -221,10 +217,8 @@ void mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 
 	mush_aabb* box;
 	if ((box = mushspace_find_box (space, p))
-#if !MUSHSPACE_93
-	    || mushspace_place_box_for(space, p, &box) == MUSH_ERR_NONE
-#endif
-	) {
+	    || mushspace_place_box_for(space, p, &box) == MUSH_ERR_NONE)
+	{
 		mush_aabb_put(box, p, c);
 		return;
 	}
@@ -241,7 +235,6 @@ static mush_aabb* mushspace_find_box(const mushspace* space, mushcoords c) {
 	return NULL;
 }
 
-#if !MUSHSPACE_93
 static bool mushspace_place_box(
 	mushspace* space, mush_aabb* aabb,
 	mushcoords* reason, mush_aabb** reason_box)
@@ -1058,7 +1051,6 @@ static void mushspace_get_next_in1(
 		*best_in    = box_idx;
 	}
 }
-#endif
 
 #define mushspace_load_arr_auxdata MUSHSPACE_CAT(mushspace,_load_arr_auxdata)
 typedef struct {
@@ -1073,15 +1065,9 @@ typedef struct {
 } mushspace_load_arr_auxdata;
 
 int MUSHSPACE_CAT(mushspace,_load_string)(
-	mushspace* space, const char* str, size_t len
-#if !MUSHSPACE_93
-	, mushcoords* end, mushcoords target, bool binary
-#endif
-	)
+	mushspace* space, const char* str, size_t len,
+	mushcoords* end, mushcoords target, bool binary)
 {
-#if MUSHSPACE_93
-	return mushspace_bef93load_string(space, str, len);
-#else
 	size_t aabbs_len;
 	mush_aabb *aabbs =
 		mushspace_get_aabbs(str, len, target, binary, &aabbs_len);
@@ -1193,10 +1179,8 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 		assert (*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f');
 	assert (!(str > str_end));
 	return MUSH_ERR_NONE;
-#endif
 }
 
-#if !MUSHSPACE_93
 // Returns an array of AABBs (a slice out of a static buffer) which describe
 // where the input should be loaded. There are at most 2^dim of them; in binary
 // mode, at most 2. The length is written to *len_out.
@@ -1644,49 +1628,3 @@ static void mushspace_load_blank(size_t blanks, void* p) {
 	}
 	aux->str = str;
 }
-#else // MUSHSPACE_93
-static bool mushspace_bef93newline(bool* got_cr, mushcoords* pos) {
-	*got_cr = false;
-	pos->x = 0;
-	return ++pos->y >= 25;
-}
-static int mushspace_bef93load_string(
-	mushspace* space, const char* str, size_t len)
-{
-	bool got_cr = false;
-	mushcoords pos = MUSHCOORDS(0,0,0);
-
-	for (size_t i = 0; i < len; ++i) {
-		char c = str[i];
-
-		switch (c) {
-		case '\r': got_cr = true; break;
-		case '\n': if (mushspace_bef93newline(&got_cr, &pos)) goto end; break;
-		default:
-			if (got_cr && mushspace_bef93newline(&got_cr, &pos))
-				goto end;
-
-			if (c != ' ')
-				mush_staticaabb_put(&space->static_box, pos, c);
-
-			if (++pos.x < 80)
-				break;
-
-			// Skip to and past EOL after column 80.
-			while (++i < len) {
-				c = str[i];
-				switch (c) {
-				case '\r': got_cr = true; break;
-				default:   if (!got_cr) break;
-				case '\n': if (mushspace_bef93newline(&got_cr, &pos)) goto end;
-				           goto skipped;
-				}
-			}
-skipped:
-			break;
-		}
-	}
-end:
-	return MUSH_ERR_NONE;
-}
-#endif

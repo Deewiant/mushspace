@@ -8,7 +8,7 @@
 
 #define mush_staticaabb MUSHSPACE_NAME(mush_staticaabb)
 
-#if MUSHSPACE_93
+#ifdef MUSHSPACE_93
 	#undef MUSH_STATICAABB_SIZE_X
 	#undef MUSH_STATICAABB_SIZE_Y
 	#undef MUSH_STATICAABB_BEG
@@ -19,11 +19,6 @@
 
 	#define MUSH_STATICAABB_BEG MUSHCOORDS(0,0,0)
 #else
-	#undef MUSH_STATICAABB_SIZE_X
-	#undef MUSH_STATICAABB_SIZE_Y
-	#undef MUSH_STATICAABB_SIZE_Z
-	#undef MUSH_STATICAABB_BEG
-
 	// We want the static area to cover the size of a "typical" program
 	// (whatever that is) and have power-of-two width and height for fast
 	// indexing calculations.
