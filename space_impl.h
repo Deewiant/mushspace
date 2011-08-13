@@ -13,12 +13,14 @@
 typedef struct mushspace mushspace;
 
 #define mushspace_get MUSHSPACE_CAT(mushspace,_get)
+#define mushspace_put MUSHSPACE_CAT(mushspace,_put)
 
 size_t     MUSHSPACE_CAT(mushspace,_size)    (void);
 mushspace *MUSHSPACE_CAT(mushspace,_allocate)(void*, mushstats*);
 void       MUSHSPACE_CAT(mushspace,_free)    (mushspace*);
 
 mushcell mushspace_get(mushspace*, mushcoords);
+void     mushspace_put(mushspace*, mushcoords, mushcell);
 
 // Returns 0 on success or one of the following possible error codes:
 //
