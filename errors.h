@@ -4,6 +4,7 @@
 #define MUSHSPACE_ERRORS_H
 
 enum {
+	MUSH_ERR_NONE    = 0,
 	MUSH_ERR_OOM     = 1,
 	MUSH_ERR_NO_ROOM = 2,
 };

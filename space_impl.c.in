@@ -869,7 +869,7 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 	for (; str < str_end; ++str)
 		assert (*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f');
 	assert (!(str > str_end));
-	return 0;
+	return MUSH_ERR_NONE;
 #endif
 }
 
@@ -1338,10 +1338,10 @@ static int mushspace_bef93load_string(
 
 		switch (c) {
 		case '\r': got_cr = true; break;
-		case '\n': if (mushspace_bef93newline(&got_cr, &pos)) return 0; break;
+		case '\n': if (mushspace_bef93newline(&got_cr, &pos)) goto end; break;
 		default:
 			if (got_cr && mushspace_bef93newline(&got_cr, &pos))
-				return 0;
+				goto end;
 
 			if (c != ' ')
 				mush_staticaabb_put(&space->static_box, pos, c);
@@ -1355,7 +1355,7 @@ static int mushspace_bef93load_string(
 				switch (c) {
 				case '\r': got_cr = true; break;
 				default:   if (!got_cr) break;
-				case '\n': if (mushspace_bef93newline(&got_cr, &pos)) return 0;
+				case '\n': if (mushspace_bef93newline(&got_cr, &pos)) goto end;
 				           goto skipped;
 				}
 			}
@@ -1363,6 +1363,7 @@ skipped:
 			break;
 		}
 	}
-	return 0;
+end:
+	return MUSH_ERR_NONE;
 }
 #endif
