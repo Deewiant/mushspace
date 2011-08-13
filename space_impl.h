@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "config.h"
 #include "coords.h"
 #include "errors.h"
 #include "stats.h"
@@ -20,8 +21,13 @@ extern const size_t MUSHSPACE_CAT(mushspace,_size);
 mushspace *MUSHSPACE_CAT(mushspace,_allocate)(void*, mushstats*);
 void       MUSHSPACE_CAT(mushspace,_free)    (mushspace*);
 
-mushcell mushspace_get(mushspace*, mushcoords);
-void     mushspace_put(mushspace*, mushcoords, mushcell);
+mushcell mushspace_get(
+#ifndef MUSH_ENABLE_STATS
+	const
+#endif
+	mushspace*, mushcoords);
+
+void mushspace_put(mushspace*, mushcoords, mushcell);
 
 // Returns 0 on success or one of the following possible error codes:
 //
