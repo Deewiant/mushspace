@@ -16,6 +16,15 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 	return true;
 }
 
+bool mushcoords_overlaps(
+	mushcoords beg1, mushcoords end1, mushcoords beg2, mushcoords end2)
+{
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+		if (beg1.v[i] > end2.v[i] || beg2.v[i] > end1.v[i])
+			return false;
+	return true;
+}
+
 #define DEFINE_OP(NAME) \
 	mushcoords mushcoords_##NAME(mushcoords a, mushcoords b) { \
 		mushcoords x = a; \

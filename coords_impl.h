@@ -29,6 +29,7 @@ typedef union mushcoords {
 #define MUSHCOORDS3(a,b,c) (mushcoords){{.x = a, .y = b, .z = c}}
 
 #define mushcoords_contains MUSHSPACE_CAT(mushcoords,_contains)
+#define mushcoords_overlaps MUSHSPACE_CAT(mushcoords,_overlaps)
 
 #define mushcoords_sub         MUSHSPACE_CAT(mushcoords,_sub)
 #define mushcoords_equal       MUSHSPACE_CAT(mushcoords,_equal)
@@ -42,6 +43,7 @@ typedef union mushcoords {
 	MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
 
 bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
+bool mushcoords_overlaps(mushcoords, mushcoords, mushcoords, mushcoords);
 
 mushcoords mushcoords_sub(mushcoords, mushcoords);
 
