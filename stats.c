@@ -3,7 +3,7 @@
 #include "stats.h"
 
 void mushstats_add(mushstats* stats, MushStat stat, uint64_t val) {
-#ifdef ENABLE_STATS
+#ifdef MUSH_ENABLE_STATS
 	switch (stat) {
 	case MushStat_lookups:            stats->lookups            += val; break;
 	case MushStat_assignments:        stats->assignments        += val; break;

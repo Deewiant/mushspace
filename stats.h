@@ -5,10 +5,10 @@
 
 #include <stdint.h>
 
-#define ENABLE_STATS
+#define MUSH_ENABLE_STATS
 
 typedef struct mushstats {
-#ifdef ENABLE_STATS
+#ifdef MUSH_ENABLE_STATS
 	uint64_t
 		lookups,
 		assignments,
