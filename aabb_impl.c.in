@@ -162,8 +162,5 @@ void mush_aabb_tessellate1(
 		if (ab > p) end->v[i] = mushcell_min(end->v[i], ab-1);
 	}
 
-	mush_aabb box, abox;
-	mush_aabb_make_unsafe(&box, *beg, *end);
-	mush_aabb_make_unsafe(&abox, avoid_beg, avoid_end);
-	assert (!mush_aabb_overlaps(&box, &abox));
+	assert (!mushcoords_overlaps(*beg, *end, avoid_beg, avoid_end));
 }
