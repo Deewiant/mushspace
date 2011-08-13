@@ -190,6 +190,8 @@ void MUSHSPACE_CAT(mushspace,_free)(mushspace* space) {
 	for (size_t i = space->box_count; i--;)
 		free(space->boxen[i].data);
 	free(space->boxen);
+	mush_bakaabb_free(space->bak);
+	free(space->bak);
 	free(space->stats);
 }
 
