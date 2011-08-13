@@ -54,6 +54,8 @@ struct mushspace {
 	mush_staticaabb static_box;
 };
 
+const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
+
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_place_box         MUSHSPACE_CAT(mushspace,_place_box)
 #define mushspace_really_place_box  MUSHSPACE_CAT(mushspace,_really_place_box)
@@ -168,8 +170,6 @@ static void mushspace_load_arr(mushcell*, size_t, void*,
                                mushstats*);
 static void mushspace_load_blank(size_t, void*);
 #endif
-
-size_t MUSHSPACE_CAT(mushspace,_size)(void) { return sizeof(mushspace); }
 
 mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
