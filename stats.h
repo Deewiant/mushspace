@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-#define MUSH_ENABLE_STATS
+#include "config.h"
 
 typedef struct mushstats {
 #ifdef MUSH_ENABLE_STATS
