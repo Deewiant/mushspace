@@ -26,6 +26,12 @@ mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
 	return kh_value(hash, kh_get(mushcoords, hash, c));
 }
 
+void mush_bakaabb_put(mush_bakaabb* bak, mushcoords p, mushcell c) {
+	khash_t(mushcoords) *hash = bak->data;
+	int unused;
+	kh_value(hash, kh_put(mushcoords, hash, p, &unused)) = c;
+}
+
 size_t mush_bakaabb_size(const mush_bakaabb* bak) {
 	const khash_t(mushcoords) *hash = bak->data;
 	return kh_size(hash);
