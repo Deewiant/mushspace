@@ -20,4 +20,9 @@ mushcell mushcell_add(mushcell, mushcell);
 mushcell mushcell_sub(mushcell, mushcell);
 mushcell mushcell_inc(mushcell);
 
+// Don't overflow/underflow, instead clamp the result to
+// MUSHCELL_MIN/MUSHCELL_MAX.
+mushcell mushcell_add_clamped(mushcell, mushcell);
+mushcell mushcell_sub_clamped(mushcell, mushcell);
+
 #endif
