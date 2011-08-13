@@ -1,8 +1,6 @@
 # File created: 2011-08-07 16:12:35
 
-CC = @(CC)
-
-ifeq ($(CC),gcc)
+ifeq (@(CC),gcc)
 SRCFLAGS     = -Wall -Wextra -pedantic
 GENFLAGS     = -fPIC
 MUSHSRCFLAGS = -std=c1x
@@ -11,7 +9,7 @@ NATIVEFLAGS          = -march=native
 OPTFLAGS             = -flto -O3
 DEBFLAGS-@(OPTIMIZE) = -g
 endif
-ifeq ($(CC),clang)
+ifeq (@(CC),clang)
 SRCFLAGS     = -Wall -Wextra
 GENFLAGS     = -fPIC
 MUSHSRCFLAGS = -std=c99
@@ -30,3 +28,7 @@ BOTHFLAGS = $(DEBFLAGS-n) $(OPTFLAGS-y) $(NATIVEFLAGS-y)
 CFLAGS    = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS) $(MUSHSRCFLAGS)
 LINKFLAGS = $(GENFLAGS) $(BOTHFLAGS)
 LIBCFLAGS = $(GENFLAGS) $(OPTFLAGS) $(NATIVEFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
+
+!cc       = |> ^ CC %f^ @(CC) $(CFLAGS) -c %f -o %o |>
+!ccshared = |> ^ LD %o^ @(CC) $(LINKFLAGS) -shared %f -o %o |>
+!ar       = |> ^ AR %o^ ar rcs %o %f |>

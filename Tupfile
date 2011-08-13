@@ -2,9 +2,9 @@
 
 include_rules
 
-: config.h.in            |> tup varsed %f %o |> config.h
-: foreach *.c | config.h |> $(CC) $(CFLAGS) -c %f -o %o |> %B.o
-: *.o                    |> $(CC) $(LINKFLAGS) -shared %f -o %o |> libmushspace.so
-: *.o                    |> ar rcs %o %f |> libmushspace.a
+: config.h.in            |> ^ VARSED %o^ tup varsed %f %o |> config.h
+: foreach *.c | config.h |> !cc |> %B.o
+: *.o                    |> !ccshared |> libmushspace.so
+: *.o                    |> !ar |> libmushspace.a
 
 .gitignore
