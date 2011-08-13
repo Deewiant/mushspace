@@ -166,7 +166,13 @@ static mush_aabb* mushspace_find_box(const mushspace* space, mushcoords c) {
 }
 
 #if !MUSHSPACE_93
-static bool mushspace_place_box(mushspace* space, mush_aabb* aabb) {
+static bool mushspace_place_box(
+	mushspace* space, mush_aabb* aabb,
+	mushcoords* reason, mush_aabb** reason_box)
+{
+	assert ((reason == NULL) == (reason_box == NULL));
+	if (reason)
+		assert (mush_aabb_safe_contains(aabb, *reason));
 
 	// Split the box up along any axes it wraps around on.
 	mush_aabb aabbs[1 << MUSHSPACE_DIM];
@@ -206,6 +212,13 @@ incorporated:
 		box = mushspace_really_place_box(space, box);
 		if (box == NULL)
 			return false;
+
+		if (reason && mush_aabb_contains(box, *reason)) {
+			*reason_box = box;
+
+			// This can only happen once.
+			reason = NULL;
+		}
 
 		// If it crossed bak, we need to fix things up and move any occupied
 		// cells from bak (which is below all boxen) to the appropriate box
@@ -762,7 +775,7 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 		if (end)
 			mushcoords_max_into(end, aabbs[i].end);
 
-		if (!mushspace_place_box(space, &aabbs[i]))
+		if (!mushspace_place_box(space, &aabbs[i], NULL, NULL))
 			return MUSH_ERR_OOM;
 	}
 
