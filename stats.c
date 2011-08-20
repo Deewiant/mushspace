@@ -2,6 +2,8 @@
 
 #include "stats.h"
 
+#include <assert.h>
+
 void mushstats_add(
 #ifndef MUSH_ENABLE_STATS
 	const
@@ -9,9 +11,16 @@ void mushstats_add(
 	mushstats* stats, MushStat stat, uint64_t val) {
 #ifdef MUSH_ENABLE_STATS
 	switch (stat) {
-	case MushStat_lookups:            stats->lookups            += val; break;
-	case MushStat_assignments:        stats->assignments        += val; break;
-	case MushStat_boxes_incorporated: stats->boxes_incorporated += val; break;
+#define CASE(x) case MushStat_##x: stats->x += val; break;
+	CASE(lookups)
+	CASE(assignments)
+	CASE(boxes_incorporated)
+	CASE(boxes_placed)
+	CASE(subsumed_contains)
+	CASE(subsumed_fusables)
+	CASE(subsumed_disjoint)
+	CASE(subsumed_overlaps)
+#undef CASE
 	}
 #else
 	(void)stats; (void)stat; (void)val;

@@ -12,7 +12,12 @@ typedef struct mushstats {
 	uint64_t
 		lookups,
 		assignments,
-		boxes_incorporated;
+		boxes_incorporated,
+		boxes_placed,
+		subsumed_contains,
+		subsumed_fusables,
+		subsumed_disjoint,
+		subsumed_overlaps;
 #else
 	char unused;
 #endif
@@ -22,6 +27,11 @@ typedef enum {
 	MushStat_lookups,
 	MushStat_assignments,
 	MushStat_boxes_incorporated,
+	MushStat_boxes_placed,
+	MushStat_subsumed_contains,
+	MushStat_subsumed_fusables,
+	MushStat_subsumed_disjoint,
+	MushStat_subsumed_overlaps,
 } MushStat;
 
 void mushstats_add(
