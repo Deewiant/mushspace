@@ -28,7 +28,7 @@ typedef struct mush_bakaabb_iter mush_bakaabb_iter;
 #define mush_bakaabb_it_pos    MUSHSPACE_CAT(mush_bakaabb,_it_pos)
 #define mush_bakaabb_it_val    MUSHSPACE_CAT(mush_bakaabb,_it_val)
 
-void mush_bakaabb_init(mush_bakaabb*, mushcoords);
+bool mush_bakaabb_init(mush_bakaabb*, mushcoords);
 void mush_bakaabb_free(mush_bakaabb* bak);
 
 mushcell mush_bakaabb_get(const mush_bakaabb*, mushcoords);

@@ -16,9 +16,10 @@ static size_t mush_bakaabb_hash(mushcoords);
 KHASH_INIT(mushcoords, mushcoords, mushcell, true,
            mush_bakaabb_hash, mushcoords_equal)
 
-void mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
+bool mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
 	bak->data = kh_init(mushcoords);
 	bak->beg = bak->end = c;
+	return bak->data != NULL;
 }
 void mush_bakaabb_free(mush_bakaabb* bak) {
 	kh_destroy(mushcoords, bak->data);
