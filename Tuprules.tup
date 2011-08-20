@@ -34,6 +34,7 @@ LINKFLAGS = $(GENFLAGS) $(BOTHFLAGS)
 LIBCFLAGS = $(GENFLAGS) $(OPTFLAGS) $(NATIVEFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
 
 !cc       = |> ^ CC   %f^ @(CC) $(CFLAGS) -c %f -o %o |>
+!cc98     = |> ^ CC98 %f^ @(CC) $(CFLAGS) -c %f -o %o |>
 !cc1d     = |> ^ CC1D %f^ @(CC) $(CFLAGS) $(DEFDIM)1 -c %f -o %o |>
 !cc2d     = |> ^ CC2D %f^ @(CC) $(CFLAGS) $(DEFDIM)2 -c %f -o %o |>
 !cc3d     = |> ^ CC3D %f^ @(CC) $(CFLAGS) $(DEFDIM)3 -c %f -o %o |>

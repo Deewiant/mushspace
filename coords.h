@@ -8,7 +8,7 @@
 #include "cell.h"
 #include "typenames.h"
 
-#define mushcoords MUSHSPACE_CAT(mushcoords,MUSHSPACE_DIM)
+#define mushcoords MUSHSPACE_NAME(mushcoords)
 
 typedef union mushcoords {
 #pragma pack(push)
@@ -47,10 +47,14 @@ typedef union mushcoords {
 	MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
 
 bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
+
+#if !MUSHSPACE_93
 bool mushcoords_overlaps(mushcoords, mushcoords, mushcoords, mushcoords);
+#endif
 
 mushcoords mushcoords_sub(mushcoords, mushcoords);
 
+#if !MUSHSPACE_93
 mushcoords mushcoords_adds_clamped(mushcoords, mushcell);
 mushcoords mushcoords_subs_clamped(mushcoords, mushcell);
 
@@ -67,5 +71,6 @@ mushcoords mushcoords_get_end_of_contiguous_range(
 	bool*       reached_to,
 	mushcoords  tessell_beg,
 	mushcoords  area_beg);
+#endif
 
 #endif

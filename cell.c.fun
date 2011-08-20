@@ -21,6 +21,7 @@ mushcell mushcell_inc(mushcell n) {
 	return mushcell_add(n, 1);
 }
 
+#if !MUSHSPACE_93
 mushcell mushcell_add_clamped(mushcell a, mushcell b) {
 	mushcell result;
 
@@ -61,6 +62,7 @@ mushcell mushcell_sub_clamped(mushcell a, mushcell b) {
 #endif
 	return result;
 }
+#endif
 
 void mushcell_space(mushcell* p, size_t l) {
 	for (mushcell *e = p + l; p != e; ++p)

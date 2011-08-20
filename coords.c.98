@@ -16,6 +16,7 @@ bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
 	return true;
 }
 
+#if !MUSHSPACE_93
 bool mushcoords_overlaps(
 	mushcoords beg1, mushcoords end1, mushcoords beg2, mushcoords end2)
 {
@@ -24,6 +25,7 @@ bool mushcoords_overlaps(
 			return false;
 	return true;
 }
+#endif
 
 #define DEFINE_OP(NAME) \
 	mushcoords mushcoords_##NAME(mushcoords a, mushcoords b) { \
@@ -41,7 +43,10 @@ bool mushcoords_overlaps(
 		return x; \
 	}
 
-DEFINE_OP        (sub)
+DEFINE_OP(sub)
+
+#if !MUSHSPACE_93
+
 DEFINE_CLAMPED_OP(add)
 DEFINE_CLAMPED_OP(sub)
 
@@ -151,5 +156,6 @@ end:
 #endif
 	return end_pt;
 }
+#endif // !MUSHSPACE_93
 
 // vim:ft=c
