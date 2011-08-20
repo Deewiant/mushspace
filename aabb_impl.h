@@ -47,6 +47,8 @@ typedef struct mush_aabb {
 #define mush_aabb_on_same_primary_axis \
 	MUSHSPACE_CAT(mush_aabb,_on_same_primary_axis)
 
+#define mush_aabb_can_fuse_with MUSHSPACE_CAT(mush_aabb,_can_fuse_with)
+
 #define mush_aabb_tessellate  MUSHSPACE_CAT(mush_aabb,_tessellate)
 #define mush_aabb_tessellate1 MUSHSPACE_CAT(mush_aabb,_tessellate1)
 
@@ -80,6 +82,9 @@ bool mush_aabb_get_overlap_with(
 bool mush_aabb_on_same_axis        (const mush_aabb*, const mush_aabb*);
 bool mush_aabb_on_same_primary_axis(const mush_aabb*, const mush_aabb*);
 #endif
+
+// True if we can create a new AABB which covers exactly the two given.
+bool mush_aabb_can_fuse_with(const mush_aabb*, const mush_aabb*);
 
 void mush_aabb_tessellate(
 	mushcoords, const mush_aabb*, size_t, mushcoords*, mushcoords*);
