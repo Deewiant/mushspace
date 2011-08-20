@@ -27,7 +27,7 @@ mushcell mushspace_get(
 #endif
 	mushspace*, mushcoords);
 
-void mushspace_put(mushspace*, mushcoords, mushcell);
+int mushspace_put(mushspace*, mushcoords, mushcell);
 
 // Returns 0 on success or one of the following possible error codes:
 //

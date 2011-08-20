@@ -35,13 +35,12 @@ mushcell mushspace_get(mushspace* space, mushcoords c) {
 	                                   : ' ';
 }
 
-void mushspace_put(mushspace* space, mushcoords p, mushcell c) {
+int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	mushstats_add(space->stats, MushStat_assignments, 1);
 
-	if (mush_staticaabb_contains(p)) {
+	if (mush_staticaabb_contains(p))
 		mush_staticaabb_put(&space->box, p, c);
-		return;
-	}
+	return MUSH_ERR_NONE;
 }
 
 static bool mushspace2_93_newline(bool* got_cr, mushcoords* pos) {

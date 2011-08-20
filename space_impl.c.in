@@ -213,12 +213,12 @@ mushcell mushspace_get(
 	return ' ';
 }
 
-void mushspace_put(mushspace* space, mushcoords p, mushcell c) {
+int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	mushstats_add(space->stats, MushStat_assignments, 1);
 
 	if (mush_staticaabb_contains(p)) {
 		mush_staticaabb_put(&space->static_box, p, c);
-		return;
+		return MUSH_ERR_NONE;
 	}
 
 	mush_aabb* box;
@@ -226,12 +226,13 @@ void mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	    || mushspace_place_box_for(space, p, &box) == MUSH_ERR_NONE)
 	{
 		mush_aabb_put(box, p, c);
-		return;
+		return MUSH_ERR_NONE;
 	}
 
 	if (!space->bak.data)
 		mush_bakaabb_init(&space->bak, p);
 	mush_bakaabb_put(&space->bak, p, c);
+	return MUSH_ERR_NONE;
 }
 
 static mush_aabb* mushspace_find_box(const mushspace* space, mushcoords c) {
