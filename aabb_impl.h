@@ -43,6 +43,10 @@ typedef struct mush_aabb {
 
 #define mush_aabb_get_overlap_with MUSHSPACE_CAT(mush_aabb,_get_overlap_with)
 
+#define mush_aabb_on_same_axis MUSHSPACE_CAT(mush_aabb,_on_same_axis)
+#define mush_aabb_on_same_primary_axis \
+	MUSHSPACE_CAT(mush_aabb,_on_same_primary_axis)
+
 #define mush_aabb_tessellate  MUSHSPACE_CAT(mush_aabb,_tessellate)
 #define mush_aabb_tessellate1 MUSHSPACE_CAT(mush_aabb,_tessellate1)
 
@@ -71,6 +75,11 @@ bool mush_aabb_overlapsc(const mush_aabb*, mushcoords, mushcoords);
 
 bool mush_aabb_get_overlap_with(
 	const mush_aabb*, const mush_aabb*, mush_aabb*);
+
+#if MUSHSPACE_DIM > 1
+bool mush_aabb_on_same_axis        (const mush_aabb*, const mush_aabb*);
+bool mush_aabb_on_same_primary_axis(const mush_aabb*, const mush_aabb*);
+#endif
 
 void mush_aabb_tessellate(
 	mushcoords, const mush_aabb*, size_t, mushcoords*, mushcoords*);

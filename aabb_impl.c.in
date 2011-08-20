@@ -127,6 +127,19 @@ bool mush_aabb_get_overlap_with(
 	return true;
 }
 
+#if MUSHSPACE_DIM > 1
+bool mush_aabb_on_same_axis(const mush_aabb* a, const mush_aabb* b) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+		if (a->beg.v[i] == b->beg.v[i] && a->end.v[i] == b->end.v[i])
+			return true;
+	return false;
+}
+bool mush_aabb_on_same_primary_axis(const mush_aabb* a, const mush_aabb* b) {
+	const mushdim I = MUSHSPACE_DIM-1;
+	return a->beg.v[I] == b->beg.v[I] && a->end.v[I] == b->end.v[I];
+}
+#endif
+
 // Modifies the given beg/end pair to give a box which contains the given
 // coordinates but doesn't overlap with any of the given boxes. The coordinates
 // should, of course, be already contained between the beg and end.
