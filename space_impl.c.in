@@ -232,7 +232,9 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	if (!space->bak.data && !mush_bakaabb_init(&space->bak, p))
 		return MUSH_ERR_OOM;
 
-	mush_bakaabb_put(&space->bak, p, c);
+	if (!mush_bakaabb_put(&space->bak, p, c))
+		return MUSH_ERR_OOM;
+
 	return MUSH_ERR_NONE;
 }
 
