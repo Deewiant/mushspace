@@ -26,3 +26,19 @@ void mushstats_add(
 	(void)stats; (void)stat; (void)val;
 #endif
 }
+
+void mushstats_new_max(
+#ifndef MUSH_ENABLE_STATS
+	const
+#endif
+	mushstats* stats, MushStat stat, uint64_t val) {
+#ifdef MUSH_ENABLE_STATS
+	switch (stat) {
+#define CASE(x) case MushStat_##x: if (val > stats->x) stats->x = val; break;
+#undef CASE
+	default: assert(0);
+	}
+#else
+	(void)stats; (void)stat; (void)val;
+#endif
+}

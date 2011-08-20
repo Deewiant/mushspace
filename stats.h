@@ -40,4 +40,10 @@ void mushstats_add(
 #endif
 	mushstats*, MushStat, uint64_t);
 
+void mushstats_new_max(
+#ifndef MUSH_ENABLE_STATS
+	const
+#endif
+	mushstats*, MushStat, uint64_t);
+
 #endif
