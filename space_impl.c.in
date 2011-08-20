@@ -59,9 +59,9 @@ const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
 
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_place_box         MUSHSPACE_CAT(mushspace,_place_box)
-#define mushspace_really_place_box  MUSHSPACE_CAT(mushspace,_really_place_box)
 #define mushspace_place_box_for     MUSHSPACE_CAT(mushspace,_place_box_for)
 #define mushspace_get_box_for       MUSHSPACE_CAT(mushspace,_get_box_for)
+#define mushspace_really_place_box  MUSHSPACE_CAT(mushspace,_really_place_box)
 #define mushspace_map_no_place      MUSHSPACE_CAT(mushspace,_map_no_place)
 #define mushspace_map_in_static     MUSHSPACE_CAT(mushspace,_map_in_static)
 #define mushspace_map_in_box        MUSHSPACE_CAT(mushspace,_map_in_box)
@@ -91,8 +91,6 @@ static mush_aabb* mushspace_find_box(const mushspace*, mushcoords);
 static bool mushspace_place_box(
 	mushspace*, mush_aabb*, mushcoords*, mush_aabb**);
 
-static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
-
 static bool mushspace_place_box_for(mushspace*, mushcoords, mush_aabb**);
 
 static void mushspace_get_box_for(mushspace*, mushcoords, mush_aabb*);
@@ -108,6 +106,8 @@ static bool mushspace_extend_big_sequence_start_for(
 
 static bool mushspace_extend_first_placed_big_for(
 	const mushspace*, mushcoords, const mush_aabb*, mush_aabb*);
+
+static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
 
 static void mushspace_map_no_place(
 	mushspace*, const mush_aabb*, void*,
