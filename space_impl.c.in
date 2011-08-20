@@ -169,11 +169,12 @@ static void mushspace_load_blank(size_t, void*);
 mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (space) {
-		space->box_count = 0;
+		space->invalidatees = NULL;
+		space->stats        = stats ? stats : malloc(sizeof *space->stats);
 
-		space->boxen    = NULL;
-		space->bak.data = NULL;
-		space->stats    = stats ? stats : malloc(sizeof *space->stats);
+		space->box_count = 0;
+		space->boxen     = NULL;
+		space->bak.data  = NULL;
 
 		mush_anamnesic_ring_init(&space->recent_buf);
 
