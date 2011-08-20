@@ -40,7 +40,8 @@ struct mushspace {
 	bool just_placed_big;
 	mushcoords big_sequence_start, first_placed_big;
 
-	void (*invalidatees)(void*);
+	void (**invalidatees)(void*);
+	void  **invalidatees_data;
 
 	mushcoords last_beg, last_end;
 
