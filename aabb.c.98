@@ -1,6 +1,6 @@
-// File created: 2011-08-06 17:57:52
+// File created: 2011-08-06 17:57:40
 
-#include "aabb_impl.h"
+#include "aabb.h"
 
 #include <assert.h>
 #include <string.h>
