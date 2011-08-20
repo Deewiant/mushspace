@@ -4,11 +4,11 @@ include_rules
 
 : config.h.in |> ^ VARSED %o^ tup varsed %f %o |> config.h
 
-: foreach *.c           | config.h |> !cc   |> %B.o
-: foreach *.c.in *.c.98 | config.h |> !cc1d |> %B.1d.o
-: foreach *.c.in *.c.98 | config.h |> !cc2d |> %B.2d.o
-: foreach *.c.in *.c.98 | config.h |> !cc3d |> %B.3d.o
-: foreach *.c.in *.c.93 | config.h |> !cc93 |> %B.93.o
+: foreach *.c    | config.h |> !cc   |> %B.o
+: foreach *.c.98 | config.h |> !cc1d |> %B.1d.o
+: foreach *.c.98 | config.h |> !cc2d |> %B.2d.o
+: foreach *.c.98 | config.h |> !cc3d |> %B.3d.o
+: foreach *.c.93 | config.h |> !cc93 |> %B.93.o
 
 : *.o |> !ccshared |> libmushspace.so
 : *.o |> !ar |> libmushspace.a
