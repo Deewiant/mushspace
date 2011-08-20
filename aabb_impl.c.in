@@ -112,6 +112,21 @@ bool mush_aabb_overlapsc(const mush_aabb* a, mushcoords beg, mushcoords end) {
 	return mushcoords_overlaps(a->beg, a->end, beg, end);
 }
 
+bool mush_aabb_get_overlap_with(
+	const mush_aabb* a, const mush_aabb* b, mush_aabb* overlap)
+{
+	if (!mush_aabb_overlaps(a, b))
+		return false;
+
+	mushcoords ob = a->beg; mushcoords_max_into(&ob, b->beg);
+	mushcoords oe = a->end; mushcoords_max_into(&oe, b->end);
+	mush_aabb_make(overlap, ob, oe);
+
+	assert (mush_aabb_contains_box(a, overlap));
+	assert (mush_aabb_contains_box(b, overlap));
+	return true;
+}
+
 // Modifies the given beg/end pair to give a box which contains the given
 // coordinates but doesn't overlap with any of the given boxes. The coordinates
 // should, of course, be already contained between the beg and end.
