@@ -34,7 +34,7 @@ bool mush_aabb_alloc(mush_aabb* aabb) {
 	aabb->data = malloc(aabb->size);
 	if (!aabb->data)
 		return false;
-	memset(aabb->data, ' ', aabb->size);
+	mushcell_space(aabb->data, aabb->size);
 	return true;
 }
 

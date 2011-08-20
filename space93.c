@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "staticaabb_impl.h"
+#include "stdlib.h"
 
 struct mushspace {
 	mushstats *stats;
@@ -20,7 +21,7 @@ mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (space) {
 		space->stats = stats ? stats : malloc(sizeof *space->stats);
-		memset(space->box.array, ' ', sizeof space->box.array);
+		mushcell_space(space->box.array, MUSH_ARRAY_LEN(space->box.array));
 	}
 	return space;
 }
