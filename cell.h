@@ -5,6 +5,7 @@
 
 #include <limits.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 typedef          long mushcell;
 typedef unsigned long mushucell;
@@ -30,5 +31,8 @@ mushcell mushcell_inc(mushcell);
 // MUSHCELL_MIN/MUSHCELL_MAX.
 mushcell mushcell_add_clamped(mushcell, mushcell);
 mushcell mushcell_sub_clamped(mushcell, mushcell);
+
+// This doesn't really belong here but it's the best place for now.
+void mushcell_space(mushcell*, size_t);
 
 #endif

@@ -61,3 +61,8 @@ mushcell mushcell_sub_clamped(mushcell a, mushcell b) {
 #endif
 	return result;
 }
+
+void mushcell_space(mushcell* p, size_t l) {
+	for (mushcell *e = p + l; p != e; ++p)
+		*p = ' ';
+}
