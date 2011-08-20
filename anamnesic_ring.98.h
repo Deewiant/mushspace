@@ -6,9 +6,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "typenames.h"
-#include "aabb.h"
-#include "coords.h"
+#include "aabb.98.h"
+#include "coords.all.h"
+#include "typenames.any.h"
 
 #define mush_anamnesic_ring MUSHSPACE_NAME(mush_anamnesic_ring)
 #define mush_memory         MUSHSPACE_NAME(mush_memory)

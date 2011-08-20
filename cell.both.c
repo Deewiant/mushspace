@@ -1,6 +1,6 @@
 // File created: 2011-08-09 19:22:21
 
-#include "cell.h"
+#include "cell.both.h"
 
 #if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 #define GNU_X86_ASM 1

@@ -5,8 +5,8 @@
 
 #include <stdlib.h>
 
-#include "coords.h"
-#include "typenames.h"
+#include "coords.all.h"
+#include "typenames.any.h"
 
 #define mush_bakaabb      MUSHSPACE_NAME(mush_bakaabb)
 #define mush_bakaabb_iter MUSHSPACE_NAME(mush_bakaabb_iter)

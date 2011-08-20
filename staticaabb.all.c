@@ -1,6 +1,6 @@
 // File created: 2011-08-07 18:11:59
 
-#include "staticaabb.h"
+#include "staticaabb.all.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -33,5 +33,3 @@ size_t mush_staticaabb_get_idx_no_offset(mushcoords c) {
 #endif
 	return i;
 }
-
-// vim:ft=c

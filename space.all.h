@@ -7,10 +7,10 @@
 #include <stdlib.h>
 
 #include "config.h"
-#include "coords.h"
-#include "errors.h"
-#include "stats.h"
-#include "typenames.h"
+#include "coords.all.h"
+#include "errors.any.h"
+#include "stats.any.h"
+#include "typenames.any.h"
 
 #define mushspace MUSHSPACE_NAME(mushspace)
 

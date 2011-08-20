@@ -1,6 +1,6 @@
 // File created: 2011-08-07 17:49:34
 
-#include "anamnesic_ring.h"
+#include "anamnesic_ring.98.h"
 
 #include <assert.h>
 #include <string.h>
@@ -32,5 +32,3 @@ void mush_anamnesic_ring_read(
 const mush_memory* mush_anamnesic_ring_last(const mush_anamnesic_ring* r) {
 	return &r->ring[(r->pos == 0 ? MUSH_ANAMNESIC_RING_SIZE : r->pos) - 1];
 }
-
-// vim:ft=c

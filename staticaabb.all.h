@@ -6,8 +6,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "coords.h"
-#include "typenames.h"
+#include "coords.all.h"
+#include "typenames.any.h"
 
 #define mush_staticaabb MUSHSPACE_NAME(mush_staticaabb)
 

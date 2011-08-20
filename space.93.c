@@ -1,11 +1,11 @@
 // File created: 2011-08-14 00:10:39
 
-#include "space.h"
+#include "space.all.h"
 
 #include <string.h>
 
-#include "staticaabb.h"
-#include "stdlib.h"
+#include "staticaabb.all.h"
+#include "stdlib.any.h"
 
 struct mushspace {
 	mushstats *stats;
@@ -82,5 +82,3 @@ skipped:
 end:
 	return MUSH_ERR_NONE;
 }
-
-// vim:ft=c

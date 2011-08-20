@@ -1,18 +1,18 @@
 // File created: 2011-08-06 15:44:53
 
-#include "space.h"
+#include "space.all.h"
 
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
 
-#include "anamnesic_ring.h"
-#include "aabb.h"
-#include "bakaabb.h"
-#include "coords.h"
-#include "staticaabb.h"
-#include "stats.h"
-#include "stdlib.h"
+#include "anamnesic_ring.98.h"
+#include "aabb.98.h"
+#include "bakaabb.98.h"
+#include "coords.all.h"
+#include "staticaabb.all.h"
+#include "stats.any.h"
+#include "stdlib.any.h"
 
 // Threshold for switching to mush_bakaabb. Only limits mushspace_put, not
 // mushspace_load_string.
@@ -2188,5 +2188,3 @@ static void mushspace_load_blank(size_t blanks, void* p) {
 	}
 	aux->str = str;
 }
-
-// vim:ft=c

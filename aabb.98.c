@@ -1,11 +1,11 @@
 // File created: 2011-08-06 17:57:40
 
-#include "aabb.h"
+#include "aabb.98.h"
 
 #include <assert.h>
 #include <string.h>
 
-#include "stdlib.h"
+#include "stdlib.any.h"
 
 #define mush_aabb_can_direct_copy MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
 #define mush_aabb_can_direct_copy_area \
@@ -474,5 +474,3 @@ void mush_aabb_tessellate1(
 
 	assert (!mushcoords_overlaps(*beg, *end, avoid_beg, avoid_end));
 }
-
-// vim:ft=c

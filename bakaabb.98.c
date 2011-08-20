@@ -1,6 +1,6 @@
 // File created: 2011-08-07 17:31:02
 
-#include "bakaabb.h"
+#include "bakaabb.98.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -181,5 +181,3 @@ static size_t mush_bakaabb_hash(mushcoords c) {
 #error No hash function for a size_t of this size!
 #endif
 }
-
-// vim:ft=c

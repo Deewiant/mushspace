@@ -1,6 +1,6 @@
 // File created: 2011-08-07 18:20:32
 
-#include "coords.h"
+#include "coords.all.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -157,5 +157,3 @@ end:
 	return end_pt;
 }
 #endif // !MUSHSPACE_93
-
-// vim:ft=c
