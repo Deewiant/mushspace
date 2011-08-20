@@ -183,7 +183,7 @@ static const double __ac_HASH_UPPER = 0.77;
 			return __ac_iseither(h->flags, i)? h->n_buckets : i;           \
 		} else return 0;                                                  \
 	}                                                                    \
-	static inline void AC_CAT(kh_resize_,name)(khash_t(name) *h, khint_t new_n_buckets) \
+	static inline bool AC_CAT(kh_resize_,name)(khash_t(name) *h, khint_t new_n_buckets) \
 	{                                                                    \
 		uint32_t *new_flags = 0;                                          \
 		khint_t j = 1;                                                    \
@@ -193,12 +193,18 @@ static const double __ac_HASH_UPPER = 0.77;
 			new_n_buckets = __ac_prime_list[t+1];                          \
 			if (h->size >= (khint_t)(new_n_buckets * __ac_HASH_UPPER + 0.5)) j = 0; \
 			else {                                                         \
-				new_flags = (uint32_t*)malloc(((new_n_buckets>>4) + 1) * sizeof(uint32_t)); \
+				new_flags = malloc(((new_n_buckets>>4) + 1) * sizeof(uint32_t)); \
+				if (!new_flags) return false;                               \
 				memset(new_flags, 0xaa, ((new_n_buckets>>4) + 1) * sizeof(uint32_t)); \
 				if (h->n_buckets < new_n_buckets) {                         \
-					h->keys = (khkey_t*)realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
-					if (kh_is_map)                                           \
-						h->vals = (khval_t*)realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
+					khkey_t *keys = realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
+					if (!keys) return false;                                 \
+					if (kh_is_map) {                                         \
+						khval_t *vals = realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
+						if (!vals) return false;                              \
+						h->vals = vals;                                       \
+					}                                                        \
+					h->keys = keys;                                          \
 				}                                                           \
 			}                                                              \
 		}                                                                 \
@@ -242,13 +248,19 @@ static const double __ac_HASH_UPPER = 0.77;
 			h->n_occupied = h->size;                                       \
 			h->upper_bound = (khint_t)(h->n_buckets * __ac_HASH_UPPER + 0.5); \
 		}                                                                 \
+		return true;                                                      \
 	}                                                                    \
 	static inline khint_t AC_CAT(kh_put_,name)(khash_t(name) *h, khkey_t key, int *ret) \
 	{                                                                    \
 		khint_t x;                                                        \
 		if (h->n_occupied >= h->upper_bound) {                            \
-			if (h->n_buckets > (h->size<<1)) AC_CAT(kh_resize_,name)(h, h->n_buckets - 1); \
-			else AC_CAT(kh_resize_,name)(h, h->n_buckets + 1);             \
+			bool ok;                                                       \
+			if (h->n_buckets > (h->size<<1)) ok = AC_CAT(kh_resize_,name)(h, h->n_buckets - 1); \
+			else ok = AC_CAT(kh_resize_,name)(h, h->n_buckets + 1);        \
+			if (!ok) {                                                     \
+				*ret = -1;                                                  \
+				return 0;                                                   \
+			}                                                              \
 		}                                                                 \
 		{                                                                 \
 			khint_t inc, k, i, site, last;                                 \
