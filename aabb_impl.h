@@ -49,6 +49,10 @@ typedef struct mush_aabb {
 
 #define mush_aabb_can_fuse_with MUSHSPACE_CAT(mush_aabb,_can_fuse_with)
 
+#define mush_aabb_consume      MUSHSPACE_CAT(mush_aabb,_consume)
+#define mush_aabb_subsume      MUSHSPACE_CAT(mush_aabb,_subsume)
+#define mush_aabb_subsume_area MUSHSPACE_CAT(mush_aabb,_subsume_area)
+
 #define mush_aabb_tessellate  MUSHSPACE_CAT(mush_aabb,_tessellate)
 #define mush_aabb_tessellate1 MUSHSPACE_CAT(mush_aabb,_tessellate1)
 
@@ -85,6 +89,14 @@ bool mush_aabb_on_same_primary_axis(const mush_aabb*, const mush_aabb*);
 
 // True if we can create a new AABB which covers exactly the two given.
 bool mush_aabb_can_fuse_with(const mush_aabb*, const mush_aabb*);
+
+// box should be unallocated and old allocated.
+//
+// box takes ownership of old's array. old must be contained within box.
+bool mush_aabb_consume(mush_aabb* box, mush_aabb* old);
+
+void mush_aabb_subsume     (mush_aabb*, const mush_aabb*);
+void mush_aabb_subsume_area(mush_aabb*, const mush_aabb*, const mush_aabb*);
 
 void mush_aabb_tessellate(
 	mushcoords, const mush_aabb*, size_t, mushcoords*, mushcoords*);

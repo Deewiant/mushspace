@@ -7,6 +7,29 @@
 
 #include "stdlib.h"
 
+#define mush_aabb_can_direct_copy MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
+#define mush_aabb_can_direct_copy_area \
+	MUSHSPACE_CAT(mush_aabb,_can_direct_copy_area)
+
+#define mush_aabb_subsume_owners_area \
+	MUSHSPACE_CAT(mush_aabb,_subsume_owners_area)
+
+static bool mush_aabb_can_direct_copy(
+	const mush_aabb*, const mush_aabb*, size_t);
+static bool mush_aabb_can_direct_copy_area(
+	const mush_aabb*, const mush_aabb*, size_t, const mush_aabb*);
+
+// Copies from data to aabb, given that it's an area contained in owner.
+static void mush_aabb_subsume_owners_area(
+	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
+	const mushcell* data, size_t);
+
+#if MUSHSPACE_DIM > 1
+#define mush_aabb_consume_2d MUSHSPACE_CAT(mush_aabb,_consume_2d)
+static void mush_aabb_consume_2d(
+	const mush_aabb*, const mush_aabb*, size_t, size_t, size_t);
+#endif
+
 void mush_aabb_make(mush_aabb* aabb, mushcoords b, mushcoords e) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		assert (b.v[i] <= e.v[i]);
@@ -163,6 +186,204 @@ bool mush_aabb_can_fuse_with(const mush_aabb* a, const mush_aabb* b) {
 		return true;
 	}
 	return false;
+}
+
+static bool mush_aabb_can_direct_copy(
+	const mush_aabb* copier, const mush_aabb* copiee, size_t copiee_size)
+{
+#if MUSHSPACE_DIM == 1
+	(void)copier; (void)copiee; (void)copiee_size;
+	return true;
+#else
+	if (copiee_size == copiee->width && copiee_size <= copier->width)
+		return true;
+
+	return copier->width == copiee->width
+#if MUSHSPACE_DIM >= 3
+	    && copier->area  == copiee->area
+#endif
+	;
+#endif
+}
+static bool mush_aabb_can_direct_copy_area(
+	const mush_aabb* copier, const mush_aabb* copiee, size_t copiee_size,
+	const mush_aabb* owner)
+{
+#if MUSHSPACE_DIM >= 2
+	if (copiee->width != owner->width) return false;
+#if MUSHSPACE_DIM >= 3
+	if (copiee->area  != owner->area)  return false;
+#endif
+#endif
+	(void)owner;
+	return mush_aabb_can_direct_copy(copier, copiee, copiee_size);
+}
+
+bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
+	assert (mush_aabb_contains_box(box, old));
+
+	static const size_t SIZE = sizeof *box->data;
+
+	if (!(box->data = realloc(old->data, box->size * SIZE)))
+		return false;
+
+	mushcell_space(box->data + old->size, box->size - old->size);
+
+	const size_t old_idx = mush_aabb_get_idx(box, old->beg);
+
+	if (mush_aabb_can_direct_copy(box, old, old->size)) {
+		if (old_idx == 0)
+			return true;
+
+		if (old_idx < old->size) {
+			memmove(box->data + old_idx, box->data, old->size * SIZE);
+			mushcell_space(box->data, old_idx);
+		} else {
+			memcpy(box->data + old_idx, box->data, old->size * SIZE);
+			mushcell_space(box->data, old->size);
+		}
+		return true;
+	}
+
+	assert (MUSHSPACE_DIM > 1);
+
+#if MUSHSPACE_DIM > 1
+	// If the beginning coordinates are identical, the first row is already in
+	// the right place so we don't need to touch it.
+	const bool   same_beg             = mushcoords_equal(box->beg, old->beg);
+	const size_t last_row_idx_summand = same_beg ? old->width : 0;
+#endif
+
+#if MUSHSPACE_DIM == 2
+	mush_aabb_consume_2d(box, old, old_idx, old->size, last_row_idx_summand);
+#elif MUSHSPACE_DIM == 3
+	const size_t
+		last_area_idx =
+			old_idx + (same_beg && box->width == old->width ? old->area : 0),
+
+		new_old_end = old_idx + old->size / old->area * box->area;
+
+	for (size_t b = new_old_end, o = old->size; b > last_area_idx;) {
+		b -= box->area;
+		mush_aabb_consume_2d(box, old, b, o, last_row_idx_summand);
+		o -= old->area;
+	}
+#endif
+	return true;
+}
+#if MUSHSPACE_DIM > 1
+static void mush_aabb_consume_2d(
+	const mush_aabb* box, const mush_aabb* old,
+	size_t old_idx, size_t old_end, size_t last_row_idx_summand)
+{
+	static const size_t SIZE = sizeof *box->data;
+	const size_t
+#if MUSHSPACE_DIM == 2
+		old_rect_size = old->size,
+#else
+		old_rect_size = old->area,
+#endif
+		old_height    = old_rect_size / old->width,
+		new_old_end   = old_idx + old_height * box->width,
+		last_row_idx  = old_idx + last_row_idx_summand;
+
+	for (size_t b = new_old_end, o = old_end; b > last_row_idx;) {
+		b -= box->width;
+		o -= old->width;
+
+		// The old data is always earlier in the array than the new location, so
+		// overlapping can only occur from one direction: b + old->width <= o
+		// can't happen.
+		assert (b + old->width > o);
+
+		if (o + old->width <= b) {
+			memcpy        (box->data + b, box->data + o, old->width * SIZE);
+			mushcell_space(               box->data + o, old->width);
+		} else if (b != o) {
+			memmove       (box->data + b, box->data + o, old->width * SIZE);
+			mushcell_space(               box->data + o, b - o);
+		}
+	}
+}
+#endif
+void mush_aabb_subsume(mush_aabb* a, const mush_aabb* b) {
+	assert (mush_aabb_contains_box(a, b));
+
+	mush_aabb_subsume_owners_area(a, b, b, b->data, b->size);
+}
+void mush_aabb_subsume_area(
+	mush_aabb* a, const mush_aabb* b, const mush_aabb* area)
+{
+	assert (mush_aabb_contains_box(a, area));
+	assert (mush_aabb_contains_box(b, area));
+
+	size_t beg_idx = mush_aabb_get_idx(b, area->beg),
+	       end_idx = mush_aabb_get_idx(b, area->end);
+
+	mush_aabb_subsume_owners_area(
+		a, b, area, b->data + beg_idx, end_idx - beg_idx + 1);
+
+	assert (mush_aabb_get(a, area->beg) == mush_aabb_get(b, area->beg));
+	assert (mush_aabb_get(a, area->end) == mush_aabb_get(b, area->end));
+}
+static void mush_aabb_subsume_owners_area(
+	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
+	const mushcell* data, size_t len)
+{
+	assert (mush_aabb_contains_box(aabb,  area));
+	assert (mush_aabb_contains_box(owner, area));
+
+	// We can't just use only area since the data is usually not continuous:
+	//
+	//   ownerowner
+	//   owner****D
+	//   ATADA****D
+	//   ATADA****D
+	//   ATADA****r
+	//   ownerowner
+	//
+	// (In the above: area is shown with asterisks, owner with "owner", and the
+	//  area from data to data+len with "DATA".)
+	//
+	// In such a case, if we were to advance in the array by area->width instead
+	// of owner->width we'd be screwed.
+
+	static const size_t SIZE = sizeof *data;
+
+	const size_t beg_idx = mush_aabb_get_idx(aabb, area->beg);
+
+	if (mush_aabb_can_direct_copy_area(aabb, area, area->size, owner)) {
+		memcpy(aabb->data + beg_idx, data, len * SIZE);
+		goto end;
+	}
+
+	assert (MUSHSPACE_DIM > 1);
+
+#if MUSHSPACE_DIM == 2
+	for (size_t o = 0, a = beg_idx; o < len;) {
+		memcpy(aabb->data + a, data + o, area->width * SIZE);
+		o += owner->width;
+		a +=  aabb->width;
+	}
+
+#elif MUSHSPACE_DIM == 3
+	const size_t owner_area_size = area->area / area->width * owner->width;
+
+	for (size_t o = 0, a = beg_idx; o < len;) {
+		for (size_t oy = o, ay = a; oy < o + owner_area_size;) {
+			memcpy(aabb->data + ay, data + oy, area->width * SIZE);
+			oy += owner->width;
+			ay +=  aabb->width;
+		}
+		o += owner->area;
+		a +=  aabb->area;
+	}
+#endif
+end:
+	assert (mush_aabb_get(aabb, area->beg) == data[0]);
+	assert (mush_aabb_get(aabb, area->end) == data[len-1]);
+	assert (mush_aabb_get(aabb, area->beg) == mush_aabb_get(owner, area->beg));
+	assert (mush_aabb_get(aabb, area->end) == mush_aabb_get(owner, area->end));
 }
 
 // Modifies the given beg/end pair to give a box which contains the given
