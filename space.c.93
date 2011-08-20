@@ -82,3 +82,5 @@ skipped:
 end:
 	return MUSH_ERR_NONE;
 }
+
+// vim:ft=c

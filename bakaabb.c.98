@@ -181,3 +181,5 @@ static size_t mush_bakaabb_hash(mushcoords c) {
 #error No hash function for a size_t of this size!
 #endif
 }
+
+// vim:ft=c

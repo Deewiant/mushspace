@@ -474,3 +474,5 @@ void mush_aabb_tessellate1(
 
 	assert (!mushcoords_overlaps(*beg, *end, avoid_beg, avoid_end));
 }
+
+// vim:ft=c

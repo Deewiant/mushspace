@@ -33,3 +33,5 @@ size_t mush_staticaabb_get_idx_no_offset(mushcoords c) {
 #endif
 	return i;
 }
+
+// vim:ft=c

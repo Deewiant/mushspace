@@ -2188,3 +2188,5 @@ static void mushspace_load_blank(size_t blanks, void* p) {
 	}
 	aux->str = str;
 }
+
+// vim:ft=c
