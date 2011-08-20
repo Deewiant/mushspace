@@ -9,6 +9,8 @@
 
 size_t mush_size_t_max(size_t, size_t);
 
+int mush_size_t_qsort_cmp(const void*, const void*);
+
 // Don't overflow, instead clamp the result to SIZE_MAX.
 size_t mush_size_t_add_clamped(size_t, size_t);
 size_t mush_size_t_mul_clamped(size_t, size_t);
