@@ -32,7 +32,7 @@ bool mush_bakaabb_init(mush_bakaabb*, mushcoords);
 void mush_bakaabb_free(mush_bakaabb* bak);
 
 mushcell mush_bakaabb_get(const mush_bakaabb*, mushcoords);
-void     mush_bakaabb_put(      mush_bakaabb*, mushcoords, mushcell);
+bool     mush_bakaabb_put(      mush_bakaabb*, mushcoords, mushcell);
 
 size_t mush_bakaabb_size(const mush_bakaabb*);
 
