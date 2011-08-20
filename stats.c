@@ -21,6 +21,7 @@ void mushstats_add(
 	CASE(subsumed_disjoint)
 	CASE(subsumed_overlaps)
 #undef CASE
+	default: assert(0);
 	}
 #else
 	(void)stats; (void)stat; (void)val;
@@ -35,6 +36,7 @@ void mushstats_new_max(
 #ifdef MUSH_ENABLE_STATS
 	switch (stat) {
 #define CASE(x) case MushStat_##x: if (val > stats->x) stats->x = val; break;
+	CASE(max_boxes_live)
 #undef CASE
 	default: assert(0);
 	}
