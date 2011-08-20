@@ -25,7 +25,8 @@ typedef struct mush_aabb {
 #define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
 #define mush_aabb_alloc       MUSHSPACE_CAT(mush_aabb,_alloc)
 
-#define mush_aabb_volume_on MUSHSPACE_CAT(mush_aabb,_volume_on)
+#define mush_aabb_clamped_size MUSHSPACE_CAT(mush_aabb,_clamped_size)
+#define mush_aabb_volume_on    MUSHSPACE_CAT(mush_aabb,_volume_on)
 
 #define mush_aabb_contains      MUSHSPACE_CAT(mush_aabb,_contains)
 #define mush_aabb_contains_box  MUSHSPACE_CAT(mush_aabb,_contains_box)
@@ -48,7 +49,8 @@ void mush_aabb_make_unsafe(mush_aabb*, mushcoords, mushcoords);
 void mush_aabb_finalize   (mush_aabb*);
 bool mush_aabb_alloc      (mush_aabb*);
 
-size_t mush_aabb_volume_on(const mush_aabb*, mushdim axis);
+size_t mush_aabb_clamped_size(const mush_aabb*);
+size_t mush_aabb_volume_on   (const mush_aabb*, mushdim);
 
 bool mush_aabb_contains    (const mush_aabb*, mushcoords);
 bool mush_aabb_contains_box(const mush_aabb*, const mush_aabb*);
