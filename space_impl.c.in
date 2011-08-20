@@ -92,9 +92,7 @@ static bool mushspace_place_box(
 
 static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
 
-// MUSH_ERR_NO_ROOM: exceeded MAX_PLACED_BOXEN.
-// MUSH_ERR_OOM:     out of memory.
-static int mushspace_place_box_for(mushspace*, mushcoords, mush_aabb**);
+static bool mushspace_place_box_for(mushspace*, mushcoords, mush_aabb**);
 
 static void mushspace_get_box_for(mushspace*, mushcoords, mush_aabb*);
 
@@ -222,8 +220,8 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	}
 
 	mush_aabb* box;
-	if ((box = mushspace_find_box (space, p))
-	    || mushspace_place_box_for(space, p, &box) == MUSH_ERR_NONE)
+	if (    (box = mushspace_find_box(space, p))
+	     || mushspace_place_box_for  (space, p, &box))
 	{
 		mush_aabb_put(box, p, c);
 		return MUSH_ERR_NONE;
@@ -343,22 +341,22 @@ incorporated:
 	return true;
 }
 
-static int mushspace_place_box_for(
+static bool mushspace_place_box_for(
 	mushspace* space, mushcoords c, mush_aabb** placed)
 {
 	if (space->box_count >= MAX_PLACED_BOXEN)
-		return MUSH_ERR_NO_ROOM;
+		return false;
 
 	mush_aabb aabb;
 	mushspace_get_box_for(space, c, &aabb);
 
 	if (!mushspace_place_box(space, &aabb, &c, placed))
-		return MUSH_ERR_OOM;
+		return false;
 
 	mush_anamnesic_ring_push(
 		&space->recent_buf, (mush_memory){.placed = **placed, c});
 
-	return MUSH_ERR_NONE;
+	return true;
 }
 static void mushspace_get_box_for(
 	mushspace* space, mushcoords c, mush_aabb* aabb)
