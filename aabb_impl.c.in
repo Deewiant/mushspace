@@ -50,20 +50,12 @@ size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
 	return 1;
 }
 
-mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
-	assert (mush_aabb_contains(aabb, c));
-	return aabb->data[mush_aabb_get_idx(aabb, c)];
-}
-
-void mush_aabb_put(mush_aabb* aabb, mushcoords p, mushcell c) {
-	assert (mush_aabb_contains(aabb, p));
-	aabb->data[mush_aabb_get_idx(aabb, p)] = c;
-}
-
 bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
 	return mushcoords_contains(c, aabb->beg, aabb->end);
 }
-
+bool mush_aabb_contains_box(const mush_aabb* a, const mush_aabb* b) {
+	return mush_aabb_contains(a, b->beg) && mush_aabb_contains(a, b->end);
+}
 bool mush_aabb_safe_contains(const mush_aabb* aabb, mushcoords c) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (aabb->beg.v[i] > aabb->end.v[i]) {
@@ -74,6 +66,16 @@ bool mush_aabb_safe_contains(const mush_aabb* aabb, mushcoords c) {
 				return false;
 	}
 	return true;
+}
+
+mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
+	assert (mush_aabb_contains(aabb, c));
+	return aabb->data[mush_aabb_get_idx(aabb, c)];
+}
+
+void mush_aabb_put(mush_aabb* aabb, mushcoords p, mushcell c) {
+	assert (mush_aabb_contains(aabb, p));
+	aabb->data[mush_aabb_get_idx(aabb, p)] = c;
 }
 
 size_t mush_aabb_get_idx(const mush_aabb* aabb, mushcoords c) {
@@ -93,15 +95,11 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 	return i;
 }
 
-bool mush_aabb_overlapsc(const mush_aabb* a, mushcoords beg, mushcoords end) {
-	return mushcoords_overlaps(a->beg, a->end, beg, end);
-}
 bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
 	return mush_aabb_overlapsc(a, b->beg, b->end);
 }
-
-bool mush_aabb_contains_box(const mush_aabb* a, const mush_aabb* b) {
-	return mush_aabb_contains(a, b->beg) && mush_aabb_contains(a, b->end);
+bool mush_aabb_overlapsc(const mush_aabb* a, mushcoords beg, mushcoords end) {
+	return mushcoords_overlaps(a->beg, a->end, beg, end);
 }
 
 // Modifies the given beg/end pair to give a box which contains the given
