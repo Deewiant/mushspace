@@ -11,12 +11,16 @@
 typedef uint8_t mushcell;
 typedef uint8_t mushucell;
 
-#define mushcell_max   mushcell_93_max
-#define mushcell_min   mushcell_93_min
-#define mushcell_add   mushcell_93_add
-#define mushcell_sub   mushcell_93_sub
-#define mushcell_inc   mushcell_93_inc
-#define mushcell_space mushcell_93_space
+#define mushcell_max      mushcell_93_max
+#define mushcell_min      mushcell_93_min
+#define mushcell_max_into mushcell_93_max_into
+#define mushcell_min_into mushcell_93_min_into
+#define mushcell_add      mushcell_93_add
+#define mushcell_sub      mushcell_93_sub
+#define mushcell_inc      mushcell_93_inc
+#define mushcell_add_into mushcell_93_add_into
+#define mushcell_sub_into mushcell_93_sub_into
+#define mushcell_space    mushcell_93_space
 
 #define MUSHCELL_MIN 0
 #define MUSHCELL_MAX UINT8_MAX
@@ -33,14 +37,18 @@ typedef unsigned long mushucell;
 // This doesn't, strictly speaking, belong here, but oh well.
 typedef uint8_t mushdim;
 
-mushcell mushcell_max(mushcell, mushcell);
-mushcell mushcell_min(mushcell, mushcell);
+mushcell mushcell_max     (mushcell,  mushcell);
+mushcell mushcell_min     (mushcell,  mushcell);
+void     mushcell_max_into(mushcell*, mushcell);
+void     mushcell_min_into(mushcell*, mushcell);
 
 // Deal with signed overflow/underflow by wrapping around the way Gawd
 // intended.
-mushcell mushcell_add(mushcell, mushcell);
-mushcell mushcell_sub(mushcell, mushcell);
-mushcell mushcell_inc(mushcell);
+mushcell mushcell_add (mushcell,  mushcell);
+mushcell mushcell_sub (mushcell,  mushcell);
+mushcell mushcell_inc (mushcell);
+void mushcell_add_into(mushcell*, mushcell);
+void mushcell_sub_into(mushcell*, mushcell);
 
 #if !MUSHSPACE_93
 // Don't overflow/underflow, instead clamp the result to

@@ -11,6 +11,9 @@
 mushcell mushcell_max(mushcell a, mushcell b) { return a > b ? a : b; }
 mushcell mushcell_min(mushcell a, mushcell b) { return a < b ? a : b; }
 
+void mushcell_max_into(mushcell* a, mushcell b) { *a = mushcell_max(*a, b); }
+void mushcell_min_into(mushcell* a, mushcell b) { *a = mushcell_min(*a, b); }
+
 mushcell mushcell_add(mushcell a, mushcell b) {
 	return (mushcell)((mushucell)a + (mushucell)b);
 }
@@ -20,6 +23,8 @@ mushcell mushcell_sub(mushcell a, mushcell b) {
 mushcell mushcell_inc(mushcell n) {
 	return mushcell_add(n, 1);
 }
+void mushcell_add_into(mushcell* a, mushcell b) { *a = mushcell_add(*a, b); }
+void mushcell_sub_into(mushcell* a, mushcell b) { *a = mushcell_sub(*a, b); }
 
 #if !MUSHSPACE_93
 mushcell mushcell_add_clamped(mushcell a, mushcell b) {
