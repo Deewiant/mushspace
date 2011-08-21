@@ -30,9 +30,6 @@ static void mush_aabb_consume_2d(
 #endif
 
 void mush_aabb_make(mush_aabb* aabb, mushcoords b, mushcoords e) {
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		assert (b.v[i] <= e.v[i]);
-
 	mush_aabb_make_unsafe(aabb, b, e);
 	mush_aabb_finalize(aabb);
 }
@@ -42,6 +39,9 @@ void mush_aabb_make_unsafe(mush_aabb* aabb, mushcoords b, mushcoords e) {
 }
 
 void mush_aabb_finalize(mush_aabb* aabb) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+		assert (aabb->beg.v[i] <= aabb->end.v[i]);
+
 	aabb->size = aabb->end.x - aabb->beg.x + 1;
 
 #if MUSHSPACE_DIM >= 2
