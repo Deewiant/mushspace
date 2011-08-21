@@ -5,6 +5,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
+const mush_bounds MUSH_STATICAABB_BOUNDS =
+	{.beg = MUSH_STATICAABB_BEG_INIT, .end = MUSH_STATICAABB_END_INIT};
+
 bool mush_staticaabb_contains(mushcoords c) {
 	return mushcoords_contains(c, MUSH_STATICAABB_BEG, MUSH_STATICAABB_END);
 }
