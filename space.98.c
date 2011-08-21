@@ -535,8 +535,8 @@ static bool mushspace_get_box_along_recent_line_for(
 	space->big_sequence_start = recents[0].c;
 
 	mushcoords beg = c, end = c;
-	if (positive) end.v[axis] = mushcell_add(end.v[axis], BIGBOX_PAD);
-	else          beg.v[axis] = mushcell_sub(beg.v[axis], BIGBOX_PAD);
+	if (positive) mushcell_add_into(&end.v[axis], BIGBOX_PAD);
+	else          mushcell_sub_into(&beg.v[axis], BIGBOX_PAD);
 
 	mush_aabb_make_unsafe(aabb, beg, end);
 	return true;
@@ -598,8 +598,8 @@ static bool mushspace_extend_big_sequence_start_for(
 
 	// Extend last along the axis where c was outside it.
 	mushcoords beg = last->beg, end = last->end;
-	if (positive) end.v[axis] = mushcell_add(end.v[axis], BIGBOX_PAD);
-	else          beg.v[axis] = mushcell_sub(beg.v[axis], BIGBOX_PAD);
+	if (positive) mushcell_add_into(&end.v[axis], BIGBOX_PAD);
+	else          mushcell_sub_into(&beg.v[axis], BIGBOX_PAD);
 
 	mush_aabb_make_unsafe(aabb, beg, end);
 	return true;
@@ -663,12 +663,12 @@ static bool mushspace_extend_first_placed_big_for(
 		beg = space->big_sequence_start;
 		end = last->end;
 
-		end.v[axis] = mushcell_add(end.v[axis], BIGBOX_PAD);
+		mushcell_add_into(&end.v[axis], BIGBOX_PAD);
 	} else {
 		beg = last->beg;
 		end = space->big_sequence_start;
 
-		beg.v[axis] = mushcell_sub(beg.v[axis], BIGBOX_PAD);
+		mushcell_sub_into(&beg.v[axis], BIGBOX_PAD);
 	}
 	mush_aabb_make_unsafe(aabb, beg, end);
 	return true;
@@ -1685,28 +1685,28 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 					// target location.
 
 					if (found_past & axis)
-						aabb.end.v[i] = mushcell_max(aabb.end.v[i], box->end.v[i]);
+						mushcell_max_into(&aabb.end.v[i], box->end.v[i]);
 					else {
 						aabb.end.v[i] = box->end.v[i];
 						found_past |= axis;
 					}
 
 					if (!(found_before & axis))
-						aabb.beg.v[i] = mushcell_min(aabb.beg.v[i], box->beg.v[i]);
+						mushcell_min_into(&aabb.beg.v[i], box->beg.v[i]);
 				} else {
 					// This box is before this axis, in the negative direction: it
 					// both begins and ends in the positive direction from the
 					// target location.
 
 					if (found_before & axis)
-						aabb.beg.v[i] = mushcell_min(aabb.beg.v[i], box->beg.v[i]);
+						mushcell_min_into(&aabb.beg.v[i], box->beg.v[i]);
 					else {
 						aabb.beg.v[i] = box->beg.v[i];
 						found_before |= axis;
 					}
 
 					if (!(found_past & axis))
-						aabb.end.v[i] = mushcell_max(aabb.end.v[i], box->end.v[i]);
+						mushcell_max_into(&aabb.end.v[i], box->end.v[i]);
 				}
 			}
 		}
@@ -1830,7 +1830,7 @@ static mush_aabb* mushspace_get_aabbs(
 
 			if (get_beg) for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 				if (get_beg & 1 << i) {
-					aabbs[a].beg.v[i] = mushcell_min(aabbs[a].beg.v[i], pos.v[i]);
+					mushcell_min_into(&aabbs[a].beg.v[i], pos.v[i]);
 					get_beg &= ~(1 << i);
 				}
 			}
@@ -1869,8 +1869,8 @@ static mush_aabb* mushspace_get_aabbs(
 				mush_hit_newline;
 		#endif
 		#if MUSHSPACE_DIM >= 3
-			aabbs[a].end.x = mushcell_max(aabbs[a].end.x, last_nonspace.x);
-			aabbs[a].end.y = mushcell_max(aabbs[a].end.y, last_nonspace.y);
+			mushcell_max_into(&aabbs[a].end.x, last_nonspace.x);
+			mushcell_max_into(&aabbs[a].end.y, last_nonspace.y);
 
 			pos.x = target.x;
 			pos.y = target.y;
@@ -1931,7 +1931,7 @@ static bool mushspace_newline(
 {
 	*got_cr = false;
 
-	aabbs[*a].end.x = mushcell_max(aabbs[*a].end.x, last_nonspace.x);
+	mushcell_max_into(&aabbs[*a].end.x, last_nonspace.x);
 
 	pos->x = target.x;
 
