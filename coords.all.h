@@ -26,10 +26,12 @@ typedef union mushcoords {
 	mushcell v[MUSHSPACE_DIM];
 } mushcoords;
 
-#define MUSHCOORDS MUSHSPACE_CAT(MUSHCOORDS,MUSHSPACE_DIM)
-#define MUSHCOORDS1(a,b,c) (mushcoords){{.x = a}}
-#define MUSHCOORDS2(a,b,c) (mushcoords){{.x = a, .y = b}}
-#define MUSHCOORDS3(a,b,c) (mushcoords){{.x = a, .y = b, .z = c}}
+#define MUSHCOORDS_INIT MUSHSPACE_CAT(MUSHCOORDS_INIT,MUSHSPACE_DIM)
+#define MUSHCOORDS_INIT1(a,b,c) {{.x = a}}
+#define MUSHCOORDS_INIT2(a,b,c) {{.x = a, .y = b}}
+#define MUSHCOORDS_INIT3(a,b,c) {{.x = a, .y = b, .z = c}}
+
+#define MUSHCOORDS(a,b,c) ((mushcoords)MUSHCOORDS_INIT(a,b,c))
 
 #define mushcoords_contains MUSHSPACE_CAT(mushcoords,_contains)
 #define mushcoords_overlaps MUSHSPACE_CAT(mushcoords,_overlaps)
