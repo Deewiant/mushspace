@@ -141,7 +141,7 @@ bool mush_aabb_get_overlap_with(
 		return false;
 
 	mushcoords ob = a->beg; mushcoords_max_into(&ob, b->beg);
-	mushcoords oe = a->end; mushcoords_max_into(&oe, b->end);
+	mushcoords oe = a->end; mushcoords_min_into(&oe, b->end);
 	mush_aabb_make(overlap, ob, oe);
 
 	assert (mush_aabb_contains_box(a, overlap));
