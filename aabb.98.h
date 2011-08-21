@@ -103,9 +103,14 @@ void mush_aabb_subsume     (mush_aabb*, const mush_aabb*);
 void mush_aabb_subsume_area(mush_aabb*, const mush_aabb*, const mush_aabb*);
 void mush_aabb_space_area  (mush_aabb*, const mush_aabb*);
 
+// Modifies the given beg/end pair to give a box which contains the given
+// coordinates but doesn't overlap with any of the given boxes. The coordinates
+// should, of course, be already contained between the beg and end.
 void mush_aabb_tessellate(
 	mushcoords, const mush_aabb*, size_t, mushcoords*, mushcoords*);
 
+// Since the algorithm is currently just a fold over the boxes, this simpler
+// version exists to avoid heap allocation in some cases.
 void mush_aabb_tessellate1(
 	mushcoords, mushcoords, mushcoords, mushcoords*, mushcoords*);
 

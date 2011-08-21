@@ -412,9 +412,6 @@ end:
 	assert (mush_aabb_get(aabb, area->end) == ' ');
 }
 
-// Modifies the given beg/end pair to give a box which contains the given
-// coordinates but doesn't overlap with any of the given boxes. The coordinates
-// should, of course, be already contained between the beg and end.
 void mush_aabb_tessellate(
 	mushcoords pos, const mush_aabb* bs, size_t len,
 	mushcoords* beg, mushcoords* end)
@@ -425,8 +422,6 @@ void mush_aabb_tessellate(
 		mush_aabb_tessellate1(pos, bs[i].beg, bs[i].end, beg, end);
 }
 
-// Since the algorithm is currently just a fold over the boxes, this simpler
-// version exists to avoid heap allocation in some cases.
 void mush_aabb_tessellate1(
 	mushcoords pos, mushcoords avoid_beg, mushcoords avoid_end,
 	mushcoords* beg, mushcoords* end)
