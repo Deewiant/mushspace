@@ -33,6 +33,14 @@ mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
 
 bool mush_bakaabb_put(mush_bakaabb* bak, mushcoords p, mushcell c) {
 	khash_t(mushcoords) *hash = bak->data;
+
+	if (c == ' ') {
+		khint_t i = kh_get(mushcoords, hash, p);
+		if (i != kh_end(hash))
+			kh_del(mushcoords, hash, i);
+		return true;
+	}
+
 	int status;
 	khint_t i = kh_put(mushcoords, hash, p, &status);
 	if (status == -1)
