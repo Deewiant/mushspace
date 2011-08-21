@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "bounds.all.h"
 #include "stdlib.any.h"
 
 #define mush_aabb_can_direct_copy MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
@@ -83,7 +84,8 @@ size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
 }
 
 bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
-	return mushcoords_contains(c, aabb->beg, aabb->end);
+	mush_bounds bounds = {aabb->beg, aabb->end};
+	return mush_bounds_contains(&bounds, c);
 }
 bool mush_aabb_contains_box(const mush_aabb* a, const mush_aabb* b) {
 	return mush_aabb_contains(a, b->beg) && mush_aabb_contains(a, b->end);
@@ -128,7 +130,9 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 }
 
 bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
-	return mushcoords_overlaps(a->beg, a->end, b->beg, b->end);
+	mush_bounds ab = {a->beg, a->end};
+	mush_bounds bb = {b->beg, b->end};
+	return mush_bounds_overlaps(&ab, &bb);
 }
 
 bool mush_aabb_get_overlap_with(
@@ -413,7 +417,8 @@ void mush_aabb_tessellate(
 	mushcoords pos, const mush_aabb* bs, size_t len,
 	mushcoords* beg, mushcoords* end)
 {
-	assert (mushcoords_contains(pos, *beg, *end));
+	mush_bounds bounds = {*beg, *end};
+	assert (mush_bounds_contains(&bounds, pos));
 
 	for (size_t i = 0; i < len; ++i)
 		mush_aabb_tessellate1(pos, bs[i].beg, bs[i].end, beg, end);
@@ -423,7 +428,8 @@ void mush_aabb_tessellate1(
 	mushcoords pos, mushcoords avoid_beg, mushcoords avoid_end,
 	mushcoords* beg, mushcoords* end)
 {
-	assert (mushcoords_contains(pos, *beg, *end));
+	mush_bounds bounds = {*beg, *end};
+	assert (mush_bounds_contains(&bounds, pos));
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		// This could be improved, consider for instance the bottommost box in
@@ -462,5 +468,6 @@ void mush_aabb_tessellate1(
 		if (ab > p) end->v[i] = mushcell_min(end->v[i], ab-1);
 	}
 
-	assert (!mushcoords_overlaps(*beg, *end, avoid_beg, avoid_end));
+	mush_bounds abounds = {avoid_beg, avoid_end};
+	assert (!mush_bounds_overlaps(&bounds, &abounds));
 }

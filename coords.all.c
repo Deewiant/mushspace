@@ -5,28 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end) {
-	if (pos.x < beg.x || pos.x > end.x) return false;
-#if MUSHSPACE_DIM >= 2
-	if (pos.y < beg.y || pos.y > end.y) return false;
-#if MUSHSPACE_DIM >= 3
-	if (pos.z < beg.z || pos.z > end.z) return false;
-#endif
-#endif
-	return true;
-}
-
-#if !MUSHSPACE_93
-bool mushcoords_overlaps(
-	mushcoords beg1, mushcoords end1, mushcoords beg2, mushcoords end2)
-{
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		if (beg1.v[i] > end2.v[i] || beg2.v[i] > end1.v[i])
-			return false;
-	return true;
-}
-#endif
-
 #define DEFINE_OP(NAME) \
 	mushcoords mushcoords_##NAME(mushcoords a, mushcoords b) { \
 		mushcoords x = a; \

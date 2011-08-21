@@ -9,7 +9,7 @@ const mush_bounds MUSH_STATICAABB_BOUNDS =
 	{.beg = MUSH_STATICAABB_BEG_INIT, .end = MUSH_STATICAABB_END_INIT};
 
 bool mush_staticaabb_contains(mushcoords c) {
-	return mushcoords_contains(c, MUSH_STATICAABB_BEG, MUSH_STATICAABB_END);
+	return mush_bounds_contains(&MUSH_STATICAABB_BOUNDS, c);
 }
 
 mushcell mush_staticaabb_get(const mush_staticaabb* aabb, mushcoords p) {

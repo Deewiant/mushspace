@@ -33,11 +33,8 @@ typedef union mushcoords {
 
 #define MUSHCOORDS(a,b,c) ((mushcoords)MUSHCOORDS_INIT(a,b,c))
 
-#define mushcoords_contains MUSHSPACE_CAT(mushcoords,_contains)
-#define mushcoords_overlaps MUSHSPACE_CAT(mushcoords,_overlaps)
-
-#define mushcoords_sub         MUSHSPACE_CAT(mushcoords,_sub)
-#define mushcoords_equal       MUSHSPACE_CAT(mushcoords,_equal)
+#define mushcoords_sub   MUSHSPACE_CAT(mushcoords,_sub)
+#define mushcoords_equal MUSHSPACE_CAT(mushcoords,_equal)
 
 #define mushcoords_adds_clamped MUSHSPACE_CAT(mushcoords,_adds_clamped)
 #define mushcoords_subs_clamped MUSHSPACE_CAT(mushcoords,_subs_clamped)
@@ -47,12 +44,6 @@ typedef union mushcoords {
 
 #define mushcoords_get_end_of_contiguous_range \
 	MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
-
-bool mushcoords_contains(mushcoords pos, mushcoords beg, mushcoords end);
-
-#if !MUSHSPACE_93
-bool mushcoords_overlaps(mushcoords, mushcoords, mushcoords, mushcoords);
-#endif
 
 mushcoords mushcoords_sub(mushcoords, mushcoords);
 
