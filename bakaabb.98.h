@@ -6,14 +6,15 @@
 #include <stdlib.h>
 
 #include "coords.all.h"
+#include "bounds.all.h"
 #include "typenames.any.h"
 
 #define mush_bakaabb      MUSHSPACE_NAME(mush_bakaabb)
 #define mush_bakaabb_iter MUSHSPACE_NAME(mush_bakaabb_iter)
 
 typedef struct mush_bakaabb {
+	mush_bounds bounds;
 	void *data;
-	mushcoords beg, end;
 } mush_bakaabb;
 
 typedef struct mush_bakaabb_iter mush_bakaabb_iter;

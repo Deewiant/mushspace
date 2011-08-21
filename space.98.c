@@ -387,7 +387,8 @@ incorporated:
 		if (!space->bak.data || !mush_bakaabb_size(&space->bak))
 			continue;
 
-		if (!mush_aabb_overlapsc(box, space->bak.beg, space->bak.end))
+		mush_bounds bounds = {box->beg, box->end};
+		if (!mush_bounds_overlaps(&bounds, &space->bak.bounds))
 			continue;
 
 		assert (box == &space->boxen[space->box_count-1]);

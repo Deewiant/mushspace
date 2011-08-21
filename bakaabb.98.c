@@ -18,7 +18,7 @@ KHASH_INIT(mushcoords, mushcoords, mushcell, true,
 
 bool mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
 	bak->data = kh_init(mushcoords);
-	bak->beg = bak->end = c;
+	bak->bounds = (mush_bounds){c,c};
 	return bak->data != NULL;
 }
 void mush_bakaabb_free(mush_bakaabb* bak) {
