@@ -27,7 +27,8 @@ void mush_bakaabb_free(mush_bakaabb* bak) {
 
 mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
 	const khash_t(mushcoords) *hash = bak->data;
-	return kh_value(hash, kh_get(mushcoords, hash, c));
+	khint_t i = kh_get(mushcoords, hash, c);
+	return i == kh_end(hash) ? ' ' : kh_value(hash, i);
 }
 
 bool mush_bakaabb_put(mush_bakaabb* bak, mushcoords p, mushcell c) {
