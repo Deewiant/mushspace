@@ -134,10 +134,10 @@ static bool mushspace_get_box_along_recent_volume_for(
 	const mushspace*, mushcoords, mush_aabb*);
 
 static bool mushspace_extend_big_sequence_start_for(
-	const mushspace*, mushcoords, const mush_aabb*, mush_aabb*);
+	const mushspace*, mushcoords, const mush_bounds*, mush_aabb*);
 
 static bool mushspace_extend_first_placed_big_for(
-	const mushspace*, mushcoords, const mush_aabb*, mush_aabb*);
+	const mushspace*, mushcoords, const mush_bounds*, mush_aabb*);
 
 static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
 
@@ -438,8 +438,9 @@ static bool mushspace_place_box_for(
 	if (!mushspace_place_box(space, &aabb, &c, placed))
 		return false;
 
+	mush_bounds placed_bounds = {(*placed)->beg, (*placed)->end};
 	mush_anamnesic_ring_push(
-		&space->recent_buf, (mush_memory){.placed = **placed, c});
+		&space->recent_buf, (mush_memory){.placed = placed_bounds, c});
 
 	return true;
 }
@@ -547,7 +548,7 @@ static bool mushspace_get_box_along_recent_volume_for(
 	assert (space->recent_buf.full);
 	assert (space->just_placed_big);
 
-	const mush_aabb *last =
+	const mush_bounds *last =
 		&mush_anamnesic_ring_last(&space->recent_buf)->placed;
 
 	if (mushspace_extend_big_sequence_start_for(space, c, last, aabb))
@@ -559,7 +560,7 @@ static bool mushspace_get_box_along_recent_volume_for(
 	return false;
 }
 static bool mushspace_extend_big_sequence_start_for(
-	const mushspace* space, mushcoords c, const mush_aabb* last,
+	const mushspace* space, mushcoords c, const mush_bounds* last,
 	mush_aabb* aabb)
 {
 	// See if c is at big_sequence_start except for one axis, along which it's
@@ -597,16 +598,16 @@ static bool mushspace_extend_big_sequence_start_for(
 		return false;
 
 	// Extend last along the axis where c was outside it.
-	mushcoords beg = last->beg, end = last->end;
-	if (positive) mushcell_add_into(&end.v[axis], BIGBOX_PAD);
-	else          mushcell_sub_into(&beg.v[axis], BIGBOX_PAD);
+	mush_bounds bounds = *last;
+	if (positive) mushcell_add_into(&bounds.end.v[axis], BIGBOX_PAD);
+	else          mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 
-	mush_aabb_make_unsafe(aabb, beg, end);
+	mush_aabb_make_unsafe(aabb, bounds.beg, bounds.end);
 	return true;
 }
 
 static bool mushspace_extend_first_placed_big_for(
-	const mushspace* space, mushcoords c, const mush_aabb* last,
+	const mushspace* space, mushcoords c, const mush_bounds* last,
 	mush_aabb* aabb)
 {
 	// Match against space->first_placed_big. This is for the case when we've
@@ -658,19 +659,19 @@ static bool mushspace_extend_first_placed_big_for(
 	if (axis == MUSHSPACE_DIM)
 		return false;
 
-	mushcoords beg, end;
+	mush_bounds bounds;
 	if (positive) {
-		beg = space->big_sequence_start;
-		end = last->end;
+		bounds.beg = space->big_sequence_start;
+		bounds.end = last->end;
 
-		mushcell_add_into(&end.v[axis], BIGBOX_PAD);
+		mushcell_add_into(&bounds.end.v[axis], BIGBOX_PAD);
 	} else {
-		beg = last->beg;
-		end = space->big_sequence_start;
+		bounds.beg = last->beg;
+		bounds.end = space->big_sequence_start;
 
-		mushcell_sub_into(&beg.v[axis], BIGBOX_PAD);
+		mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 	}
-	mush_aabb_make_unsafe(aabb, beg, end);
+	mush_aabb_make_unsafe(aabb, bounds.beg, bounds.end);
 	return true;
 #endif
 }

@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "aabb.98.h"
+#include "bounds.all.h"
 #include "coords.all.h"
 #include "typenames.any.h"
 
@@ -16,7 +16,7 @@
 #define MUSH_ANAMNESIC_RING_SIZE 3
 
 typedef struct mush_memory {
-	mush_aabb placed;
+	mush_bounds placed;
 	mushcoords c;
 } mush_memory;
 
