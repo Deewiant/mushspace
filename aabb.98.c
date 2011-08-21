@@ -14,10 +14,9 @@
 #define mush_aabb_subsume_owners_area \
 	MUSHSPACE_CAT(mush_aabb,_subsume_owners_area)
 
-static bool mush_aabb_can_direct_copy(
-	const mush_aabb*, const mush_aabb*, size_t);
+static bool mush_aabb_can_direct_copy(const mush_aabb*, const mush_aabb*);
 static bool mush_aabb_can_direct_copy_area(
-	const mush_aabb*, const mush_aabb*, size_t, const mush_aabb*);
+	const mush_aabb*, const mush_aabb*, const mush_aabb*);
 
 // Copies from data to aabb, given that it's an area contained in owner.
 static void mush_aabb_subsume_owners_area(
@@ -189,13 +188,13 @@ bool mush_aabb_can_fuse_with(const mush_aabb* a, const mush_aabb* b) {
 }
 
 static bool mush_aabb_can_direct_copy(
-	const mush_aabb* copier, const mush_aabb* copiee, size_t copiee_size)
+	const mush_aabb* copier, const mush_aabb* copiee)
 {
 #if MUSHSPACE_DIM == 1
-	(void)copier; (void)copiee; (void)copiee_size;
+	(void)copier; (void)copiee;
 	return true;
 #else
-	if (copiee_size == copiee->width && copiee_size <= copier->width)
+	if (copiee->size == copiee->width && copiee->size <= copier->width)
 		return true;
 
 	return copier->width == copiee->width
@@ -206,8 +205,7 @@ static bool mush_aabb_can_direct_copy(
 #endif
 }
 static bool mush_aabb_can_direct_copy_area(
-	const mush_aabb* copier, const mush_aabb* copiee, size_t copiee_size,
-	const mush_aabb* owner)
+	const mush_aabb* copier, const mush_aabb* copiee, const mush_aabb* owner)
 {
 #if MUSHSPACE_DIM >= 2
 	if (copiee->width != owner->width) return false;
@@ -216,7 +214,7 @@ static bool mush_aabb_can_direct_copy_area(
 #endif
 #endif
 	(void)owner;
-	return mush_aabb_can_direct_copy(copier, copiee, copiee_size);
+	return mush_aabb_can_direct_copy(copier, copiee);
 }
 
 bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
@@ -231,7 +229,7 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
 
 	const size_t old_idx = mush_aabb_get_idx(box, old->beg);
 
-	if (mush_aabb_can_direct_copy(box, old, old->size)) {
+	if (mush_aabb_can_direct_copy(box, old)) {
 		if (old_idx == 0)
 			return true;
 
@@ -352,7 +350,7 @@ static void mush_aabb_subsume_owners_area(
 
 	const size_t beg_idx = mush_aabb_get_idx(aabb, area->beg);
 
-	if (mush_aabb_can_direct_copy_area(aabb, area, area->size, owner)) {
+	if (mush_aabb_can_direct_copy_area(aabb, area, owner)) {
 		memcpy(aabb->data + beg_idx, data, len * SIZE);
 		goto end;
 	}
@@ -390,7 +388,7 @@ void mush_aabb_space_area(mush_aabb* aabb, const mush_aabb* area) {
 
 	const size_t beg_idx = mush_aabb_get_idx(aabb, area->beg);
 
-	if (mush_aabb_can_direct_copy(aabb, area, area->size)) {
+	if (mush_aabb_can_direct_copy(aabb, area)) {
 		mushcell_space(aabb->data + beg_idx, area->size);
 		goto end;
 	}
