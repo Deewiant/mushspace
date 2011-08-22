@@ -142,22 +142,22 @@ static bool mushspace_extend_first_placed_big_for(
 static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
 
 static void mushspace_subsume_contains(
-	mushspace*, size_t*, size_t*, size_t*, const mush_aabb*,
+	mushspace*, size_t*, size_t*, size_t*, const mush_bounds*,
 	size_t*, size_t*, size_t*);
 
 static bool mushspace_subsume_fusables(
-	mushspace*, size_t*, size_t*, size_t*, mush_aabb*,
+	mushspace*, size_t*, size_t*, size_t*, mush_bounds*,
 	size_t*, size_t*, size_t*);
 
 static bool mushspace_subsume_disjoint(
-	mushspace*, size_t*, size_t*, size_t*, mush_aabb*,
+	mushspace*, size_t*, size_t*, size_t*, mush_bounds*,
 	size_t*, size_t*, size_t*);
 
 static bool mushspace_disjoint_mms_validator(
 	const mush_bounds*, const mush_aabb*, size_t, void*);
 
 static bool mushspace_subsume_overlaps(
-	mushspace*, size_t*, size_t*, size_t*, mush_aabb*,
+	mushspace*, size_t*, size_t*, size_t*, mush_bounds*,
 	size_t*, size_t*, size_t*);
 
 static bool mushspace_overlaps_mms_validator(
@@ -696,8 +696,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 	       consumee_size = 0,
 	       used_cells = aabb->size;
 
-	mush_aabb consumer;
-	mush_aabb_make_unsafe(&consumer, aabb->beg, aabb->end);
+	mush_bounds consumer_bounds = {aabb->beg, aabb->end};
 
 	// boxen that we haven't yet subsumed. Removed entries are set to
 	// space->box_count.
@@ -721,7 +720,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 		#define PARAMS space,            \
 		               candidates,       \
 		               subsumees, &slen, \
-		               &consumer,        \
+		               &consumer_bounds, \
 		               &consumee, &consumee_size, &used_cells
 
 		    mushspace_subsume_contains(PARAMS);
@@ -732,6 +731,8 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 
 		#undef PARAMS
 	}
+	mush_aabb consumer;
+	mush_aabb_make_unsafe(&consumer, consumer_bounds.beg, consumer_bounds.end);
 
 	free(candidates);
 
@@ -787,7 +788,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 static void mushspace_subsume_contains(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
-	const mush_aabb* consumer,
+	const mush_bounds* consumer,
 	size_t* consumee, size_t* consumee_size, size_t* used_cells)
 {
 	for (size_t i = 0; i < space->box_count; ++i) {
@@ -795,7 +796,8 @@ static void mushspace_subsume_contains(
 		if (c == space->box_count)
 			continue;
 
-		if (!mush_aabb_contains_box(consumer, &space->boxen[c]))
+		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
+		if (!mush_bounds_contains_bounds(consumer, &bounds))
 			continue;
 
 		subsumees[*slen++] = c;
@@ -810,7 +812,7 @@ static void mushspace_subsume_contains(
 static bool mushspace_subsume_fusables(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
-	mush_aabb* consumer,
+	mush_bounds* consumer,
 	size_t* consumee, size_t* consumee_size, size_t* used_cells)
 {
 	size_t s0 = *slen;
@@ -823,7 +825,8 @@ static bool mushspace_subsume_fusables(
 		size_t c = candidates[i];
 		if (c == space->box_count)
 			continue;
-		if (mush_aabb_can_fuse_with(consumer, &space->boxen[c]))
+		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
+		if (mush_bounds_can_fuse(consumer, &bounds))
 			subsumees[*slen++] = i;
 	}
 
@@ -844,22 +847,25 @@ static bool mushspace_subsume_fusables(
 	if (*slen - s0 > 1) {
 		size_t j = s0;
 		for (size_t i = s0; i < *slen; ++i) {
-			size_t s = subsumees [i],
-			       c = candidates[s];
-			if (mush_aabb_on_same_primary_axis(consumer, &space->boxen[c]))
+			size_t s = subsumees[i];
+			const mush_aabb   *box = &space->boxen[candidates[s]];
+			const mush_bounds  bounds = {box->beg, box->end};
+			if (mush_bounds_on_same_primary_axis(consumer, &bounds))
 				subsumees[j++] = s;
 		}
 
 		if (j == s0) {
 			// Just grab the first one instead of being smart about it.
-			const mush_aabb *box = &space->boxen[candidates[subsumees[s0]]];
+			const mush_aabb   *box    = &space->boxen[candidates[subsumees[s0]]];
+			const mush_bounds  bounds = {box->beg, box->end};
 
 			j = s0 + 1;
 
 			for (size_t i = j; i < *slen; ++i) {
-				size_t s = subsumees [i],
-				       c = candidates[s];
-				if (mush_aabb_on_same_axis(box, &space->boxen[c]))
+				size_t s = subsumees[i];
+				const mush_aabb   *sbox    = &space->boxen[candidates[s]];
+				const mush_bounds  sbounds = {sbox->beg, sbox->end};
+				if (mush_bounds_on_same_axis(&bounds, &sbounds))
 					subsumees[j++] = s;
 			}
 		}
@@ -883,11 +889,8 @@ static bool mushspace_subsume_fusables(
 		size_t corrected = subsumees[i] - offset++;
 		subsumees[i] = candidates[corrected];
 
-		mush_bounds tmp = {consumer->beg, consumer->end};
-		mushspace_min_max_size(&tmp, consumee, consumee_size, used_cells,
+		mushspace_min_max_size(consumer, consumee, consumee_size, used_cells,
 		                       subsumees[i], &space->boxen[subsumees[i]]);
-		consumer->beg = tmp.beg;
-		consumer->end = tmp.end;
 
 		candidates[corrected] = space->box_count;
 
@@ -898,7 +901,7 @@ static bool mushspace_subsume_fusables(
 static bool mushspace_subsume_disjoint(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
-	mush_aabb* consumer,
+	mush_bounds* consumer,
 	size_t* consumee, size_t* consumee_size, size_t* used_cells)
 {
 	const size_t s0 = *slen;
@@ -909,16 +912,14 @@ static bool mushspace_subsume_disjoint(
 
 		// All fusables have been removed, so a sufficient condition for
 		// disjointness is non-overlappingness.
-		if (mush_aabb_overlaps(consumer, &space->boxen[c]))
+		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
+		if (mush_bounds_overlaps(consumer, &bounds))
 			continue;
 
-		mush_bounds tmp = {consumer->beg, consumer->end};
 		if (mushspace_valid_min_max_size(mushspace_disjoint_mms_validator, NULL,
-		                                 &tmp, consumee, consumee_size,
+		                                 consumer, consumee, consumee_size,
 		                                 used_cells, c, &space->boxen[c]))
 		{
-			consumer->beg = tmp.beg;
-			consumer->end = tmp.end;
 			subsumees[*slen++] = c;
 			candidates[i] = space->box_count;
 
@@ -938,7 +939,7 @@ static bool mushspace_disjoint_mms_validator(
 static bool mushspace_subsume_overlaps(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
-	mush_aabb* consumer,
+	mush_bounds* consumer,
 	size_t* consumee, size_t* consumee_size, size_t* used_cells)
 {
 	const size_t s0 = *slen;
@@ -947,18 +948,16 @@ static bool mushspace_subsume_overlaps(
 		if (c == space->box_count)
 			continue;
 
-		if (!mush_aabb_overlaps(consumer, &space->boxen[c]))
+		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
+		if (!mush_bounds_overlaps(consumer, &bounds))
 			continue;
 
-		mush_bounds tmp = {consumer->beg, consumer->end};
 		if (
 			mushspace_valid_min_max_size(
 				mushspace_overlaps_mms_validator, consumer,
-				&tmp, consumee, consumee_size, used_cells,
+				consumer, consumee, consumee_size, used_cells,
 				c, &space->boxen[c]))
 		{
-			consumer->beg = tmp.beg;
-			consumer->end = tmp.end;
 			subsumees[*slen++] = c;
 			candidates[i] = space->box_count;
 
@@ -971,12 +970,11 @@ static bool mushspace_subsume_overlaps(
 static bool mushspace_overlaps_mms_validator(
 	const mush_bounds* b, const mush_aabb* fodder, size_t used_cells, void* cp)
 {
-	const mush_aabb *consumer = cp;
-	const mush_bounds cbounds = {consumer->beg, consumer->end};
-	const mush_bounds fbounds = {  fodder->beg,   fodder->end};
+	const mush_bounds *consumer = cp;
+	const mush_bounds fbounds = {fodder->beg, fodder->end};
 
 	mush_bounds obounds;
-	mush_bounds_get_overlap(&cbounds, &fbounds, &obounds);
+	mush_bounds_get_overlap(consumer, &fbounds, &obounds);
 
 	mush_aabb overlap;
 	mush_aabb_make(&overlap, obounds.beg, obounds.end);
