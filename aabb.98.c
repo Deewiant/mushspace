@@ -135,21 +135,6 @@ bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
 	return mush_bounds_overlaps(&ab, &bb);
 }
 
-bool mush_aabb_get_overlap_with(
-	const mush_aabb* a, const mush_aabb* b, mush_aabb* overlap)
-{
-	if (!mush_aabb_overlaps(a, b))
-		return false;
-
-	mushcoords ob = a->beg; mushcoords_max_into(&ob, b->beg);
-	mushcoords oe = a->end; mushcoords_min_into(&oe, b->end);
-	mush_aabb_make(overlap, ob, oe);
-
-	assert (mush_aabb_contains_box(a, overlap));
-	assert (mush_aabb_contains_box(b, overlap));
-	return true;
-}
-
 #if MUSHSPACE_DIM > 1
 bool mush_aabb_on_same_axis(const mush_aabb* a, const mush_aabb* b) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)

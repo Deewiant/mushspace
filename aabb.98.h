@@ -43,8 +43,6 @@ typedef struct mush_aabb {
 
 #define mush_aabb_overlaps MUSHSPACE_CAT(mush_aabb,_overlaps)
 
-#define mush_aabb_get_overlap_with MUSHSPACE_CAT(mush_aabb,_get_overlap_with)
-
 #define mush_aabb_on_same_axis MUSHSPACE_CAT(mush_aabb,_on_same_axis)
 #define mush_aabb_on_same_primary_axis \
 	MUSHSPACE_CAT(mush_aabb,_on_same_primary_axis)
@@ -80,9 +78,6 @@ size_t mush_aabb_get_idx          (const mush_aabb*, mushcoords);
 size_t mush_aabb_get_idx_no_offset(const mush_aabb*, mushcoords);
 
 bool mush_aabb_overlaps(const mush_aabb*, const mush_aabb*);
-
-bool mush_aabb_get_overlap_with(
-	const mush_aabb*, const mush_aabb*, mush_aabb*);
 
 #if MUSHSPACE_DIM > 1
 bool mush_aabb_on_same_axis        (const mush_aabb*, const mush_aabb*);
