@@ -1158,7 +1158,11 @@ static void mushspace_irrelevize_subsumption_order(
 
 			// If they overlap, copy the overlap area to the lower box and space
 			// that area in the higher one.
-			if (mush_aabb_get_overlap_with(higher, lower, &overlap)) {
+			mush_bounds hbounds = {higher->beg, higher->end},
+			            lbounds = { lower->beg,  lower->end},
+			            obounds;
+			if (mush_bounds_get_overlap(&hbounds, &lbounds, &obounds)) {
+				mush_aabb_make(&overlap, obounds.beg, obounds.end);
 				mush_aabb_subsume_area(lower, higher, &overlap);
 				mush_aabb_space_area(higher, &overlap);
 			}
