@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "bounds.all.h"
-#include "stdlib.any.h"
 
 #define mush_aabb_can_direct_copy MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
 #define mush_aabb_can_direct_copy_area \
@@ -61,14 +60,6 @@ bool mush_aabb_alloc(mush_aabb* aabb) {
 		return false;
 	mushcell_space(aabb->data, aabb->size);
 	return true;
-}
-
-size_t mush_aabb_clamped_size(const mush_aabb* aabb) {
-	size_t sz = 1;
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		sz = mush_size_t_mul_clamped(
-			sz, mush_size_t_add_clamped(aabb->end.v[i] - aabb->beg.v[i], 1));
-	return sz;
 }
 
 size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
