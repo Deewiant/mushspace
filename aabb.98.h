@@ -46,8 +46,6 @@ typedef struct mush_aabb {
 #define mush_aabb_on_same_primary_axis \
 	MUSHSPACE_CAT(mush_aabb,_on_same_primary_axis)
 
-#define mush_aabb_can_fuse_with MUSHSPACE_CAT(mush_aabb,_can_fuse_with)
-
 #define mush_aabb_consume      MUSHSPACE_CAT(mush_aabb,_consume)
 #define mush_aabb_subsume      MUSHSPACE_CAT(mush_aabb,_subsume)
 #define mush_aabb_subsume_area MUSHSPACE_CAT(mush_aabb,_subsume_area)
@@ -81,9 +79,6 @@ bool mush_aabb_overlaps(const mush_aabb*, const mush_aabb*);
 bool mush_aabb_on_same_axis        (const mush_aabb*, const mush_aabb*);
 bool mush_aabb_on_same_primary_axis(const mush_aabb*, const mush_aabb*);
 #endif
-
-// True if we can create a new AABB which covers exactly the two given.
-bool mush_aabb_can_fuse_with(const mush_aabb*, const mush_aabb*);
 
 // box should be unallocated and old allocated.
 //

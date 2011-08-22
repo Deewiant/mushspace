@@ -139,31 +139,6 @@ bool mush_aabb_on_same_primary_axis(const mush_aabb* a, const mush_aabb* b) {
 }
 #endif
 
-bool mush_aabb_can_fuse_with(const mush_aabb* a, const mush_aabb* b) {
-
-	bool overlap = mush_aabb_overlaps(a, b);
-
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-		if (a->beg.v[i] == b->beg.v[i] && a->end.v[i] == b->end.v[i])
-			continue;
-
-		if (!(   overlap
-		      || mushcell_add_clamped(a->end.v[i], 1) == b->beg.v[i]
-		      || mushcell_add_clamped(b->end.v[i], 1) == a->beg.v[i]))
-			return false;
-
-		for (mushdim j = i+1; j < MUSHSPACE_DIM; ++j)
-			if (a->beg.v[j] != b->beg.v[j] || a->end.v[j] != b->end.v[j])
-				return false;
-
-		#if MUSHSPACE_DIM > 1
-			assert (mush_aabb_on_same_axis(a, b));
-		#endif
-		return true;
-	}
-	return false;
-}
-
 static bool mush_aabb_can_direct_copy(
 	const mush_aabb* copier, const mush_aabb* copiee)
 {
