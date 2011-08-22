@@ -42,10 +42,6 @@ typedef struct mush_aabb {
 
 #define mush_aabb_overlaps MUSHSPACE_CAT(mush_aabb,_overlaps)
 
-#define mush_aabb_on_same_axis MUSHSPACE_CAT(mush_aabb,_on_same_axis)
-#define mush_aabb_on_same_primary_axis \
-	MUSHSPACE_CAT(mush_aabb,_on_same_primary_axis)
-
 #define mush_aabb_consume      MUSHSPACE_CAT(mush_aabb,_consume)
 #define mush_aabb_subsume      MUSHSPACE_CAT(mush_aabb,_subsume)
 #define mush_aabb_subsume_area MUSHSPACE_CAT(mush_aabb,_subsume_area)
@@ -74,11 +70,6 @@ size_t mush_aabb_get_idx          (const mush_aabb*, mushcoords);
 size_t mush_aabb_get_idx_no_offset(const mush_aabb*, mushcoords);
 
 bool mush_aabb_overlaps(const mush_aabb*, const mush_aabb*);
-
-#if MUSHSPACE_DIM > 1
-bool mush_aabb_on_same_axis        (const mush_aabb*, const mush_aabb*);
-bool mush_aabb_on_same_primary_axis(const mush_aabb*, const mush_aabb*);
-#endif
 
 // box should be unallocated and old allocated.
 //

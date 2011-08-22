@@ -126,19 +126,6 @@ bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
 	return mush_bounds_overlaps(&ab, &bb);
 }
 
-#if MUSHSPACE_DIM > 1
-bool mush_aabb_on_same_axis(const mush_aabb* a, const mush_aabb* b) {
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		if (a->beg.v[i] == b->beg.v[i] && a->end.v[i] == b->end.v[i])
-			return true;
-	return false;
-}
-bool mush_aabb_on_same_primary_axis(const mush_aabb* a, const mush_aabb* b) {
-	const mushdim I = MUSHSPACE_DIM-1;
-	return a->beg.v[I] == b->beg.v[I] && a->end.v[I] == b->end.v[I];
-}
-#endif
-
 static bool mush_aabb_can_direct_copy(
 	const mush_aabb* copier, const mush_aabb* copiee)
 {
