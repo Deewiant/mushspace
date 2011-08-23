@@ -185,17 +185,17 @@ static void mushspace_irrelevize_subsumption_order(
 
 static void mushspace_map_no_place(
 	mushspace*, const mush_aabb*, void*,
-	void(*)(mushcell*, mushcell*, void*, mushstats*),
+	void(*)(mushcell*, size_t, void*, mushstats*),
 	void(*)(size_t, void*));
 
 static bool mushspace_map_in_box(
 	mushspace*, const mush_bounds*, mushcoords*,
 	const mush_aabb*, size_t,
-	void*, void(*f)(mushcell*, mushcell*, void*, mushstats*));
+	void*, void(*f)(mushcell*, size_t, void*, mushstats*));
 
 static bool mushspace_map_in_static(
 	mushspace*, const mush_bounds*, mushcoords*,
-	void*, void(*f)(mushcell*, mushcell*, void*, mushstats*));
+	void*, void(*f)(mushcell*, size_t, void*, mushstats*));
 
 static void mushspace_mapex_no_place(
 	mushspace*, const mush_aabb*, void*,
@@ -233,7 +233,7 @@ static bool mushspace_newline(
 static size_t mushspace_get_aabbs_binary(
 	const char*, size_t len, mushcoords target, mush_bounds*);
 
-static void mushspace_binary_load_arr(mushcell*, mushcell*, void*, mushstats*);
+static void mushspace_binary_load_arr(mushcell*, size_t, void*, mushstats*);
 static void mushspace_binary_load_blank(size_t, void*);
 static void mushspace_load_arr(mushcell*, size_t, void*,
                                size_t, size_t, size_t, size_t, uint8_t*,
@@ -1162,7 +1162,7 @@ static void mushspace_irrelevize_subsumption_order(
 
 static void mushspace_map_no_place(
 	mushspace* space, const mush_aabb* aabb, void* fg,
-	void(*f)(mushcell*, mushcell*, void*, mushstats*),
+	void(*f)(mushcell*, size_t, void*, mushstats*),
 	void(*g)(size_t, void*))
 {
 	mushcoords pos = aabb->bounds.beg;
@@ -1200,7 +1200,7 @@ static void mushspace_map_no_place(
 static bool mushspace_map_in_box(
 	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
 	const mush_aabb* box, size_t box_idx,
-	void* caller_data, void(*f)(mushcell*, mushcell*, void*, mushstats*))
+	void* caller_data, void(*f)(mushcell*, size_t, void*, mushstats*))
 {
 	// Consider:
 	//     +-----+
@@ -1231,12 +1231,12 @@ static bool mushspace_map_in_box(
 
 	mushcell *p = box->data;
 	size_t len = end_idx - beg_idx + 1;
-	f(p, p + len, caller_data, space->stats);
+	f(p, len, caller_data, space->stats);
 	return hit_end;
 }
 static bool mushspace_map_in_static(
 	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
-	void* caller_data, void(*f)(mushcell*, mushcell*, void*, mushstats*))
+	void* caller_data, void(*f)(mushcell*, size_t, void*, mushstats*))
 {
 	bool hit_end;
 	const size_t
@@ -1249,7 +1249,7 @@ static bool mushspace_map_in_static(
 
 	mushcell *p = space->static_box.array;
 	size_t len = end_idx - beg_idx + 1;
-	f(p, p + len, caller_data, space->stats);
+	f(p, len, caller_data, space->stats);
 	return hit_end;
 }
 
@@ -1998,10 +1998,10 @@ static size_t mushspace_get_aabbs_binary(
 }
 
 static void mushspace_binary_load_arr(
-	mushcell* arr, mushcell* end, void* p, mushstats* stats)
+	mushcell* arr, size_t len, void* p, mushstats* stats)
 {
 	const char **strp = p, *str = *strp;
-	for (; arr < end; ++arr) {
+	for (mushcell *end = arr + len; arr < end; ++arr) {
 		char c = *str++;
 		if (c != ' ') {
 			*arr = c;
