@@ -48,9 +48,6 @@ typedef struct mush_aabb {
 #define mush_aabb_subsume_area MUSHSPACE_CAT(mush_aabb,_subsume_area)
 #define mush_aabb_space_area   MUSHSPACE_CAT(mush_aabb,_space_area)
 
-#define mush_aabb_tessellate  MUSHSPACE_CAT(mush_aabb,_tessellate)
-#define mush_aabb_tessellate1 MUSHSPACE_CAT(mush_aabb,_tessellate1)
-
 void mush_aabb_make       (mush_aabb*, const mush_bounds*);
 void mush_aabb_make_unsafe(mush_aabb*, const mush_bounds*);
 void mush_aabb_finalize   (mush_aabb*);
@@ -80,16 +77,5 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old);
 void mush_aabb_subsume     (mush_aabb*, const mush_aabb*);
 void mush_aabb_subsume_area(mush_aabb*, const mush_aabb*, const mush_aabb*);
 void mush_aabb_space_area  (mush_aabb*, const mush_aabb*);
-
-// Modifies the given beg/end pair to give a box which contains the given
-// coordinates but doesn't overlap with any of the given boxes. The coordinates
-// should, of course, be already contained between the beg and end.
-void mush_aabb_tessellate(
-	mushcoords, const mush_aabb*, size_t, mushcoords*, mushcoords*);
-
-// Since the algorithm is currently just a fold over the boxes, this simpler
-// version exists to avoid heap allocation in some cases.
-void mush_aabb_tessellate1(
-	mushcoords, mushcoords, mushcoords, mushcoords*, mushcoords*);
 
 #endif
