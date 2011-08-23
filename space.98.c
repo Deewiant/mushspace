@@ -230,7 +230,7 @@ static void mushspace_get_aabbs(
 
 #if MUSHSPACE_DIM >= 2
 static bool mushspace_newline(
-	bool*, mushcoords*, mushcoords, mush_bounds*, size_t, size_t*, size_t*,
+	bool*, mushcoords*, mushcoords, mush_arr_mush_bounds, size_t*, size_t*,
 	mushcoords, size_t*, uint8_t*);
 #endif
 
@@ -1811,9 +1811,11 @@ static void mushspace_get_aabbs(
 	#if MUSHSPACE_DIM >= 2
 		bool got_cr = false;
 
+		const mush_arr_mush_bounds bounds_arr = {bounds, MUSH_ARRAY_LEN(aabbs)};
+
 		#define mush_hit_newline do { \
 			if (!mushspace_newline(&got_cr, &pos, target, \
-			                       bounds, MUSH_ARRAY_LEN(aabbs), &a, &max_a, \
+			                       bounds_arr, &a, &max_a, \
 			                       last_nonspace, &found_nonspace_for, &get_beg))\
 			{ \
 				*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM}; \
@@ -1933,20 +1935,20 @@ static void mushspace_get_aabbs(
 #if MUSHSPACE_DIM >= 2
 static bool mushspace_newline(
 	bool* got_cr, mushcoords* pos, mushcoords target,
-	mush_bounds* bounds, size_t bounds_len, size_t* a, size_t* max_a,
+	mush_arr_mush_bounds bounds, size_t* a, size_t* max_a,
 	mushcoords last_nonspace, size_t* found_nonspace_for, uint8_t* get_beg)
 {
 	*got_cr = false;
 
-	mushcell_max_into(&bounds[*a].end.x, last_nonspace.x);
+	mushcell_max_into(&bounds.ptr[*a].end.x, last_nonspace.x);
 
 	pos->x = target.x;
 
 	if ((pos->y = mushcell_inc(pos->y)) == MUSHCELL_MIN) {
 		if (*found_nonspace_for == *a)
-			mushcoords_max_into(&bounds[*a].end, last_nonspace);
+			mushcoords_max_into(&bounds.ptr[*a].end, last_nonspace);
 
-		*found_nonspace_for = bounds_len;
+		*found_nonspace_for = bounds.len;
 
 		*max_a = mush_size_t_max(*max_a, *a |= 0x02);
 	} else if (pos->y == target.y)
