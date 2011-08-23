@@ -3,7 +3,7 @@
 ifeq (@(CC),gcc)
 SRCFLAGS     = -Wall -Wextra -pedantic
 GENFLAGS     = -fPIC
-MUSHSRCFLAGS = -std=c1x -xc
+MUSHSRCFLAGS = -std=c1x
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 
@@ -14,7 +14,7 @@ endif
 ifeq (@(CC),clang)
 SRCFLAGS     = -Wall -Wextra
 GENFLAGS     = -fPIC
-MUSHSRCFLAGS = -std=c99 -xc
+MUSHSRCFLAGS = -std=c99
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 LIBSRCFLAGS  = -pedantic
