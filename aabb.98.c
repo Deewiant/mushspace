@@ -5,6 +5,10 @@
 #include <assert.h>
 #include <string.h>
 
+#include "stdlib.any.h"
+
+MUSH_DECL_CONST_DYN_ARRAY(mushcell)
+
 #define mush_aabb_can_direct_copy MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
 #define mush_aabb_can_direct_copy_area \
 	MUSHSPACE_CAT(mush_aabb,_can_direct_copy_area)
