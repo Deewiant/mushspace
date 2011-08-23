@@ -12,6 +12,8 @@ typedef struct mush_bounds {
 	mushcoords beg, end;
 } mush_bounds;
 
+MUSH_DECL_CONST_DYN_ARRAY(mush_bounds)
+
 #define mush_bounds_clamped_size    MUSHSPACE_CAT(mush_bounds,_clamped_size)
 #define mush_bounds_contains        MUSHSPACE_CAT(mush_bounds,_contains)
 #define mush_bounds_safe_contains   MUSHSPACE_CAT(mush_bounds,_safe_contains)
