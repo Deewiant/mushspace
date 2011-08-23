@@ -70,6 +70,7 @@ struct mushspace {
 MUSH_DECL_DYN_ARRAY(mushcell)
 MUSH_DECL_DYN_ARRAY(mush_aabb)
 MUSH_DECL_DYN_ARRAY(mush_bounds)
+MUSH_DECL_DYN_ARRAY(size_t)
 
 const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
 
