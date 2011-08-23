@@ -7,6 +7,9 @@
 
 #define MUSH_ARRAY_LEN(X) (sizeof(X) / sizeof((X)[0]))
 
+#define MUSH_DECL_DYN_ARRAY(T) \
+	typedef struct mush_arr_##T { T *ptr; size_t len; } mush_arr_##T;
+
 size_t mush_size_t_max(size_t, size_t);
 
 int mush_size_t_qsort_cmp(const void*, const void*);
