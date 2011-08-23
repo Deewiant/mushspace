@@ -224,8 +224,8 @@ static void mushspace_get_next_in1(
 	mushucell, const mush_bounds*, mushcell, size_t, mushcoords, size_t,
 	mushcell*, mushcell*, size_t*, size_t*);
 
-static mush_aabb* mushspace_get_aabbs(
-	const char*, size_t len, mushcoords target, bool binary, size_t* len_out);
+static void mushspace_get_aabbs(
+	const char*, size_t, mushcoords target, bool binary, mush_arr_mush_aabb*);
 
 #if MUSHSPACE_DIM >= 2
 static bool mushspace_newline(
@@ -1628,31 +1628,30 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 	mushspace* space, const char* str, size_t len,
 	mushcoords* end, mushcoords target, bool binary)
 {
-	size_t aabbs_len;
-	mush_aabb *aabbs =
-		mushspace_get_aabbs(str, len, target, binary, &aabbs_len);
+	mush_arr_mush_aabb aabbs;
+	mushspace_get_aabbs(str, len, target, binary, &aabbs);
 
-	if (!aabbs) {
-		// The error code was placed in aabbs_len.
-		return (int)aabbs_len;
+	if (!aabbs.ptr) {
+		// The error code was placed in aabbs.len.
+		return (int)aabbs.len;
 	}
 
 	if (end)
 		*end = target;
 
-	for (size_t i = 0; i < aabbs_len; ++i) {
+	for (size_t i = 0; i < aabbs.len; ++i) {
 		if (end)
-			mushcoords_max_into(end, aabbs[i].bounds.end);
+			mushcoords_max_into(end, aabbs.ptr[i].bounds.end);
 
-		if (!mushspace_place_box(space, &aabbs[i], NULL, NULL))
+		if (!mushspace_place_box(space, &aabbs.ptr[i], NULL, NULL))
 			return MUSH_ERR_OOM;
 	}
 
 	// Build one to rule them all.
 	//
 	// Note that it may have beg > end along any number of axes!
-	mush_aabb aabb = aabbs[0];
-	if (aabbs_len > 1) {
+	mush_aabb aabb = aabbs.ptr[0];
+	if (aabbs.len > 1) {
 		// If any box was placed past an axis, the end of that axis is the
 		// maximum of the ends of such boxes. Otherwise, it's the maximum of all
 		// the boxes' ends.
@@ -1674,8 +1673,8 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 			else                                found_before |= 1 << i;
 		}
 
-		for (size_t b = 1; b < aabbs_len; ++b) {
-			const mush_bounds *box = &aabbs[b].bounds;
+		for (size_t b = 1; b < aabbs.len; ++b) {
+			const mush_bounds *box = &aabbs.ptr[b].bounds;
 
 			for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 				const uint8_t axis = 1 << i;
@@ -1743,29 +1742,31 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 	return MUSH_ERR_NONE;
 }
 
-// Returns an array of AABBs (a slice out of a static buffer) which describe
-// where the input should be loaded. There are at most 2^dim of them; in binary
-// mode, at most 2. The length is written to *len_out.
+// Sets aabbs_out to an array of AABBs (a slice out of a static buffer) which
+// describe where the input should be loaded. There are at most 2^dim of them;
+// in binary mode, at most 2.
 //
-// If nothing would be loaded, returns NULL and writes an error code (an int)
-// into *aabbs_out.
-static mush_aabb* mushspace_get_aabbs(
+// If nothing would be loaded, aabbs_out->ptr is set to NULL and an error code
+// (an int) is written into aabbs_out->len.
+static void mushspace_get_aabbs(
 	const char* str, size_t len, mushcoords target, bool binary,
-	size_t* len_out)
+	mush_arr_mush_aabb* aabbs_out)
 {
 	static mush_aabb aabbs[1 << MUSHSPACE_DIM];
 
 	mush_bounds *bounds = (mush_bounds*)aabbs;
 
+	aabbs_out->ptr = aabbs;
+
 	if (binary) {
 		size_t n = mushspace_get_aabbs_binary(str, len, target, bounds);
 		if (n == SIZE_MAX) {
-			*len_out = MUSH_ERR_NO_ROOM;
-			return NULL;
+			*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM};
+			return;
 		}
 		assert (n <= 2);
-		*len_out = n;
-		return aabbs;
+		aabbs_out->len = n;
+		return;
 	}
 
 	// The index a as used below is a bitmask of along which axes pos
@@ -1814,8 +1815,8 @@ static mush_aabb* mushspace_get_aabbs(
 			                       bounds, MUSH_ARRAY_LEN(aabbs), &a, &max_a, \
 			                       last_nonspace, &found_nonspace_for, &get_beg))\
 			{ \
-				*len_out = MUSH_ERR_NO_ROOM; \
-				return NULL; \
+				*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM}; \
+				return; \
 			} \
 		} while (0)
 	#endif
@@ -1849,8 +1850,8 @@ static mush_aabb* mushspace_get_aabbs(
 
 		} else if (pos.x == target.x) {
 			// Oops, came back to where we started. That's not good.
-			*len_out = MUSH_ERR_NO_ROOM;
-			return NULL;
+			*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM};
+			return;
 		}
 		break;
 
@@ -1887,8 +1888,8 @@ static mush_aabb* mushspace_get_aabbs(
 				max_a = mush_size_t_max(max_a, a |= 0x04);
 
 			} else if (pos.z == target.z) {
-				*len_out = MUSH_ERR_NO_ROOM;
-				return NULL;
+				*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM};
+				return;
 			}
 			a &= ~0x03;
 			get_beg = found_nonspace_for == a ? 0x03 : 0x07;
@@ -1901,8 +1902,8 @@ static mush_aabb* mushspace_get_aabbs(
 
 	if (found_nonspace_for_anyone == MUSH_ARRAY_LEN(aabbs)) {
 		// Nothing to load. Not an error, but don't need to do anything so bail.
-		*len_out = MUSH_ERR_NONE;
-		return NULL;
+		*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NONE};
+		return;
 	}
 
 	if (found_nonspace_for < MUSH_ARRAY_LEN(aabbs))
@@ -1926,8 +1927,7 @@ static mush_aabb* mushspace_get_aabbs(
 			++n;
 		}
 	}
-	*len_out = n;
-	return aabbs;
+	aabbs_out->len = n;
 }
 #if MUSHSPACE_DIM >= 2
 static bool mushspace_newline(
