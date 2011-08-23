@@ -4,8 +4,6 @@
 
 #include <assert.h>
 
-#include "stdlib.any.h"
-
 size_t mush_bounds_clamped_size(const mush_bounds* bounds) {
 	size_t sz = 1;
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
@@ -105,12 +103,12 @@ bool mush_bounds_can_fuse(const mush_bounds* a, const mush_bounds* b) {
 #endif
 
 void mush_bounds_tessellate(
-	mushcoords pos, const mush_bounds* bs, size_t len, mush_bounds* bounds)
+	mushcoords pos, mush_carr_mush_bounds bs, mush_bounds* bounds)
 {
 	assert (mush_bounds_contains(bounds, pos));
 
-	for (size_t i = 0; i < len; ++i)
-		mush_bounds_tessellate1(pos, &bs[i], bounds);
+	for (size_t i = 0; i < bs.len; ++i)
+		mush_bounds_tessellate1(pos, &bs.ptr[i], bounds);
 }
 void mush_bounds_tessellate1(
 	mushcoords pos, const mush_bounds* avoid, mush_bounds* bounds)

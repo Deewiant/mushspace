@@ -4,6 +4,7 @@
 #define MUSHSPACE_BOUNDS_H
 
 #include "coords.all.h"
+#include "stdlib.any.h"
 #include "typenames.any.h"
 
 #define mush_bounds MUSHSPACE_NAME(mush_bounds)
@@ -55,8 +56,7 @@ bool mush_bounds_can_fuse(const mush_bounds*, const mush_bounds*);
 // Modifies the given bounds to be such that they contain the given coordinates
 // but don't overlap with any of the given boxes. The coordinates should, of
 // course, be already contained between the beg and end.
-void mush_bounds_tessellate(
-	mushcoords, const mush_bounds*, size_t, mush_bounds*);
+void mush_bounds_tessellate(mushcoords, mush_carr_mush_bounds, mush_bounds*);
 
 // Since the algorithm is currently just a fold over the boxes, this simpler
 // version exists to avoid heap allocation in some cases.
