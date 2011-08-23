@@ -128,10 +128,7 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 }
 
 bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
-	return mush_aabb_overlapsc(a, b->beg, b->end);
-}
-bool mush_aabb_overlapsc(const mush_aabb* a, mushcoords beg, mushcoords end) {
-	return mushcoords_overlaps(a->beg, a->end, beg, end);
+	return mushcoords_overlaps(a->beg, a->end, b->beg, b->end);
 }
 
 bool mush_aabb_get_overlap_with(

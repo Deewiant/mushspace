@@ -41,8 +41,7 @@ typedef struct mush_aabb {
 #define mush_aabb_get_idx           MUSHSPACE_CAT(mush_aabb,_get_idx)
 #define mush_aabb_get_idx_no_offset MUSHSPACE_CAT(mush_aabb,_get_idx_no_offset)
 
-#define mush_aabb_overlaps  MUSHSPACE_CAT(mush_aabb,_overlaps)
-#define mush_aabb_overlapsc MUSHSPACE_CAT(mush_aabb,_overlapsc)
+#define mush_aabb_overlaps MUSHSPACE_CAT(mush_aabb,_overlaps)
 
 #define mush_aabb_get_overlap_with MUSHSPACE_CAT(mush_aabb,_get_overlap_with)
 
@@ -80,8 +79,7 @@ void     mush_aabb_put(      mush_aabb*, mushcoords, mushcell);
 size_t mush_aabb_get_idx          (const mush_aabb*, mushcoords);
 size_t mush_aabb_get_idx_no_offset(const mush_aabb*, mushcoords);
 
-bool mush_aabb_overlaps (const mush_aabb*, const mush_aabb*);
-bool mush_aabb_overlapsc(const mush_aabb*, mushcoords, mushcoords);
+bool mush_aabb_overlaps(const mush_aabb*, const mush_aabb*);
 
 bool mush_aabb_get_overlap_with(
 	const mush_aabb*, const mush_aabb*, mush_aabb*);
