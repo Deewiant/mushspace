@@ -141,36 +141,39 @@ static bool mushspace_extend_first_placed_big_for(
 
 static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
 
+typedef struct mushspace_consumee {
+	size_t idx;
+	size_t size;
+} mushspace_consumee;
+
 static void mushspace_subsume_contains(
 	mushspace*, size_t*, size_t*, size_t*, const mush_bounds*,
-	size_t*, size_t*, size_t*);
+	mushspace_consumee*, size_t*);
 
 static bool mushspace_subsume_fusables(
 	mushspace*, size_t*, size_t*, size_t*, mush_bounds*,
-	size_t*, size_t*, size_t*);
+	mushspace_consumee*, size_t*);
 
 static bool mushspace_subsume_disjoint(
 	mushspace*, size_t*, size_t*, size_t*, mush_bounds*,
-	size_t*, size_t*, size_t*);
+	mushspace_consumee*, size_t*);
 
 static bool mushspace_disjoint_mms_validator(
 	const mush_bounds*, const mush_aabb*, size_t, void*);
 
 static bool mushspace_subsume_overlaps(
 	mushspace*, size_t*, size_t*, size_t*, mush_bounds*,
-	size_t*, size_t*, size_t*);
+	mushspace_consumee*, size_t*);
 
 static bool mushspace_overlaps_mms_validator(
 	const mush_bounds*, const mush_aabb*, size_t, void*);
 
 static void mushspace_min_max_size(
-	mush_bounds*, size_t*, size_t*, size_t*,
-	size_t, const mush_aabb*);
+	mush_bounds*, mushspace_consumee*, size_t*, size_t, const mush_aabb*);
 
 static bool mushspace_valid_min_max_size(
 	bool (*)(const mush_bounds*, const mush_aabb*, size_t, void*), void*,
-	mush_bounds*, size_t*, size_t*, size_t*,
-	size_t, const mush_aabb*);
+	mush_bounds*, mushspace_consumee*, size_t*, size_t, const mush_aabb*);
 
 static bool mushspace_cheaper_to_alloc(size_t, size_t);
 
@@ -696,9 +699,8 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 		return NULL;
 	}
 
-	size_t consumee,
-	       consumee_size = 0,
-	       used_cells = aabb->size;
+	mushspace_consumee consumee = {.size = 0};
+	size_t used_cells = aabb->size;
 
 	mush_aabb consumer;
 	mush_aabb_make_unsafe(&consumer, &aabb->bounds);
@@ -726,7 +728,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 		               candidates,       \
 		               subsumees, &slen, \
 		               &consumer.bounds, \
-		               &consumee, &consumee_size, &used_cells
+		               &consumee, &used_cells
 
 		    mushspace_subsume_contains(PARAMS);
 		if (mushspace_subsume_fusables(PARAMS)) continue;
@@ -757,7 +759,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 	bool ok;
 	if (slen) {
 		ok = mushspace_consume_and_subsume(space, subsumees, slen,
-		                                          consumee, &consumer);
+		                                          consumee.idx, &consumer);
 		free(subsumees);
 	} else {
 		free(subsumees);
@@ -792,7 +794,7 @@ static void mushspace_subsume_contains(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
 	const mush_bounds* consumer,
-	size_t* consumee, size_t* consumee_size, size_t* used_cells)
+	mushspace_consumee* consumee, size_t* used_cells)
 {
 	for (size_t i = 0; i < space->box_count; ++i) {
 		size_t c = candidates[i];
@@ -803,8 +805,7 @@ static void mushspace_subsume_contains(
 			continue;
 
 		subsumees[*slen++] = c;
-		mushspace_min_max_size(
-			NULL, consumee, consumee_size, used_cells, c, &space->boxen[c]);
+		mushspace_min_max_size(NULL, consumee, used_cells, c, &space->boxen[c]);
 
 		candidates[i] = space->box_count;
 
@@ -815,7 +816,7 @@ static bool mushspace_subsume_fusables(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
 	mush_bounds* consumer,
-	size_t* consumee, size_t* consumee_size, size_t* used_cells)
+	mushspace_consumee* consumee, size_t* used_cells)
 {
 	size_t s0 = *slen;
 
@@ -888,7 +889,7 @@ static bool mushspace_subsume_fusables(
 		size_t corrected = subsumees[i] - offset++;
 		subsumees[i] = candidates[corrected];
 
-		mushspace_min_max_size(consumer, consumee, consumee_size, used_cells,
+		mushspace_min_max_size(consumer, consumee, used_cells,
 		                       subsumees[i], &space->boxen[subsumees[i]]);
 
 		candidates[corrected] = space->box_count;
@@ -901,7 +902,7 @@ static bool mushspace_subsume_disjoint(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
 	mush_bounds* consumer,
-	size_t* consumee, size_t* consumee_size, size_t* used_cells)
+	mushspace_consumee* consumee, size_t* used_cells)
 {
 	const size_t s0 = *slen;
 	for (size_t i = 0; i < space->box_count; ++i) {
@@ -914,8 +915,8 @@ static bool mushspace_subsume_disjoint(
 		if (mush_bounds_overlaps(consumer, &space->boxen[c].bounds))
 			continue;
 
-		if (mushspace_valid_min_max_size(mushspace_disjoint_mms_validator, NULL,
-		                                 consumer, consumee, consumee_size,
+		if (mushspace_valid_min_max_size(mushspace_disjoint_mms_validator,
+		                                 NULL, consumer, consumee,
 		                                 used_cells, c, &space->boxen[c]))
 		{
 			subsumees[*slen++] = c;
@@ -938,7 +939,7 @@ static bool mushspace_subsume_overlaps(
 	mushspace* space,
 	size_t* candidates, size_t* subsumees, size_t* slen,
 	mush_bounds* consumer,
-	size_t* consumee, size_t* consumee_size, size_t* used_cells)
+	mushspace_consumee* consumee, size_t* used_cells)
 {
 	const size_t s0 = *slen;
 	for (size_t i = 0; i < space->box_count; ++i) {
@@ -949,11 +950,9 @@ static bool mushspace_subsume_overlaps(
 		if (!mush_bounds_overlaps(consumer, &space->boxen[c].bounds))
 			continue;
 
-		if (
-			mushspace_valid_min_max_size(
-				mushspace_overlaps_mms_validator, consumer,
-				consumer, consumee, consumee_size, used_cells,
-				c, &space->boxen[c]))
+		if (mushspace_valid_min_max_size(mushspace_overlaps_mms_validator,
+		                                 consumer, consumer, consumee,
+		                                 used_cells, c, &space->boxen[c]))
 		{
 			subsumees[*slen++] = c;
 			candidates[i] = space->box_count;
@@ -978,13 +977,13 @@ static bool mushspace_overlaps_mms_validator(
 }
 static void mushspace_min_max_size(
 	mush_bounds* bounds,
-	size_t* max_idx, size_t* max_size, size_t* total_size,
+	mushspace_consumee* max, size_t* total_size,
 	size_t box_idx, const mush_aabb* box)
 {
 	*total_size += box->size;
-	if (box->size > *max_size) {
-		*max_size = box->size;
-		*max_idx  = box_idx;
+	if (box->size > max->size) {
+		max->size = box->size;
+		max->idx  = box_idx;
 	}
 	if (bounds) {
 		mushcoords_min_into(&bounds->beg, box->bounds.beg);
@@ -1004,21 +1003,21 @@ static bool mushspace_valid_min_max_size(
 	bool (*valid)(const mush_bounds*, const mush_aabb*, size_t, void*),
 	void* userdata,
 	mush_bounds* bounds,
-	size_t* max_idx, size_t* max_size, size_t* total_size,
+	mushspace_consumee* max, size_t* total_size,
 	size_t box_idx, const mush_aabb* box)
 {
 	mush_bounds try_bounds = *bounds;
-	size_t try_max_idx, try_max_size = *max_size, try_total_size = *total_size;
+	mushspace_consumee try_max = *max;
+	size_t try_total_size = *total_size;
 
 	mushspace_min_max_size(
-		&try_bounds, &try_max_idx, &try_max_size, &try_total_size, box_idx, box);
+		&try_bounds, &try_max, &try_total_size, box_idx, box);
 
 	if (!valid(&try_bounds, box, *total_size, userdata))
 		return false;
 
 	*bounds     = try_bounds;
-	*max_idx    = try_max_idx;
-	*max_size   = try_max_size;
+	*max        = try_max;
 	*total_size = try_total_size;
 	return true;
 }
