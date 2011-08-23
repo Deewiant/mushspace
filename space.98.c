@@ -67,6 +67,8 @@ struct mushspace {
 	mush_staticaabb static_box;
 };
 
+MUSH_DECL_DYN_ARRAY(mushcell)
+
 const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
 
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
