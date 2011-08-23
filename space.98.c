@@ -397,7 +397,7 @@ incorporated:
 
 		bool overlaps = false;
 		for (size_t b = 0; b < space->box_count-1; ++b) {
-			if (mush_aabb_overlaps(box, &space->boxen[b])) {
+			if (mush_bounds_overlaps(bounds, &space->boxen[b].bounds)) {
 				overlaps = true;
 				break;
 			}
