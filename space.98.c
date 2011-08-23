@@ -1636,13 +1636,13 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 	mush_aabb *aabbs =
 		mushspace_get_aabbs(str, len, target, binary, &aabbs_len);
 
-	if (end)
-		*end = target;
-
 	if (!aabbs) {
 		// The error code was placed in aabbs_len.
 		return (int)aabbs_len;
 	}
+
+	if (end)
+		*end = target;
 
 	for (size_t i = 0; i < aabbs_len; ++i) {
 		if (end)
