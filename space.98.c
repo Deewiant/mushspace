@@ -1763,12 +1763,12 @@ static mush_aabb* mushspace_get_aabbs(
 
 	if (binary) {
 		size_t n = mushspace_get_aabbs_binary(str, len, target, bounds);
-		if (n == SIZE_MAX)
+		if (n == SIZE_MAX) {
 			*len_out = MUSH_ERR_NO_ROOM;
-		else {
-			assert (n <= 2);
-			*len_out = n;
+			return NULL;
 		}
+		assert (n <= 2);
+		*len_out = n;
 		return aabbs;
 	}
 
