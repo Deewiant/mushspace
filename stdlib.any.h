@@ -10,6 +10,9 @@
 #define MUSH_DECL_DYN_ARRAY(T) \
 	typedef struct mush_arr_##T { T *ptr; size_t len; } mush_arr_##T;
 
+#define MUSH_DECL_CONST_DYN_ARRAY(T) \
+	typedef struct mush_carr_##T { const T *ptr; size_t len; } mush_carr_##T;
+
 size_t mush_size_t_max(size_t, size_t);
 
 int mush_size_t_qsort_cmp(const void*, const void*);
