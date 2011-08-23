@@ -12,9 +12,9 @@
 #define mush_aabb MUSHSPACE_NAME(mush_aabb)
 
 typedef struct mush_aabb {
+	mush_bounds bounds;
 	mushcell *data;
 	size_t size;
-	mushcoords beg, end;
 
 #if MUSHSPACE_DIM >= 2
 	size_t width;

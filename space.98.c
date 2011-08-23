@@ -186,12 +186,12 @@ static void mushspace_map_no_place(
 	void(*)(size_t, void*));
 
 static bool mushspace_map_in_box(
-	mushspace*, const mush_aabb*, mushcoords*,
+	mushspace*, const mush_bounds*, mushcoords*,
 	const mush_aabb*, size_t,
 	void*, void(*f)(mushcell*, mushcell*, void*, mushstats*));
 
 static bool mushspace_map_in_static(
-	mushspace*, const mush_aabb*, mushcoords*,
+	mushspace*, const mush_bounds*, mushcoords*,
 	void*, void(*f)(mushcell*, mushcell*, void*, mushstats*));
 
 static void mushspace_mapex_no_place(
@@ -201,13 +201,13 @@ static void mushspace_mapex_no_place(
 	void(*)(size_t, void*));
 
 static bool mushspace_mapex_in_box(
-	mushspace*, const mush_aabb*, mushcoords*,
+	mushspace*, const mush_bounds*, mushcoords*,
 	const mush_aabb*, size_t, void*,
 	void(*)(mushcell*, size_t, void*, size_t, size_t, size_t, size_t, uint8_t*,
 	        mushstats*));
 
 static bool mushspace_mapex_in_static(
-	mushspace*, const mush_aabb*, mushcoords*, void*,
+	mushspace*, const mush_bounds*, mushcoords*, void*,
 	void(*)(mushcell*, size_t, void*, size_t, size_t, size_t, size_t, uint8_t*,
 	        mushstats*));
 
@@ -215,7 +215,7 @@ static bool mushspace_get_next_in(
 	const mushspace*, const mush_aabb*, mushcoords*, size_t*);
 
 static void mushspace_get_next_in1(
-	mushucell, const mush_aabb*, mushcell, size_t, mushcoords, size_t,
+	mushucell, const mush_bounds*, mushcell, size_t, mushcoords, size_t,
 	mushcell*, mushcell*, size_t*, size_t*);
 
 static mush_aabb* mushspace_get_aabbs(
@@ -223,12 +223,12 @@ static mush_aabb* mushspace_get_aabbs(
 
 #if MUSHSPACE_DIM >= 2
 static bool mushspace_newline(
-	bool*, mushcoords*, mushcoords, mush_aabb*, size_t, size_t*, size_t*,
+	bool*, mushcoords*, mushcoords, mush_bounds*, size_t, size_t*, size_t*,
 	mushcoords, size_t*, uint8_t*);
 #endif
 
 static size_t mushspace_get_aabbs_binary(
-	const char*, size_t len, mushcoords target, mush_aabb* aabbs_out);
+	const char*, size_t len, mushcoords target, mush_bounds*);
 
 static void mushspace_binary_load_arr(mushcell*, mushcell*, void*, mushstats*);
 static void mushspace_binary_load_blank(size_t, void*);
@@ -341,24 +341,25 @@ static bool mushspace_place_box(
 	size_t a = 1;
 
 	for (size_t b = 0; b < a; ++b) {
-		mush_aabb *box = &aabbs[b];
+		mush_bounds *bounds = &aabbs[b].bounds;
 		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-			if (box->beg.v[i] <= box->end.v[i])
+			if (bounds->beg.v[i] <= bounds->end.v[i])
 				continue;
 
-			mush_bounds clipped = {box->beg, box->end};
+			mush_bounds clipped = *bounds;
 			clipped.end.v[i] = MUSHCELL_MAX;
 			mush_aabb_make_unsafe(&aabbs[a++], &clipped);
-			box->beg.v[i] = MUSHCELL_MIN;
+			bounds->beg.v[i] = MUSHCELL_MIN;
 		}
 	}
 
 	// Then do the actual placement.
 	for (size_t b = 0; b < a; ++b) {
-		mush_aabb *box = &aabbs[b];
+		mush_aabb   *box    = &aabbs[b];
+		mush_bounds *bounds = &box->bounds;
 
-		if (   mush_staticaabb_contains(box->beg)
-		    && mush_staticaabb_contains(box->end))
+		if (   mush_staticaabb_contains(bounds->beg)
+		    && mush_staticaabb_contains(bounds->end))
 		{
 incorporated:
 			mushstats_add(space->stats, MushStat_boxes_incorporated, 1);
@@ -374,6 +375,8 @@ incorporated:
 		if (box == NULL)
 			return false;
 
+		bounds = &box->bounds;
+
 		if (reason && mush_aabb_contains(box, *reason)) {
 			*reason_box = box;
 
@@ -387,8 +390,7 @@ incorporated:
 		if (!space->bak.data || !mush_bakaabb_size(&space->bak))
 			continue;
 
-		mush_bounds bounds = {box->beg, box->end};
-		if (!mush_bounds_overlaps(&bounds, &space->bak.bounds))
+		if (!mush_bounds_overlaps(bounds, &space->bak.bounds))
 			continue;
 
 		assert (box == &space->boxen[space->box_count-1]);
@@ -438,9 +440,8 @@ static bool mushspace_place_box_for(
 	if (!mushspace_place_box(space, &aabb, &c, placed))
 		return false;
 
-	mush_bounds placed_bounds = {(*placed)->beg, (*placed)->end};
 	mush_anamnesic_ring_push(
-		&space->recent_buf, (mush_memory){.placed = placed_bounds, c});
+		&space->recent_buf, (mush_memory){.placed = (*placed)->bounds, c});
 
 	return true;
 }
@@ -698,7 +699,8 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 	       consumee_size = 0,
 	       used_cells = aabb->size;
 
-	mush_bounds consumer_bounds = {aabb->beg, aabb->end};
+	mush_aabb consumer;
+	mush_aabb_make_unsafe(&consumer, &aabb->bounds);
 
 	// boxen that we haven't yet subsumed. Removed entries are set to
 	// space->box_count.
@@ -722,7 +724,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 		#define PARAMS space,            \
 		               candidates,       \
 		               subsumees, &slen, \
-		               &consumer_bounds, \
+		               &consumer.bounds, \
 		               &consumee, &consumee_size, &used_cells
 
 		    mushspace_subsume_contains(PARAMS);
@@ -733,8 +735,6 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 
 		#undef PARAMS
 	}
-	mush_aabb consumer;
-	mush_aabb_make_unsafe(&consumer, &consumer_bounds);
 
 	free(candidates);
 
@@ -798,8 +798,7 @@ static void mushspace_subsume_contains(
 		if (c == space->box_count)
 			continue;
 
-		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
-		if (!mush_bounds_contains_bounds(consumer, &bounds))
+		if (!mush_bounds_contains_bounds(consumer, &space->boxen[c].bounds))
 			continue;
 
 		subsumees[*slen++] = c;
@@ -827,8 +826,7 @@ static bool mushspace_subsume_fusables(
 		size_t c = candidates[i];
 		if (c == space->box_count)
 			continue;
-		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
-		if (mush_bounds_can_fuse(consumer, &bounds))
+		if (mush_bounds_can_fuse(consumer, &space->boxen[c].bounds))
 			subsumees[*slen++] = i;
 	}
 
@@ -850,24 +848,22 @@ static bool mushspace_subsume_fusables(
 		size_t j = s0;
 		for (size_t i = s0; i < *slen; ++i) {
 			size_t s = subsumees[i];
-			const mush_aabb   *box = &space->boxen[candidates[s]];
-			const mush_bounds  bounds = {box->beg, box->end};
-			if (mush_bounds_on_same_primary_axis(consumer, &bounds))
+			const mush_bounds *bounds = &space->boxen[candidates[s]].bounds;
+			if (mush_bounds_on_same_primary_axis(consumer, bounds))
 				subsumees[j++] = s;
 		}
 
 		if (j == s0) {
 			// Just grab the first one instead of being smart about it.
-			const mush_aabb   *box    = &space->boxen[candidates[subsumees[s0]]];
-			const mush_bounds  bounds = {box->beg, box->end};
+			const mush_bounds *bounds =
+				&space->boxen[candidates[subsumees[s0]]].bounds;
 
 			j = s0 + 1;
 
 			for (size_t i = j; i < *slen; ++i) {
 				size_t s = subsumees[i];
-				const mush_aabb   *sbox    = &space->boxen[candidates[s]];
-				const mush_bounds  sbounds = {sbox->beg, sbox->end};
-				if (mush_bounds_on_same_axis(&bounds, &sbounds))
+				const mush_bounds *sbounds = &space->boxen[candidates[s]].bounds;
+				if (mush_bounds_on_same_axis(bounds, sbounds))
 					subsumees[j++] = s;
 			}
 		}
@@ -914,8 +910,7 @@ static bool mushspace_subsume_disjoint(
 
 		// All fusables have been removed, so a sufficient condition for
 		// disjointness is non-overlappingness.
-		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
-		if (mush_bounds_overlaps(consumer, &bounds))
+		if (mush_bounds_overlaps(consumer, &space->boxen[c].bounds))
 			continue;
 
 		if (mushspace_valid_min_max_size(mushspace_disjoint_mms_validator, NULL,
@@ -950,8 +945,7 @@ static bool mushspace_subsume_overlaps(
 		if (c == space->box_count)
 			continue;
 
-		const mush_bounds bounds = {space->boxen[c].beg, space->boxen[c].end};
-		if (!mush_bounds_overlaps(consumer, &bounds))
+		if (!mush_bounds_overlaps(consumer, &space->boxen[c].bounds))
 			continue;
 
 		if (
@@ -973,13 +967,10 @@ static bool mushspace_overlaps_mms_validator(
 	const mush_bounds* b, const mush_aabb* fodder, size_t used_cells, void* cp)
 {
 	const mush_bounds *consumer = cp;
-	const mush_bounds fbounds = {fodder->beg, fodder->end};
-
-	mush_bounds obounds;
-	mush_bounds_get_overlap(consumer, &fbounds, &obounds);
 
 	mush_aabb overlap;
-	mush_aabb_make(&overlap, &obounds);
+	mush_bounds_get_overlap(consumer, &fodder->bounds, &overlap.bounds);
+	mush_aabb_finalize(&overlap);
 
 	return mushspace_cheaper_to_alloc(
 		mush_bounds_clamped_size(b), used_cells + fodder->size - overlap.size);
@@ -995,8 +986,8 @@ static void mushspace_min_max_size(
 		*max_idx  = box_idx;
 	}
 	if (bounds) {
-		mushcoords_min_into(&bounds->beg, box->beg);
-		mushcoords_max_into(&bounds->end, box->end);
+		mushcoords_min_into(&bounds->beg, box->bounds.beg);
+		mushcoords_max_into(&bounds->end, box->bounds.end);
 	}
 }
 // Fills in the input values with the mushspace_min_max_size data, returning
@@ -1158,11 +1149,10 @@ static void mushspace_irrelevize_subsumption_order(
 
 			// If they overlap, copy the overlap area to the lower box and space
 			// that area in the higher one.
-			mush_bounds hbounds = {higher->beg, higher->end},
-			            lbounds = { lower->beg,  lower->end},
-			            obounds;
-			if (mush_bounds_get_overlap(&hbounds, &lbounds, &obounds)) {
-				mush_aabb_make(&overlap, &obounds);
+			if (mush_bounds_get_overlap(&higher->bounds, &lower->bounds,
+			                            &overlap.bounds))
+			{
+				mush_aabb_finalize(&overlap);
 				mush_aabb_subsume_area(lower, higher, &overlap);
 				mush_aabb_space_area(higher, &overlap);
 			}
@@ -1171,15 +1161,15 @@ static void mushspace_irrelevize_subsumption_order(
 }
 
 static void mushspace_map_no_place(
-	mushspace* space, const mush_aabb* aabb, void* caller_data,
+	mushspace* space, const mush_aabb* aabb, void* fg,
 	void(*f)(mushcell*, mushcell*, void*, mushstats*),
 	void(*g)(size_t, void*))
 {
-	mushcoords pos = aabb->beg;
+	mushcoords pos = aabb->bounds.beg;
 
 	for (;;) next_pos: {
 		if (mush_staticaabb_contains(pos)) {
-			if (mushspace_map_in_static(space, aabb, &pos, caller_data, f))
+			if (mushspace_map_in_static(space, &aabb->bounds, &pos, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -1188,10 +1178,10 @@ static void mushspace_map_no_place(
 		for (size_t b = 0; b < space->box_count; ++b) {
 			const mush_aabb *box = &space->boxen[b];
 
-			if (!mush_aabb_contains(box, pos))
+			if (!mush_bounds_contains(&box->bounds, pos))
 				continue;
 
-			if (mushspace_map_in_box(space, aabb, &pos, box, b, caller_data, f))
+			if (mushspace_map_in_box(space, &aabb->bounds, &pos, box, b, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -1202,13 +1192,13 @@ static void mushspace_map_no_place(
 		size_t skipped = 0;
 		bool found = mushspace_get_next_in(space, aabb, &pos, &skipped);
 		if (g)
-			g(skipped, caller_data);
+			g(skipped, fg);
 		if (!found)
 			return;
 	}
 }
 static bool mushspace_map_in_box(
-	mushspace* space, const mush_aabb* aabb, mushcoords* pos,
+	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
 	const mush_aabb* box, size_t box_idx,
 	void* caller_data, void(*f)(mushcell*, mushcell*, void*, mushstats*))
 {
@@ -1223,19 +1213,19 @@ static bool mushspace_map_in_box(
 	// We want to map the range from x to y (shaded). Unless we tessellate,
 	// we'll get the whole thing from box B straight away.
 
-	mushcoords tes_beg = box->beg;
-	mushcoords tes_end = box->end;
-	mush_aabb_tessellate(*pos, space->boxen, box_idx, &tes_beg, &tes_end);
+	mush_bounds tes = box->bounds;
+	mush_aabb_tessellate(*pos, space->boxen, box_idx, &tes.beg, &tes.end);
 
 	// The static box is above all dynamic boxen, so check it as well.
 	mush_aabb_tessellate1(*pos, MUSH_STATICAABB_BEG, MUSH_STATICAABB_END,
-	                      &tes_beg, &tes_end);
+	                      &tes.beg, &tes.end);
 
 	bool hit_end;
 	const size_t
 		beg_idx = mush_aabb_get_idx(box, *pos),
 		end_idx = mush_aabb_get_idx(box, mushcoords_get_end_of_contiguous_range(
-			tes_end, pos, aabb->end, aabb->beg, &hit_end, tes_beg, box->beg));
+			tes.end, pos, bounds->end,
+			bounds->beg, &hit_end, tes.beg, box->bounds.beg));
 
 	assert (beg_idx <= end_idx);
 
@@ -1245,15 +1235,15 @@ static bool mushspace_map_in_box(
 	return hit_end;
 }
 static bool mushspace_map_in_static(
-	mushspace* space, const mush_aabb* aabb, mushcoords* pos,
+	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
 	void* caller_data, void(*f)(mushcell*, mushcell*, void*, mushstats*))
 {
 	bool hit_end;
 	const size_t
 		beg_idx = mush_staticaabb_get_idx(*pos),
 		end_idx = mush_staticaabb_get_idx(mushcoords_get_end_of_contiguous_range(
-			MUSH_STATICAABB_END, pos, aabb->end,
-			aabb->beg, &hit_end, MUSH_STATICAABB_BEG, MUSH_STATICAABB_BEG));
+			MUSH_STATICAABB_END, pos, bounds->end,
+			bounds->beg, &hit_end, MUSH_STATICAABB_BEG, MUSH_STATICAABB_BEG));
 
 	assert (beg_idx <= end_idx);
 
@@ -1276,16 +1266,16 @@ static bool mushspace_map_in_static(
 //   (LSB for line, next-most for page). This may be updated by the function to
 //   reflect that it's done with the line/page.
 static void mushspace_mapex_no_place(
-	mushspace* space, const mush_aabb* aabb, void* caller_data,
+	mushspace* space, const mush_aabb* aabb, void* fg,
 	void(*f)(mushcell*, size_t, void*, size_t, size_t, size_t, size_t, uint8_t*,
 	        mushstats*),
 	void(*g)(size_t, void*))
 {
-	mushcoords pos = aabb->beg;
+	mushcoords pos = aabb->bounds.beg;
 
 	for (;;) next_pos: {
 		if (mush_staticaabb_contains(pos)) {
-			if (mushspace_mapex_in_static(space, aabb, &pos, caller_data, f))
+			if (mushspace_mapex_in_static(space, &aabb->bounds, &pos, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -1294,10 +1284,10 @@ static void mushspace_mapex_no_place(
 		for (size_t b = 0; b < space->box_count; ++b) {
 			const mush_aabb *box = &space->boxen[b];
 
-			if (!mush_aabb_contains(box, pos))
+			if (!mush_bounds_contains(&box->bounds, pos))
 				continue;
 
-			if (mushspace_mapex_in_box(space, aabb, &pos, box, b, caller_data, f))
+			if (mushspace_mapex_in_box(space, &aabb->bounds, &pos, box, b, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -1308,13 +1298,13 @@ static void mushspace_mapex_no_place(
 		size_t skipped = 0;
 		bool found = mushspace_get_next_in(space, aabb, &pos, &skipped);
 		if (g)
-			g(skipped, caller_data);
+			g(skipped, fg);
 		if (!found)
 			return;
 	}
 }
 static bool mushspace_mapex_in_box(
-	mushspace* space, const mush_aabb* aabb, mushcoords* pos,
+	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
 	const mush_aabb* box, size_t box_idx,
 	void* caller_data,
 	void(*f)(mushcell*, size_t, void*, size_t, size_t, size_t, size_t, uint8_t*,
@@ -1328,13 +1318,13 @@ static bool mushspace_mapex_in_box(
 	// These depend on the original pos and thus have to be initialized before
 	// the call to mushcoords_get_end_of_contiguous_range.
 
-	// {box->beg.x, pos->y, pos->z}
+	// {box->bounds.beg.x, pos->y, pos->z}
 	mushcoords ls = *pos;
-	ls.x = box->beg.x;
+	ls.x = box->bounds.beg.x;
 
 #if MUSHSPACE_DIM >= 2
-	// {box->beg.x, box->beg.y, pos->z}
-	mushcoords ps = box->beg;
+	// {box->bounds.beg.x, box->bounds.beg.y, pos->z}
+	mushcoords ps = box->bounds.beg;
 	memcpy(ps.v + 2, pos->v + 2, (MUSHSPACE_DIM - 2) * sizeof(mushcell));
 #endif
 
@@ -1345,18 +1335,17 @@ static bool mushspace_mapex_in_box(
 #endif
 #endif
 
-	mushcoords tes_beg = box->beg;
-	mushcoords tes_end = box->end;
-	mush_aabb_tessellate(*pos, space->boxen, box_idx, &tes_beg, &tes_end);
-
+	mush_bounds tes = box->bounds;
+	mush_aabb_tessellate(*pos, space->boxen, box_idx, &tes.beg, &tes.end);
 	mush_aabb_tessellate1(*pos, MUSH_STATICAABB_BEG, MUSH_STATICAABB_END,
-	                      &tes_beg, &tes_end);
+	                      &tes.beg, &tes.end);
 
 	bool hit_end;
 	const size_t
 		beg_idx = mush_aabb_get_idx(box, *pos),
 		end_idx = mush_aabb_get_idx(box, mushcoords_get_end_of_contiguous_range(
-			tes_end, pos, aabb->end, aabb->beg, &hit_end, tes_beg, box->beg));
+			tes.end, pos, bounds->end,
+			bounds->beg, &hit_end, tes.beg, box->bounds.beg));
 
 	assert (beg_idx <= end_idx);
 
@@ -1370,14 +1359,14 @@ static bool mushspace_mapex_in_box(
 
 #if MUSHSPACE_DIM >= 2
 	width = box->width;
-	hit |= (pos->x == aabb->beg.x && pos->y != ls.y) << 0;
+	hit |= (pos->x == bounds->beg.x && pos->y != ls.y) << 0;
 
 	// Befunge needs this to skip leading newlines.
 	page_start = mush_aabb_get_idx(box, ps) - beg_idx;
 #endif
 #if MUSHSPACE_DIM >= 3
 	area = box->area;
-	hit |= (pos->y == aabb->beg.y && pos->z != ls.z) << 1;
+	hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
 #endif
 
 	f(p, len, caller_data, width, area, line_start, page_start, &hit,
@@ -1386,8 +1375,8 @@ static bool mushspace_mapex_in_box(
 #if MUSHSPACE_DIM >= 2
 	if (hit == 0x01 && pos->y == prev_y) {
 		// f hit an EOL and pos->y hasn't been bumped, so bump it.
-		pos->x = aabb->beg.x;
-		if ((pos->y = mushcell_inc(pos->y)) > aabb->end.y) {
+		pos->x = bounds->beg.x;
+		if ((pos->y = mushcell_inc(pos->y)) > bounds->end.y) {
 			#if MUSHSPACE_DIM >= 3
 				goto bump_z;
 			#else
@@ -1399,17 +1388,17 @@ static bool mushspace_mapex_in_box(
 #if MUSHSPACE_DIM >= 3
 	if (hit == 0x02 && pos->z == prev_z) {
 		// Ditto for EOP.
-		pos->x = aabb->beg.x;
+		pos->x = bounds->beg.x;
 bump_z:
-		pos->y = aabb->beg.y;
-		if ((pos->z = mushcell_inc(pos->z)) > aabb->end.z)
+		pos->y = bounds->beg.y;
+		if ((pos->z = mushcell_inc(pos->z)) > bounds->end.z)
 			hit_end = true;
 	}
 #endif
 	return hit_end;
 }
 static bool mushspace_mapex_in_static(
-	mushspace* space, const mush_aabb* aabb, mushcoords* pos,
+	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
 	void* caller_data,
 	void(*f)(mushcell*, size_t, void*, size_t, size_t, size_t, size_t, uint8_t*,
 	        mushstats*))
@@ -1435,8 +1424,8 @@ static bool mushspace_mapex_in_static(
 	size_t
 		beg_idx = mush_staticaabb_get_idx(*pos),
 		end_idx = mush_staticaabb_get_idx(mushcoords_get_end_of_contiguous_range(
-			MUSH_STATICAABB_END, pos, aabb->end,
-			aabb->beg, &hit_end, MUSH_STATICAABB_BEG, MUSH_STATICAABB_BEG));
+			MUSH_STATICAABB_END, pos, bounds->end,
+			bounds->beg, &hit_end, MUSH_STATICAABB_BEG, MUSH_STATICAABB_BEG));
 
 	assert (beg_idx <= end_idx);
 
@@ -1449,13 +1438,13 @@ static bool mushspace_mapex_in_static(
 
 #if MUSHSPACE_DIM >= 2
 	width = MUSH_STATICAABB_SIZE.x;
-	hit |= (pos->x == aabb->beg.x && pos->y != ls.y) << 0;
+	hit |= (pos->x == bounds->beg.x && pos->y != ls.y) << 0;
 
 	page_start = mush_staticaabb_get_idx(ps) - beg_idx;
 #endif
 #if MUSHSPACE_DIM >= 3
 	area = MUSH_STATICAABB_SIZE.x * MUSH_STATICAABB_SIZE.y;
-	hit |= (pos->y == aabb->beg.y && pos->z != ls.z) << 1;
+	hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
 #endif
 
 	f(p, len, caller_data, width, area, line_start, page_start, &hit,
@@ -1463,8 +1452,8 @@ static bool mushspace_mapex_in_static(
 
 #if MUSHSPACE_DIM >= 2
 	if (hit == 0x01 && pos->y == prev_y) {
-		pos->x = aabb->beg.x;
-		if ((pos->y = mushcell_inc(pos->y)) > aabb->end.y) {
+		pos->x = bounds->beg.x;
+		if ((pos->y = mushcell_inc(pos->y)) > bounds->end.y) {
 			#if MUSHSPACE_DIM >= 3
 				goto bump_z;
 			#else
@@ -1475,10 +1464,10 @@ static bool mushspace_mapex_in_static(
 #endif
 #if MUSHSPACE_DIM >= 3
 	if (hit == 0x02 && pos->z == prev_z) {
-		pos->x = aabb->beg.x;
+		pos->x = bounds->beg.x;
 bump_z:
-		pos->y = aabb->beg.y;
-		if ((pos->z = mushcell_inc(pos->z)) > aabb->end.z)
+		pos->y = bounds->beg.y;
+		if ((pos->z = mushcell_inc(pos->z)) > bounds->end.z)
 			hit_end = true;
 	}
 #endif
@@ -1518,12 +1507,14 @@ restart:
 		// Go through every box, starting from the static one.
 
 		mushspace_get_next_in1(
-			i, aabb, pos->v[i], box_count, MUSH_STATICAABB_BEG, box_count,
+			i, &aabb->bounds, pos->v[i], box_count,
+			MUSH_STATICAABB_BEG, box_count,
 			&best_coord, &best_wrapped, &best_in, &wrapped_in);
 
 		for (mushucell b = 0; b < box_count; ++b)
 			mushspace_get_next_in1(
-				i, aabb, pos->v[i], box_count, space->boxen[b].beg, b,
+				i, &aabb->bounds, pos->v[i], box_count,
+				space->boxen[b].bounds.beg, b,
 				&best_coord, &best_wrapped, &best_in, &wrapped_in);
 
 		if (best_in > box_count) {
@@ -1539,7 +1530,7 @@ restart:
 
 		const mushcoords old = *pos;
 
-		memcpy(pos->v, aabb->beg.v, i * sizeof(mushcell));
+		memcpy(pos->v, aabb->bounds.beg.v, i * sizeof(mushcell));
 		pos->v[i] = best_coord;
 
 		// Old was already a space, or we wouldn't've called this function in the
@@ -1549,7 +1540,7 @@ restart:
 		mushdim j;
 #if MUSHSPACE_DIM >= 2
 		for (j = 0; j < MUSHSPACE_DIM-1; ++j)
-			*skipped +=   mushcell_sub(aabb->end.v[j], old.v[j])
+			*skipped +=   mushcell_sub(aabb->bounds.end.v[j], old.v[j])
 			            * mush_aabb_volume_on(aabb, j);
 #else
 		// Avoid "condition is always true" warnings by doing this instead of the
@@ -1583,7 +1574,7 @@ restart:
 	return false;
 }
 static void mushspace_get_next_in1(
-	mushucell x, const mush_aabb* aabb, mushcell posx, size_t box_count,
+	mushucell x, const mush_bounds* bounds, mushcell posx, size_t box_count,
 	mushcoords box_beg, size_t box_idx,
 	mushcell* best_coord, mushcell* best_wrapped,
 	size_t* best_in, size_t* wrapped_in)
@@ -1596,22 +1587,22 @@ static void mushspace_get_next_in1(
 		return;
 
 	// If this box doesn't overlap with the AABB we're interested in, skip it.
-	if (!mush_aabb_safe_contains(aabb, box_beg))
+	if (!mush_bounds_safe_contains(bounds, box_beg))
 		return;
 
 	// If pos has crossed an axis within the AABB, prevent us from grabbing a
 	// new pos on the other side of the axis we're wrapped around, or we'll just
 	// keep looping around that axis.
-	if (posx < aabb->beg.v[x] && box_beg.v[x] > aabb->end.v[x])
+	if (posx < bounds->beg.v[x] && box_beg.v[x] > bounds->end.v[x])
 		return;
 
-	// If the path from pos to aabb->end requires a wraparound, take the global
-	// minimum box.beg as a last-resort option if nothing else is found, so that
-	// we wrap around if there's no non-wrapping solution.
+	// If the path from pos to bounds->end requires a wraparound, take the
+	// global minimum box.beg as a last-resort option if nothing else is found,
+	// so that we wrap around if there's no non-wrapping solution.
 	//
 	// Note that *best_wrapped <= *best_coord so we can safely test this after
 	// the first *best_coord check.
-	if (   posx > aabb->end.v[x]
+	if (   posx > bounds->end.v[x]
 	    && (box_beg.v[x] < *best_wrapped || *wrapped_in == box_count+1))
 	{
 		*best_wrapped = box_beg.v[x];
@@ -1654,7 +1645,7 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 
 	for (size_t i = 0; i < aabbs_len; ++i) {
 		if (end)
-			mushcoords_max_into(end, aabbs[i].end);
+			mushcoords_max_into(end, aabbs[i].bounds.end);
 
 		if (!mushspace_place_box(space, &aabbs[i], NULL, NULL))
 			return MUSH_ERR_OOM;
@@ -1677,15 +1668,17 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 		// point due to dropping space-filled lines and columns, but they haven't
 		// been subsumed into bigger boxes or anything.
 
+		mush_bounds *bounds = &aabb.bounds;
+
 		uint8_t found_past = 0, found_before = 0;
 
 		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-			if (aabb.beg.v[i] < target.v[i]) found_past   |= 1 << i;
-			else                             found_before |= 1 << i;
+			if (bounds->beg.v[i] < target.v[i]) found_past   |= 1 << i;
+			else                                found_before |= 1 << i;
 		}
 
 		for (size_t b = 1; b < aabbs_len; ++b) {
-			const mush_aabb *box = &aabbs[b];
+			const mush_bounds *box = &aabbs[b].bounds;
 
 			for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 				const uint8_t axis = 1 << i;
@@ -1696,28 +1689,28 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 					// target location.
 
 					if (found_past & axis)
-						mushcell_max_into(&aabb.end.v[i], box->end.v[i]);
+						mushcell_max_into(&bounds->end.v[i], box->end.v[i]);
 					else {
-						aabb.end.v[i] = box->end.v[i];
+						bounds->end.v[i] = box->end.v[i];
 						found_past |= axis;
 					}
 
 					if (!(found_before & axis))
-						mushcell_min_into(&aabb.beg.v[i], box->beg.v[i]);
+						mushcell_min_into(&bounds->beg.v[i], box->beg.v[i]);
 				} else {
 					// This box is before this axis, in the negative direction: it
 					// both begins and ends in the positive direction from the
 					// target location.
 
 					if (found_before & axis)
-						mushcell_min_into(&aabb.beg.v[i], box->beg.v[i]);
+						mushcell_min_into(&bounds->beg.v[i], box->beg.v[i]);
 					else {
-						aabb.beg.v[i] = box->beg.v[i];
+						bounds->beg.v[i] = box->beg.v[i];
 						found_before |= axis;
 					}
 
 					if (!(found_past & axis))
-						mushcell_max_into(&aabb.end.v[i], box->end.v[i]);
+						mushcell_max_into(&bounds->end.v[i], box->end.v[i]);
 				}
 			}
 		}
@@ -1734,9 +1727,9 @@ int MUSHSPACE_CAT(mushspace,_load_string)(
 		mushspace_load_arr_auxdata aux =
 			{ str, str_end
 		#if MUSHSPACE_DIM >= 2
-			, target.x, target.x, aabb.beg.x
+			, target.x, target.x, aabb.bounds.beg.x
 		#if MUSHSPACE_DIM >= 3
-			, target.y, target.y, aabb.beg.y
+			, target.y, target.y, aabb.bounds.beg.y
 		#endif
 		#endif
 		};
@@ -1765,8 +1758,10 @@ static mush_aabb* mushspace_get_aabbs(
 {
 	static mush_aabb aabbs[1 << MUSHSPACE_DIM];
 
+	mush_bounds *bounds = (mush_bounds*)aabbs;
+
 	if (binary) {
-		size_t n = mushspace_get_aabbs_binary(str, len, target, aabbs);
+		size_t n = mushspace_get_aabbs_binary(str, len, target, bounds);
 		if (n == SIZE_MAX)
 			*len_out = MUSH_ERR_NO_ROOM;
 		else {
@@ -1810,8 +1805,8 @@ static mush_aabb* mushspace_get_aabbs(
 	size_t found_nonspace_for_anyone = MUSH_ARRAY_LEN(aabbs);
 
 	for (size_t i = 0; i < MUSH_ARRAY_LEN(aabbs); ++i) {
-		aabbs[i].beg = MUSHCOORDS(MUSHCELL_MAX, MUSHCELL_MAX, MUSHCELL_MAX);
-		aabbs[i].end = MUSHCOORDS(MUSHCELL_MIN, MUSHCELL_MIN, MUSHCELL_MIN);
+		bounds[i].beg = MUSHCOORDS(MUSHCELL_MAX, MUSHCELL_MAX, MUSHCELL_MAX);
+		bounds[i].end = MUSHCOORDS(MUSHCELL_MIN, MUSHCELL_MIN, MUSHCELL_MIN);
 	}
 
 	#if MUSHSPACE_DIM >= 2
@@ -1819,7 +1814,7 @@ static mush_aabb* mushspace_get_aabbs(
 
 		#define mush_hit_newline do { \
 			if (!mushspace_newline(&got_cr, &pos, target, \
-			                       aabbs, MUSH_ARRAY_LEN(aabbs), &a, &max_a, \
+			                       bounds, MUSH_ARRAY_LEN(aabbs), &a, &max_a, \
 			                       last_nonspace, &found_nonspace_for, &get_beg))\
 			{ \
 				*len_out = MUSH_ERR_NO_ROOM; \
@@ -1841,14 +1836,14 @@ static mush_aabb* mushspace_get_aabbs(
 
 			if (get_beg) for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 				if (get_beg & 1 << i) {
-					mushcell_min_into(&aabbs[a].beg.v[i], pos.v[i]);
+					bounds[a].beg.v[i] = mushcell_min(bounds[a].beg.v[i], pos.v[i]);
 					get_beg &= ~(1 << i);
 				}
 			}
 		}
 		if ((pos.x = mushcell_inc(pos.x)) == MUSHCELL_MIN) {
 			if (found_nonspace_for == a)
-				mushcoords_max_into(&aabbs[a].end, last_nonspace);
+				mushcoords_max_into(&bounds[a].end, last_nonspace);
 
 			found_nonspace_for = MUSH_ARRAY_LEN(aabbs);
 			get_beg = DimensionBits;
@@ -1880,15 +1875,15 @@ static mush_aabb* mushspace_get_aabbs(
 				mush_hit_newline;
 		#endif
 		#if MUSHSPACE_DIM >= 3
-			mushcell_max_into(&aabbs[a].end.x, last_nonspace.x);
-			mushcell_max_into(&aabbs[a].end.y, last_nonspace.y);
+			mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
+			mushcell_max_into(&bounds[a].end.y, last_nonspace.y);
 
 			pos.x = target.x;
 			pos.y = target.y;
 
 			if ((pos.z = mushcell_inc(pos.z)) == MUSHCELL_MIN) {
 				if (found_nonspace_for == a)
-					mushcoords_max_into(&aabbs[a].end, last_nonspace);
+					mushcoords_max_into(&bounds[a].end, last_nonspace);
 
 				found_nonspace_for = MUSH_ARRAY_LEN(aabbs);
 
@@ -1911,13 +1906,13 @@ static mush_aabb* mushspace_get_aabbs(
 		return NULL;
 
 	if (found_nonspace_for < MUSH_ARRAY_LEN(aabbs))
-		mushcoords_max_into(&aabbs[found_nonspace_for].end, last_nonspace);
+		mushcoords_max_into(&bounds[found_nonspace_for].end, last_nonspace);
 
 	// Since a is a bitmask, the AABBs that we used aren't necessarily in order.
 	// Fix that.
 	size_t n = 0;
 	for (size_t i = 0; i <= max_a; ++i) {
-		const mush_aabb* box = &aabbs[i];
+		const mush_bounds *box = &bounds[i];
 
 		if (!(box->beg.x == MUSHCELL_MAX && box->end.x == MUSHCELL_MIN)) {
 			// The box has been initialized, so make sure it's valid and put it in
@@ -1927,7 +1922,7 @@ static mush_aabb* mushspace_get_aabbs(
 				assert (box->beg.v[j] <= box->end.v[j]);
 
 			if (i != n)
-				aabbs[n] = aabbs[i];
+				bounds[n] = bounds[i];
 			++n;
 		}
 	}
@@ -1937,20 +1932,20 @@ static mush_aabb* mushspace_get_aabbs(
 #if MUSHSPACE_DIM >= 2
 static bool mushspace_newline(
 	bool* got_cr, mushcoords* pos, mushcoords target,
-	mush_aabb* aabbs, size_t aabbs_len, size_t* a, size_t* max_a,
+	mush_bounds* bounds, size_t bounds_len, size_t* a, size_t* max_a,
 	mushcoords last_nonspace, size_t* found_nonspace_for, uint8_t* get_beg)
 {
 	*got_cr = false;
 
-	mushcell_max_into(&aabbs[*a].end.x, last_nonspace.x);
+	mushcell_max_into(&bounds[*a].end.x, last_nonspace.x);
 
 	pos->x = target.x;
 
 	if ((pos->y = mushcell_inc(pos->y)) == MUSHCELL_MIN) {
 		if (*found_nonspace_for == *a)
-			mushcoords_max_into(&aabbs[*a].end, last_nonspace);
+			mushcoords_max_into(&bounds[*a].end, last_nonspace);
 
-		*found_nonspace_for = aabbs_len;
+		*found_nonspace_for = bounds_len;
 
 		*max_a = mush_size_t_max(*max_a, *a |= 0x02);
 	} else if (pos->y == target.y)
@@ -1963,7 +1958,7 @@ static bool mushspace_newline(
 #endif
 
 static size_t mushspace_get_aabbs_binary(
-	const char* str, size_t len, mushcoords target, mush_aabb* aabbs)
+	const char* str, size_t len, mushcoords target, mush_bounds* bounds)
 {
 	size_t a = 0;
 	mushcoords beg = target, end = target;
@@ -1990,14 +1985,12 @@ static size_t mushspace_get_aabbs_binary(
 
 	if (end.x > MUSHCELL_MAX - (mushcell)i) {
 		end.x = MUSHCELL_MAX;
-		mush_bounds bounds = {beg, end};
-		mush_aabb_make(&aabbs[a++], &bounds);
+		bounds[a++] = (mush_bounds){beg, end};
 		beg.x = MUSHCELL_MIN;
 	}
 	end.x += i;
 
-	mush_bounds bounds = {beg, end};
-	mush_aabb_make(&aabbs[a++], &bounds);
+	bounds[a++] = (mush_bounds){beg, end};
 	return a;
 }
 

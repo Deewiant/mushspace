@@ -33,22 +33,22 @@ void mush_aabb_make(mush_aabb* aabb, const mush_bounds* bounds) {
 }
 
 void mush_aabb_make_unsafe(mush_aabb* aabb, const mush_bounds* bounds) {
-	*aabb = (mush_aabb){.beg = bounds->beg, .end = bounds->end};
+	*aabb = (mush_aabb){.bounds = *bounds};
 }
 
 void mush_aabb_finalize(mush_aabb* aabb) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		assert (aabb->beg.v[i] <= aabb->end.v[i]);
+		assert (aabb->bounds.beg.v[i] <= aabb->bounds.end.v[i]);
 
-	aabb->size = aabb->end.x - aabb->beg.x + 1;
+	aabb->size = aabb->bounds.end.x - aabb->bounds.beg.x + 1;
 
 #if MUSHSPACE_DIM >= 2
 	aabb->width = aabb->size;
-	aabb->size *= aabb->end.y - aabb->beg.y + 1;
+	aabb->size *= aabb->bounds.end.y - aabb->bounds.beg.y + 1;
 #endif
 #if MUSHSPACE_DIM >= 3
 	aabb->area  = aabb->size;
-	aabb->size *= aabb->end.z - aabb->beg.z + 1;
+	aabb->size *= aabb->bounds.end.z - aabb->bounds.beg.z + 1;
 #endif
 }
 
@@ -73,22 +73,13 @@ size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
 }
 
 bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
-	mush_bounds bounds = {aabb->beg, aabb->end};
-	return mush_bounds_contains(&bounds, c);
+	return mush_bounds_contains(&aabb->bounds, c);
 }
 bool mush_aabb_contains_box(const mush_aabb* a, const mush_aabb* b) {
-	return mush_aabb_contains(a, b->beg) && mush_aabb_contains(a, b->end);
+	return mush_bounds_contains_bounds(&a->bounds, &b->bounds);
 }
 bool mush_aabb_safe_contains(const mush_aabb* aabb, mushcoords c) {
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-		if (aabb->beg.v[i] > aabb->end.v[i]) {
-			if (!(c.v[i] >= aabb->beg.v[i] || c.v[i] <= aabb->end.v[i]))
-				return false;
-		} else
-			if (!(c.v[i] >= aabb->beg.v[i] && c.v[i] <= aabb->end.v[i]))
-				return false;
-	}
-	return true;
+	return mush_bounds_safe_contains(&aabb->bounds, c);
 }
 
 mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
@@ -101,8 +92,8 @@ void mush_aabb_put(mush_aabb* aabb, mushcoords p, mushcell c) {
 	aabb->data[mush_aabb_get_idx(aabb, p)] = c;
 }
 
-size_t mush_aabb_get_idx(const mush_aabb* aabb, mushcoords c) {
-	return mush_aabb_get_idx_no_offset(aabb, mushcoords_sub(c, aabb->beg));
+size_t mush_aabb_get_idx(const mush_aabb* a, mushcoords c) {
+	return mush_aabb_get_idx_no_offset(a, mushcoords_sub(c, a->bounds.beg));
 }
 size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 {
@@ -119,9 +110,7 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 }
 
 bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
-	mush_bounds ab = {a->beg, a->end};
-	mush_bounds bb = {b->beg, b->end};
-	return mush_bounds_overlaps(&ab, &bb);
+	return mush_bounds_overlaps(&a->bounds, &b->bounds);
 }
 
 static bool mush_aabb_can_direct_copy(
@@ -164,7 +153,7 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
 
 	mushcell_space(box->data + old->size, box->size - old->size);
 
-	const size_t old_idx = mush_aabb_get_idx(box, old->beg);
+	const size_t old_idx = mush_aabb_get_idx(box, old->bounds.beg);
 
 	if (mush_aabb_can_direct_copy(box, old)) {
 		if (old_idx == 0)
@@ -183,9 +172,10 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
 	assert (MUSHSPACE_DIM > 1);
 
 #if MUSHSPACE_DIM > 1
+	const bool same_beg = mushcoords_equal(box->bounds.beg, old->bounds.beg);
+
 	// If the beginning coordinates are identical, the first row is already in
 	// the right place so we don't need to touch it.
-	const bool   same_beg             = mushcoords_equal(box->beg, old->beg);
 	const size_t last_row_idx_summand = same_beg ? old->width : 0;
 #endif
 
@@ -252,14 +242,16 @@ void mush_aabb_subsume_area(
 	assert (mush_aabb_contains_box(a, area));
 	assert (mush_aabb_contains_box(b, area));
 
-	size_t beg_idx = mush_aabb_get_idx(b, area->beg),
-	       end_idx = mush_aabb_get_idx(b, area->end);
+	const mush_bounds* ab = &area->bounds;
+
+	size_t beg_idx = mush_aabb_get_idx(b, ab->beg),
+	       end_idx = mush_aabb_get_idx(b, ab->end);
 
 	mush_aabb_subsume_owners_area(
 		a, b, area, b->data + beg_idx, end_idx - beg_idx + 1);
 
-	assert (mush_aabb_get(a, area->beg) == mush_aabb_get(b, area->beg));
-	assert (mush_aabb_get(a, area->end) == mush_aabb_get(b, area->end));
+	assert (mush_aabb_get(a, ab->beg) == mush_aabb_get(b, ab->beg));
+	assert (mush_aabb_get(a, ab->end) == mush_aabb_get(b, ab->end));
 }
 static void mush_aabb_subsume_owners_area(
 	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
@@ -285,7 +277,9 @@ static void mush_aabb_subsume_owners_area(
 
 	static const size_t SIZE = sizeof *data;
 
-	const size_t beg_idx = mush_aabb_get_idx(aabb, area->beg);
+	const mush_bounds* ab = &area->bounds;
+
+	const size_t beg_idx = mush_aabb_get_idx(aabb, ab->beg);
 
 	if (mush_aabb_can_direct_copy_area(aabb, area, owner)) {
 		memcpy(aabb->data + beg_idx, data, len * SIZE);
@@ -315,15 +309,17 @@ static void mush_aabb_subsume_owners_area(
 	}
 #endif
 end:
-	assert (mush_aabb_get(aabb, area->beg) == data[0]);
-	assert (mush_aabb_get(aabb, area->end) == data[len-1]);
-	assert (mush_aabb_get(aabb, area->beg) == mush_aabb_get(owner, area->beg));
-	assert (mush_aabb_get(aabb, area->end) == mush_aabb_get(owner, area->end));
+	assert (mush_aabb_get(aabb, ab->beg) == data[0]);
+	assert (mush_aabb_get(aabb, ab->end) == data[len-1]);
+	assert (mush_aabb_get(aabb, ab->beg) == mush_aabb_get(owner, ab->beg));
+	assert (mush_aabb_get(aabb, ab->end) == mush_aabb_get(owner, ab->end));
 }
 void mush_aabb_space_area(mush_aabb* aabb, const mush_aabb* area) {
 	assert (mush_aabb_contains_box(aabb, area));
 
-	const size_t beg_idx = mush_aabb_get_idx(aabb, area->beg);
+	const mush_bounds* ab = &area->bounds;
+
+	const size_t beg_idx = mush_aabb_get_idx(aabb, ab->beg);
 
 	if (mush_aabb_can_direct_copy(aabb, area)) {
 		mushcell_space(aabb->data + beg_idx, area->size);
@@ -345,8 +341,8 @@ void mush_aabb_space_area(mush_aabb* aabb, const mush_aabb* area) {
 			mushcell_space(aabb->data + i, area->width);
 #endif
 end:
-	assert (mush_aabb_get(aabb, area->beg) == ' ');
-	assert (mush_aabb_get(aabb, area->end) == ' ');
+	assert (mush_aabb_get(aabb, ab->beg) == ' ');
+	assert (mush_aabb_get(aabb, ab->end) == ' ');
 }
 
 void mush_aabb_tessellate(
@@ -357,7 +353,7 @@ void mush_aabb_tessellate(
 	assert (mush_bounds_contains(&bounds, pos));
 
 	for (size_t i = 0; i < len; ++i)
-		mush_aabb_tessellate1(pos, bs[i].beg, bs[i].end, beg, end);
+		mush_aabb_tessellate1(pos, bs[i].bounds.beg, bs[i].bounds.end, beg, end);
 }
 
 void mush_aabb_tessellate1(
