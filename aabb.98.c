@@ -109,10 +109,6 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 	return i;
 }
 
-bool mush_aabb_overlaps(const mush_aabb* a, const mush_aabb* b) {
-	return mush_bounds_overlaps(&a->bounds, &b->bounds);
-}
-
 static bool mush_aabb_can_direct_copy(
 	const mush_aabb* copier, const mush_aabb* copiee)
 {
