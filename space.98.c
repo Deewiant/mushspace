@@ -1903,8 +1903,11 @@ static mush_aabb* mushspace_get_aabbs(
 	#undef mush_hit_newline
 	#endif
 
-	if (found_nonspace_for_anyone == MUSH_ARRAY_LEN(aabbs))
+	if (found_nonspace_for_anyone == MUSH_ARRAY_LEN(aabbs)) {
+		// Nothing to load. Not an error, but don't need to do anything so bail.
+		*len_out = MUSH_ERR_NONE;
 		return NULL;
+	}
 
 	if (found_nonspace_for < MUSH_ARRAY_LEN(aabbs))
 		mushcoords_max_into(&bounds[found_nonspace_for].end, last_nonspace);
