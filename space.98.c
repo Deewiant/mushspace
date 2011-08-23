@@ -346,9 +346,9 @@ static bool mushspace_place_box(
 			if (box->beg.v[i] <= box->end.v[i])
 				continue;
 
-			mushcoords end = box->end;
-			end.v[i] = MUSHCELL_MAX;
-			mush_aabb_make_unsafe(&aabbs[a++], box->beg, end);
+			mush_bounds clipped = {box->beg, box->end};
+			clipped.end.v[i] = MUSHCELL_MAX;
+			mush_aabb_make_unsafe(&aabbs[a++], &clipped);
 			box->beg.v[i] = MUSHCELL_MIN;
 		}
 	}
@@ -460,8 +460,10 @@ static void mushspace_get_box_for(
 	}
 
 	space->just_placed_big = false;
-	mush_aabb_make(aabb, mushcoords_subs_clamped(c, NEWBOX_PAD),
-								mushcoords_adds_clamped(c, NEWBOX_PAD));
+
+	mush_bounds bounds = {mushcoords_subs_clamped(c, NEWBOX_PAD),
+	                      mushcoords_adds_clamped(c, NEWBOX_PAD)};
+	mush_aabb_make(aabb, &bounds);
 
 end:
 	assert (mush_aabb_safe_contains(aabb, c));
@@ -535,11 +537,11 @@ static bool mushspace_get_box_along_recent_line_for(
 	space->first_placed_big   = c;
 	space->big_sequence_start = recents[0].c;
 
-	mushcoords beg = c, end = c;
-	if (positive) mushcell_add_into(&end.v[axis], BIGBOX_PAD);
-	else          mushcell_sub_into(&beg.v[axis], BIGBOX_PAD);
+	mush_bounds bounds = {c,c};
+	if (positive) mushcell_add_into(&bounds.end.v[axis], BIGBOX_PAD);
+	else          mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 
-	mush_aabb_make_unsafe(aabb, beg, end);
+	mush_aabb_make_unsafe(aabb, &bounds);
 	return true;
 }
 static bool mushspace_get_box_along_recent_volume_for(
@@ -602,7 +604,7 @@ static bool mushspace_extend_big_sequence_start_for(
 	if (positive) mushcell_add_into(&bounds.end.v[axis], BIGBOX_PAD);
 	else          mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 
-	mush_aabb_make_unsafe(aabb, bounds.beg, bounds.end);
+	mush_aabb_make_unsafe(aabb, &bounds);
 	return true;
 }
 
@@ -671,7 +673,7 @@ static bool mushspace_extend_first_placed_big_for(
 
 		mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 	}
-	mush_aabb_make_unsafe(aabb, bounds.beg, bounds.end);
+	mush_aabb_make_unsafe(aabb, &bounds);
 	return true;
 #endif
 }
@@ -732,7 +734,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 		#undef PARAMS
 	}
 	mush_aabb consumer;
-	mush_aabb_make_unsafe(&consumer, consumer_bounds.beg, consumer_bounds.end);
+	mush_aabb_make_unsafe(&consumer, &consumer_bounds);
 
 	free(candidates);
 
@@ -977,7 +979,7 @@ static bool mushspace_overlaps_mms_validator(
 	mush_bounds_get_overlap(consumer, &fbounds, &obounds);
 
 	mush_aabb overlap;
-	mush_aabb_make(&overlap, obounds.beg, obounds.end);
+	mush_aabb_make(&overlap, &obounds);
 
 	return mushspace_cheaper_to_alloc(
 		mush_bounds_clamped_size(b), used_cells + fodder->size - overlap.size);
@@ -1160,7 +1162,7 @@ static void mushspace_irrelevize_subsumption_order(
 			            lbounds = { lower->beg,  lower->end},
 			            obounds;
 			if (mush_bounds_get_overlap(&hbounds, &lbounds, &obounds)) {
-				mush_aabb_make(&overlap, obounds.beg, obounds.end);
+				mush_aabb_make(&overlap, &obounds);
 				mush_aabb_subsume_area(lower, higher, &overlap);
 				mush_aabb_space_area(higher, &overlap);
 			}
@@ -1988,12 +1990,14 @@ static size_t mushspace_get_aabbs_binary(
 
 	if (end.x > MUSHCELL_MAX - (mushcell)i) {
 		end.x = MUSHCELL_MAX;
-		mush_aabb_make(&aabbs[a++], beg, end);
+		mush_bounds bounds = {beg, end};
+		mush_aabb_make(&aabbs[a++], &bounds);
 		beg.x = MUSHCELL_MIN;
 	}
 	end.x += i;
 
-	mush_aabb_make(&aabbs[a++], beg, end);
+	mush_bounds bounds = {beg, end};
+	mush_aabb_make(&aabbs[a++], &bounds);
 	return a;
 }
 

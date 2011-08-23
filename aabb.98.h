@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 
+#include "bounds.all.h"
 #include "coords.all.h"
 #include "typenames.any.h"
 
@@ -50,8 +51,8 @@ typedef struct mush_aabb {
 #define mush_aabb_tessellate  MUSHSPACE_CAT(mush_aabb,_tessellate)
 #define mush_aabb_tessellate1 MUSHSPACE_CAT(mush_aabb,_tessellate1)
 
-void mush_aabb_make       (mush_aabb*, mushcoords, mushcoords);
-void mush_aabb_make_unsafe(mush_aabb*, mushcoords, mushcoords);
+void mush_aabb_make       (mush_aabb*, const mush_bounds*);
+void mush_aabb_make_unsafe(mush_aabb*, const mush_bounds*);
 void mush_aabb_finalize   (mush_aabb*);
 bool mush_aabb_alloc      (mush_aabb*);
 

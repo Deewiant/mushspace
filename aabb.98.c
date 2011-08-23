@@ -5,8 +5,6 @@
 #include <assert.h>
 #include <string.h>
 
-#include "bounds.all.h"
-
 #define mush_aabb_can_direct_copy MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
 #define mush_aabb_can_direct_copy_area \
 	MUSHSPACE_CAT(mush_aabb,_can_direct_copy_area)
@@ -29,13 +27,13 @@ static void mush_aabb_consume_2d(
 	const mush_aabb*, const mush_aabb*, size_t, size_t, size_t);
 #endif
 
-void mush_aabb_make(mush_aabb* aabb, mushcoords b, mushcoords e) {
-	mush_aabb_make_unsafe(aabb, b, e);
+void mush_aabb_make(mush_aabb* aabb, const mush_bounds* bounds) {
+	mush_aabb_make_unsafe(aabb, bounds);
 	mush_aabb_finalize(aabb);
 }
 
-void mush_aabb_make_unsafe(mush_aabb* aabb, mushcoords b, mushcoords e) {
-	*aabb = (mush_aabb){.beg = b, .end = e};
+void mush_aabb_make_unsafe(mush_aabb* aabb, const mush_bounds* bounds) {
+	*aabb = (mush_aabb){.beg = bounds->beg, .end = bounds->end};
 }
 
 void mush_aabb_finalize(mush_aabb* aabb) {
