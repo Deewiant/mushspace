@@ -72,16 +72,6 @@ size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
 	return 1;
 }
 
-bool mush_aabb_contains(const mush_aabb* aabb, mushcoords c) {
-	return mush_bounds_contains(&aabb->bounds, c);
-}
-bool mush_aabb_contains_box(const mush_aabb* a, const mush_aabb* b) {
-	return mush_bounds_contains_bounds(&a->bounds, &b->bounds);
-}
-bool mush_aabb_safe_contains(const mush_aabb* aabb, mushcoords c) {
-	return mush_bounds_safe_contains(&aabb->bounds, c);
-}
-
 mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
 	assert (mush_bounds_contains(&aabb->bounds, c));
 	return aabb->data[mush_aabb_get_idx(aabb, c)];

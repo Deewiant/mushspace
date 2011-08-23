@@ -31,10 +31,6 @@ typedef struct mush_aabb {
 
 #define mush_aabb_volume_on MUSHSPACE_CAT(mush_aabb,_volume_on)
 
-#define mush_aabb_contains      MUSHSPACE_CAT(mush_aabb,_contains)
-#define mush_aabb_contains_box  MUSHSPACE_CAT(mush_aabb,_contains_box)
-#define mush_aabb_safe_contains MUSHSPACE_CAT(mush_aabb,_safe_contains)
-
 #define mush_aabb_get MUSHSPACE_CAT(mush_aabb,_get)
 #define mush_aabb_put MUSHSPACE_CAT(mush_aabb,_put)
 
@@ -52,12 +48,6 @@ void mush_aabb_finalize   (mush_aabb*);
 bool mush_aabb_alloc      (mush_aabb*);
 
 size_t mush_aabb_volume_on(const mush_aabb*, mushdim);
-
-bool mush_aabb_contains    (const mush_aabb*, mushcoords);
-bool mush_aabb_contains_box(const mush_aabb*, const mush_aabb*);
-
-// Works even if the AABB is an unsafe box with beg > end.
-bool mush_aabb_safe_contains(const mush_aabb*, mushcoords);
 
 mushcell mush_aabb_get(const mush_aabb*, mushcoords);
 void     mush_aabb_put(      mush_aabb*, mushcoords, mushcell);
