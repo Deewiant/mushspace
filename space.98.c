@@ -311,7 +311,7 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 
 static mush_aabb* mushspace_find_box(const mushspace* space, mushcoords c) {
 	for (size_t i = 0; i < space->box_count; ++i)
-		if (mush_aabb_contains(&space->boxen[i], c))
+		if (mush_bounds_contains(&space->boxen[i].bounds, c))
 			return &space->boxen[i];
 	return NULL;
 }
@@ -333,7 +333,7 @@ static bool mushspace_place_box(
 {
 	assert ((reason == NULL) == (reason_box == NULL));
 	if (reason)
-		assert (mush_aabb_safe_contains(aabb, *reason));
+		assert (mush_bounds_safe_contains(&aabb->bounds, *reason));
 
 	// Split the box up along any axes it wraps around on.
 	mush_aabb aabbs[1 << MUSHSPACE_DIM];
@@ -367,7 +367,7 @@ incorporated:
 		}
 
 		for (size_t i = 0; i < space->box_count; ++i)
-			if (mush_aabb_contains_box(&space->boxen[i], box))
+			if (mush_bounds_contains_bounds(&space->boxen[i].bounds, bounds))
 				goto incorporated;
 
 		mush_aabb_finalize(box);
@@ -377,7 +377,7 @@ incorporated:
 
 		bounds = &box->bounds;
 
-		if (reason && mush_aabb_contains(box, *reason)) {
+		if (reason && mush_bounds_contains(bounds, *reason)) {
 			*reason_box = box;
 
 			// This can only happen once.
@@ -409,7 +409,7 @@ incorporated:
 
 		while (!mush_bakaabb_it_done(it, &space->bak)) {
 			mushcoords c = mush_bakaabb_it_pos(it, &space->bak);
-			if (!mush_aabb_contains(box, c)) {
+			if (!mush_bounds_contains(bounds, c)) {
 				mush_bakaabb_it_next(it, &space->bak);
 				continue;
 			}
@@ -449,7 +449,7 @@ static void mushspace_get_box_for(
 	mushspace* space, mushcoords c, mush_aabb* aabb)
 {
 	for (size_t b = 0; b < space->box_count; ++b)
-		assert (!mush_aabb_contains(&space->boxen[b], c));
+		assert (!mush_bounds_contains(&space->boxen[b].bounds, c));
 
 	if (space->recent_buf.full) {
 		if (space->just_placed_big) {
@@ -467,7 +467,7 @@ static void mushspace_get_box_for(
 	mush_aabb_make(aabb, &bounds);
 
 end:
-	assert (mush_aabb_safe_contains(aabb, c));
+	assert (mush_bounds_safe_contains(&aabb->bounds, c));
 }
 static bool mushspace_get_box_along_recent_line_for(
 	mushspace* space, mushcoords c, mush_aabb* aabb)
@@ -684,7 +684,8 @@ static bool mushspace_extend_first_placed_big_for(
 static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 {
 	for (size_t i = 0; i < space->box_count; ++i)
-		assert (!mush_aabb_contains_box(&space->boxen[i], aabb));
+		assert (!mush_bounds_contains_bounds(
+			&space->boxen[i].bounds, &aabb->bounds));
 
 	size_t *subsumees  = malloc(space->box_count * sizeof *subsumees),
 	       *candidates = malloc(space->box_count * sizeof *candidates);
@@ -1141,8 +1142,8 @@ static void mushspace_irrelevize_subsumption_order(
 		for (size_t t = s+1; t < space->box_count; ++t) {
 			mush_aabb* lower = &space->boxen[t];
 
-			if (   mush_aabb_contains_box(higher, lower)
-			    || mush_aabb_contains_box(lower, higher))
+			if (   mush_bounds_contains_bounds(&higher->bounds, &lower->bounds)
+			    || mush_bounds_contains_bounds(&lower->bounds, &higher->bounds))
 				continue;
 
 			mush_aabb overlap;
@@ -1559,7 +1560,7 @@ restart:
 
 		// If we ended up in the box, that's fine too.
 		if (   best_in < box_count
-		    && mush_aabb_contains(&space->boxen[best_in], *pos))
+		    && mush_bounds_contains(&space->boxen[best_in].bounds, *pos))
 			return true;
 
 		// If we ended up in some other box, that's also fine.

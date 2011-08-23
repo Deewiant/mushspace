@@ -83,12 +83,12 @@ bool mush_aabb_safe_contains(const mush_aabb* aabb, mushcoords c) {
 }
 
 mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
-	assert (mush_aabb_contains(aabb, c));
+	assert (mush_bounds_contains(&aabb->bounds, c));
 	return aabb->data[mush_aabb_get_idx(aabb, c)];
 }
 
 void mush_aabb_put(mush_aabb* aabb, mushcoords p, mushcell c) {
-	assert (mush_aabb_contains(aabb, p));
+	assert (mush_bounds_contains(&aabb->bounds, p));
 	aabb->data[mush_aabb_get_idx(aabb, p)] = c;
 }
 
@@ -140,7 +140,7 @@ static bool mush_aabb_can_direct_copy_area(
 }
 
 bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
-	assert (mush_aabb_contains_box(box, old));
+	assert (mush_bounds_contains_bounds(&box->bounds, &old->bounds));
 
 	static const size_t SIZE = sizeof *box->data;
 
@@ -228,15 +228,15 @@ static void mush_aabb_consume_2d(
 }
 #endif
 void mush_aabb_subsume(mush_aabb* a, const mush_aabb* b) {
-	assert (mush_aabb_contains_box(a, b));
+	assert (mush_bounds_contains_bounds(&a->bounds, &b->bounds));
 
 	mush_aabb_subsume_owners_area(a, b, b, b->data, b->size);
 }
 void mush_aabb_subsume_area(
 	mush_aabb* a, const mush_aabb* b, const mush_aabb* area)
 {
-	assert (mush_aabb_contains_box(a, area));
-	assert (mush_aabb_contains_box(b, area));
+	assert (mush_bounds_contains_bounds(&a->bounds, &area->bounds));
+	assert (mush_bounds_contains_bounds(&b->bounds, &area->bounds));
 
 	const mush_bounds* ab = &area->bounds;
 
@@ -253,8 +253,8 @@ static void mush_aabb_subsume_owners_area(
 	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
 	const mushcell* data, size_t len)
 {
-	assert (mush_aabb_contains_box(aabb,  area));
-	assert (mush_aabb_contains_box(owner, area));
+	assert (mush_bounds_contains_bounds(&aabb->bounds,  &area->bounds));
+	assert (mush_bounds_contains_bounds(&owner->bounds, &area->bounds));
 
 	// We can't just use only area since the data is usually not continuous:
 	//
@@ -311,7 +311,7 @@ end:
 	assert (mush_aabb_get(aabb, ab->end) == mush_aabb_get(owner, ab->end));
 }
 void mush_aabb_space_area(mush_aabb* aabb, const mush_aabb* area) {
-	assert (mush_aabb_contains_box(aabb, area));
+	assert (mush_bounds_contains_bounds(&aabb->bounds, &area->bounds));
 
 	const mush_bounds* ab = &area->bounds;
 
