@@ -226,7 +226,7 @@ static bool mushspace_get_next_in(
 
 static void mushspace_get_next_in1(
 	mushucell, const mush_bounds*, mushcell, size_t, mushcoords, size_t,
-	mushcell*, mushcell*, size_t*, size_t*);
+	mush_cell_idx*, mush_cell_idx*);
 
 static void mushspace_get_aabbs(
 	const char*, size_t, mushcoords target, bool binary, mush_arr_mush_aabb*);
@@ -1513,41 +1513,37 @@ restart:
 	// Separate solutions for the best non-wrapping and the best wrapping
 	// coordinate, with the wrapping coordinate used only if a non-wrapping
 	// solution is not found.
-	size_t best_in    = box_count + 1,
-	       wrapped_in = box_count + 1;
-
-	mushcell best_coord, best_wrapped;
+	mush_cell_idx
+		best_coord   = {.idx = box_count + 1},
+		best_wrapped = {.idx = box_count + 1};
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
 		// Go through every box, starting from the static one.
 
-		mushspace_get_next_in1(
-			i, &aabb->bounds, pos->v[i], box_count,
-			MUSH_STATICAABB_BEG, box_count,
-			&best_coord, &best_wrapped, &best_in, &wrapped_in);
+		mushspace_get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
+		                       MUSH_STATICAABB_BEG, box_count,
+		                       &best_coord, &best_wrapped);
 
 		for (mushucell b = 0; b < box_count; ++b)
-			mushspace_get_next_in1(
-				i, &aabb->bounds, pos->v[i], box_count,
-				space->boxen[b].bounds.beg, b,
-				&best_coord, &best_wrapped, &best_in, &wrapped_in);
+			mushspace_get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
+			                       space->boxen[b].bounds.beg, b,
+			                       &best_coord, &best_wrapped);
 
-		if (best_in > box_count) {
-			if (wrapped_in > box_count) {
+		if (best_coord.idx > box_count) {
+			if (best_wrapped.idx > box_count) {
 				// No solution: look along the next axis.
 				continue;
 			}
 
 			// Take the wrapping solution as it's the only one available.
 			best_coord = best_wrapped;
-			best_in    = wrapped_in;
 		}
 
 		const mushcoords old = *pos;
 
 		memcpy(pos->v, aabb->bounds.beg.v, i * sizeof(mushcell));
-		pos->v[i] = best_coord;
+		pos->v[i] = best_coord.cell;
 
 		// Old was already a space, or we wouldn't've called this function in the
 		// first place. (See assertions.) Hence skipped is always at least one.
@@ -1574,8 +1570,8 @@ restart:
 			return true;
 
 		// If we ended up in the box, that's fine too.
-		if (   best_in < box_count
-		    && mush_bounds_contains(&space->boxen[best_in].bounds, *pos))
+		if (   best_coord.idx < box_count
+		    && mush_bounds_contains(&space->boxen[best_coord.idx].bounds, *pos))
 			return true;
 
 		// If we ended up in some other box, that's also fine.
@@ -1592,14 +1588,13 @@ restart:
 static void mushspace_get_next_in1(
 	mushucell x, const mush_bounds* bounds, mushcell posx, size_t box_count,
 	mushcoords box_beg, size_t box_idx,
-	mushcell* best_coord, mushcell* best_wrapped,
-	size_t* best_in, size_t* wrapped_in)
+	mush_cell_idx* best_coord, mush_cell_idx* best_wrapped)
 {
-	assert (*best_wrapped <= *best_coord);
+	assert (best_wrapped->cell <= best_coord->cell);
 
 	// If the box begins later than the best solution we've found, there's no
 	// point in looking further into it.
-	if (box_beg.v[x] >= *best_coord && *best_in == box_count+1)
+	if (box_beg.v[x] >= best_coord->cell && best_coord->idx == box_count+1)
 		return;
 
 	// If this box doesn't overlap with the AABB we're interested in, skip it.
@@ -1616,18 +1611,19 @@ static void mushspace_get_next_in1(
 	// global minimum box.beg as a last-resort option if nothing else is found,
 	// so that we wrap around if there's no non-wrapping solution.
 	//
-	// Note that *best_wrapped <= *best_coord so we can safely test this after
-	// the first *best_coord check.
+	// Note that best_wrapped->cell <= best_coord->cell so we can safely test
+	// this after the first best_coord->cell check.
 	if (   posx > bounds->end.v[x]
-	    && (box_beg.v[x] < *best_wrapped || *wrapped_in == box_count+1))
+	    && (   box_beg.v[x] < best_wrapped->cell
+	        || best_wrapped->idx == box_count+1))
 	{
-		*best_wrapped = box_beg.v[x];
-		*wrapped_in   = box_idx;
+		best_wrapped->cell = box_beg.v[x];
+		best_wrapped->idx  = box_idx;
 
 	// The ordinary best solution is the minimal box.beg greater than pos.
 	} else if (box_beg.v[x] > posx) {
-		*best_coord = box_beg.v[x];
-		*best_in    = box_idx;
+		best_coord->cell = box_beg.v[x];
+		best_coord->idx  = box_idx;
 	}
 }
 
