@@ -56,10 +56,10 @@ bool mush_bounds_can_fuse(const mush_bounds*, const mush_bounds*);
 // Modifies the given bounds to be such that they contain the given coordinates
 // but don't overlap with any of the given boxes. The coordinates should, of
 // course, be already contained between the beg and end.
-void mush_bounds_tessellate(mushcoords, mush_carr_mush_bounds, mush_bounds*);
+void mush_bounds_tessellate(mush_bounds*, mushcoords, mush_carr_mush_bounds);
 
 // Since the algorithm is currently just a fold over the boxes, this simpler
 // version exists to avoid heap allocation in some cases.
-void mush_bounds_tessellate1(mushcoords, const mush_bounds*, mush_bounds*);
+void mush_bounds_tessellate1(mush_bounds*, mushcoords, const mush_bounds*);
 
 #endif

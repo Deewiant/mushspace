@@ -1235,11 +1235,11 @@ static bool mushspace_map_in_box(
 
 	mush_bounds tes = box->bounds;
 	mush_bounds_tessellate(
-		*pos, (mush_carr_mush_bounds){(const mush_bounds*)space->boxen, cai.idx},
-		&tes);
+		&tes, *pos,
+		(mush_carr_mush_bounds){(const mush_bounds*)space->boxen, cai.idx});
 
 	// The static box is above all dynamic boxen, so check it as well.
-	mush_bounds_tessellate1(*pos, &MUSH_STATICAABB_BOUNDS, &tes);
+	mush_bounds_tessellate1(&tes, *pos, &MUSH_STATICAABB_BOUNDS);
 
 	bool hit_end;
 	const size_t
@@ -1358,9 +1358,9 @@ static bool mushspace_mapex_in_box(
 
 	mush_bounds tes = box->bounds;
 	mush_bounds_tessellate(
-		*pos, (mush_carr_mush_bounds){(const mush_bounds*)space->boxen, cai.idx},
-		&tes);
-	mush_bounds_tessellate1(*pos, &MUSH_STATICAABB_BOUNDS, &tes);
+		&tes, *pos,
+		(mush_carr_mush_bounds){(const mush_bounds*)space->boxen, cai.idx});
+	mush_bounds_tessellate1(&tes, *pos, &MUSH_STATICAABB_BOUNDS);
 
 	bool hit_end;
 	const size_t
