@@ -73,6 +73,7 @@ MUSH_DECL_DYN_ARRAY(mush_bounds)
 MUSH_DECL_DYN_ARRAY(size_t)
 
 typedef struct { const mush_aabb *aabb; size_t idx; } mush_caabb_idx;
+typedef struct {       mushcell   cell; size_t idx; } mush_cell_idx;
 
 const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
 
