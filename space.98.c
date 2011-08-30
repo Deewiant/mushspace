@@ -72,8 +72,11 @@ MUSH_DECL_DYN_ARRAY(mush_aabb)
 MUSH_DECL_DYN_ARRAY(mush_bounds)
 MUSH_DECL_DYN_ARRAY(size_t)
 
+typedef struct { const mush_aabb *aabb; size_t idx; } mush_caabb_idx;
+
 const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
 
+#define mushspace_get_caabb_idx     MUSHSPACE_CAT(mushspace,_get_caabb_idx)
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_remove_boxes      MUSHSPACE_CAT(mushspace,_remove_boxes)
 #define mushspace_place_box         MUSHSPACE_CAT(mushspace,_place_box)
@@ -315,6 +318,10 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 		return MUSH_ERR_OOM;
 
 	return MUSH_ERR_NONE;
+}
+
+static mush_caabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
+	return (mush_caabb_idx){&sp->boxen[i], i};
 }
 
 static mush_aabb* mushspace_find_box(const mushspace* space, mushcoords c) {
