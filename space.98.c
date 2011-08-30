@@ -197,8 +197,7 @@ static void mushspace_map_no_place(
 	void(*)(size_t, void*));
 
 static bool mushspace_map_in_box(
-	mushspace*, const mush_bounds*, mushcoords*,
-	const mush_aabb*, size_t,
+	mushspace*, const mush_bounds*, mushcoords*, mush_caabb_idx,
 	void*, void(*f)(mush_arr_mushcell, void*, mushstats*));
 
 static bool mushspace_map_in_static(
@@ -212,8 +211,7 @@ static void mushspace_mapex_no_place(
 	void(*)(size_t, void*));
 
 static bool mushspace_mapex_in_box(
-	mushspace*, const mush_bounds*, mushcoords*,
-	const mush_aabb*, size_t, void*,
+	mushspace*, const mush_bounds*, mushcoords*, mush_caabb_idx, void*,
 	void(*)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
 	        mushstats*));
 
@@ -1195,12 +1193,12 @@ static void mushspace_map_no_place(
 		}
 
 		for (size_t b = 0; b < space->box_count; ++b) {
-			const mush_aabb *box = &space->boxen[b];
+			mush_caabb_idx box = mushspace_get_caabb_idx(space, b);
 
-			if (!mush_bounds_contains(&box->bounds, pos))
+			if (!mush_bounds_contains(&box.aabb->bounds, pos))
 				continue;
 
-			if (mushspace_map_in_box(space, &aabb->bounds, &pos, box, b, fg, f))
+			if (mushspace_map_in_box(space, &aabb->bounds, &pos, box, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -1218,7 +1216,7 @@ static void mushspace_map_no_place(
 }
 static bool mushspace_map_in_box(
 	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
-	const mush_aabb* box, size_t box_idx,
+	mush_caabb_idx cai,
 	void* caller_data, void(*f)(mush_arr_mushcell, void*, mushstats*))
 {
 	// Consider:
@@ -1232,9 +1230,11 @@ static bool mushspace_map_in_box(
 	// We want to map the range from x to y (shaded). Unless we tessellate,
 	// we'll get the whole thing from box B straight away.
 
+	const mush_aabb *box = cai.aabb;
+
 	mush_bounds tes = box->bounds;
 	mush_bounds_tessellate(
-		*pos, (mush_carr_mush_bounds){(const mush_bounds*)space->boxen, box_idx},
+		*pos, (mush_carr_mush_bounds){(const mush_bounds*)space->boxen, cai.idx},
 		&tes);
 
 	// The static box is above all dynamic boxen, so check it as well.
@@ -1300,12 +1300,12 @@ static void mushspace_mapex_no_place(
 		}
 
 		for (size_t b = 0; b < space->box_count; ++b) {
-			const mush_aabb *box = &space->boxen[b];
+			mush_caabb_idx box = mushspace_get_caabb_idx(space, b);
 
-			if (!mush_bounds_contains(&box->bounds, pos))
+			if (!mush_bounds_contains(&box.aabb->bounds, pos))
 				continue;
 
-			if (mushspace_mapex_in_box(space, &aabb->bounds, &pos, box, b, fg, f))
+			if (mushspace_mapex_in_box(space, &aabb->bounds, &pos, box, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -1323,7 +1323,7 @@ static void mushspace_mapex_no_place(
 }
 static bool mushspace_mapex_in_box(
 	mushspace* space, const mush_bounds* bounds, mushcoords* pos,
-	const mush_aabb* box, size_t box_idx,
+	mush_caabb_idx cai,
 	void* caller_data,
 	void(*f)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
 	        mushstats*))
@@ -1332,6 +1332,8 @@ static bool mushspace_mapex_in_box(
 	// Befunge). This method appears to silence -Wuninitialized in both GCC and
 	// Clang.
 	size_t width = *&width, area = *&area, page_start = *&page_start;
+
+	const mush_aabb *box = cai.aabb;
 
 	// These depend on the original pos and thus have to be initialized before
 	// the call to mushcoords_get_end_of_contiguous_range.
@@ -1355,7 +1357,7 @@ static bool mushspace_mapex_in_box(
 
 	mush_bounds tes = box->bounds;
 	mush_bounds_tessellate(
-		*pos, (mush_carr_mush_bounds){(const mush_bounds*)space->boxen, box_idx},
+		*pos, (mush_carr_mush_bounds){(const mush_bounds*)space->boxen, cai.idx},
 		&tes);
 	mush_bounds_tessellate1(*pos, &MUSH_STATICAABB_BOUNDS, &tes);
 
