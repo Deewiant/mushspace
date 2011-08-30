@@ -1185,8 +1185,7 @@ static void mushspace_irrelevize_subsumption_order(
 
 static void mushspace_map_no_place(
 	mushspace* space, const mush_aabb* aabb, void* fg,
-	void(*f)(mush_arr_mushcell, void*, mushstats*),
-	void(*g)(size_t, void*))
+	void(*f)(mush_arr_mushcell, void*, mushstats*), void(*g)(size_t, void*))
 {
 	mushcoords        pos = aabb->bounds.beg;
 	mush_bounded_pos bpos = {&aabb->bounds, &pos};
