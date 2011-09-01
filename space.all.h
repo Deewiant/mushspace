@@ -16,12 +16,13 @@
 
 typedef struct mushspace mushspace;
 
-#define mushspace_size        MUSHSPACE_CAT(mushspace,_size)
-#define mushspace_allocate    MUSHSPACE_CAT(mushspace,_allocate)
-#define mushspace_free        MUSHSPACE_CAT(mushspace,_free)
-#define mushspace_get         MUSHSPACE_CAT(mushspace,_get)
-#define mushspace_put         MUSHSPACE_CAT(mushspace,_put)
-#define mushspace_load_string MUSHSPACE_CAT(mushspace,_load_string)
+#define mushspace_size             MUSHSPACE_CAT(mushspace,_size)
+#define mushspace_allocate         MUSHSPACE_CAT(mushspace,_allocate)
+#define mushspace_free             MUSHSPACE_CAT(mushspace,_free)
+#define mushspace_get              MUSHSPACE_CAT(mushspace,_get)
+#define mushspace_put              MUSHSPACE_CAT(mushspace,_put)
+#define mushspace_get_loose_bounds MUSHSPACE_CAT(mushspace,_get_loose_bounds)
+#define mushspace_load_string      MUSHSPACE_CAT(mushspace,_load_string)
 
 extern const size_t mushspace_size;
 
@@ -35,6 +36,8 @@ mushcell mushspace_get(
 	mushspace*, mushcoords);
 
 int mushspace_put(mushspace*, mushcoords, mushcell);
+
+void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
 
 // Returns 0 on success or one of the following possible error codes:
 //

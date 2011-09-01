@@ -40,6 +40,14 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	return MUSH_ERR_NONE;
 }
 
+void mushspace_get_loose_bounds(
+	const mushspace* space, mushcoords* beg, mushcoords* end)
+{
+	(void)space;
+	*beg = MUSH_STATICAABB_BEG;
+	*end = MUSH_STATICAABB_END;
+}
+
 static bool mushspace2_93_newline(bool* got_cr, mushcoords* pos) {
 	*got_cr = false;
 	pos->x = 0;

@@ -324,6 +324,22 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	return MUSH_ERR_NONE;
 }
 
+void mushspace_get_loose_bounds(
+	const mushspace* space, mushcoords* beg, mushcoords* end)
+{
+	*beg = MUSH_STATICAABB_BEG;
+	*end = MUSH_STATICAABB_END;
+
+	for (size_t i = 0; i < space->box_count; ++i) {
+		mushcoords_min_into(beg, space->boxen[i].bounds.beg);
+		mushcoords_max_into(end, space->boxen[i].bounds.end);
+	}
+	if (space->bak.data) {
+		mushcoords_min_into(beg, space->bak.bounds.beg);
+		mushcoords_max_into(end, space->bak.bounds.end);
+	}
+}
+
 static mush_caabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
 	return (mush_caabb_idx){&sp->boxen[i], i};
 }
