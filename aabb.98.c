@@ -92,6 +92,10 @@ mushcell mush_aabb_get_no_offset(const mush_aabb* aabb, mushcoords c) {
 	return aabb->data[mush_aabb_get_idx_no_offset(aabb, c)];
 }
 
+mushcell mush_aabb_getter_no_offset(const void* aabb, mushcoords c) {
+	return mush_aabb_get_no_offset(aabb, c);
+}
+
 size_t mush_aabb_get_idx(const mush_aabb* a, mushcoords c) {
 	return mush_aabb_get_idx_no_offset(a, mushcoords_sub(c, a->bounds.beg));
 }
