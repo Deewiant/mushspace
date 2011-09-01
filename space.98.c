@@ -629,6 +629,9 @@ static void mushspace_remove_boxes(mushspace* space, size_t i, size_t j) {
 	assert (i <= j);
 	assert (j < space->box_count);
 
+	for (size_t k = i; k <= j; ++k)
+		free(space->boxen[k].data);
+
 	size_t new_len = space->box_count -= j - i + 1;
 	if (i < new_len) {
 		mush_aabb *arr = space->boxen;
