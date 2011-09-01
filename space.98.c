@@ -80,7 +80,7 @@ typedef struct mush_bounded_pos {
 	mushcoords *pos;
 } mush_bounded_pos;
 
-const size_t mushspace_size = sizeof(mushspace);
+const size_t mushspace_sizeof = sizeof(mushspace);
 
 #define mushspace_find_bounds       MUSHSPACE_CAT(mushspace,_find_bounds)
 #define mushspace_find_beg_in       MUSHSPACE_CAT(mushspace,_find_beg_in)

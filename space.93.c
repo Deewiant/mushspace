@@ -13,7 +13,7 @@ struct mushspace {
 	mush_staticaabb box;
 };
 
-const size_t mushspace_size = sizeof(mushspace);
+const size_t mushspace_sizeof = sizeof(mushspace);
 
 mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
