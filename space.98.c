@@ -426,12 +426,12 @@ incorporated:
 		if (!it)
 			return false;
 
-		while (!mush_bakaabb_it_done(it, &space->bak)) {
+		for (; !mush_bakaabb_it_done(it, &space->bak);
+		        mush_bakaabb_it_next(it, &space->bak))
+		{
 			mushcoords c = mush_bakaabb_it_pos(it, &space->bak);
-			if (!mush_bounds_contains(bounds, c)) {
-				mush_bakaabb_it_next(it, &space->bak);
+			if (!mush_bounds_contains(bounds, c))
 				continue;
-			}
 
 			mushcell v = mush_bakaabb_it_val(it, &space->bak);
 
