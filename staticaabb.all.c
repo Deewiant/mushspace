@@ -22,6 +22,12 @@ void mush_staticaabb_put(mush_staticaabb* aabb, mushcoords p, mushcell c) {
 	aabb->array[mush_staticaabb_get_idx(p)] = c;
 }
 
+mushcell mush_staticaabb_get_no_offset(
+	const mush_staticaabb* aabb, mushcoords p)
+{
+	return aabb->array[mush_staticaabb_get_idx_no_offset(p)];
+}
+
 size_t mush_staticaabb_get_idx(mushcoords c) {
 	return mush_staticaabb_get_idx_no_offset(
 		mushcoords_sub(c, MUSH_STATICAABB_BEG));
