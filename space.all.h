@@ -22,6 +22,7 @@ typedef struct mushspace mushspace;
 #define mushspace_get              MUSHSPACE_CAT(mushspace,_get)
 #define mushspace_put              MUSHSPACE_CAT(mushspace,_put)
 #define mushspace_get_loose_bounds MUSHSPACE_CAT(mushspace,_get_loose_bounds)
+#define mushspace_get_tight_bounds MUSHSPACE_CAT(mushspace,_get_tight_bounds)
 #define mushspace_load_string      MUSHSPACE_CAT(mushspace,_load_string)
 
 extern const size_t mushspace_size;
@@ -38,6 +39,20 @@ mushcell mushspace_get(
 int mushspace_put(mushspace*, mushcoords, mushcell);
 
 void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
+
+#if MUSHSPACE_93
+// Returns false if the space is completely empty. In that case, the values of
+// *beg and *end are undefined.
+bool
+#else
+// If the space is completely empty, beg->x > end->x.
+int
+#endif
+mushspace_get_tight_bounds(
+#if MUSHSPACE_93
+	const
+#endif
+	mushspace*, mushcoords* beg, mushcoords* end);
 
 // Returns 0 on success or one of the following possible error codes:
 //
