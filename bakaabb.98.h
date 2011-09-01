@@ -43,7 +43,7 @@ bool     mush_bakaabb_put(      mush_bakaabb*, mushcoords, mushcell);
 
 size_t mush_bakaabb_size(const mush_bakaabb*);
 
-mush_bakaabb_iter* mush_bakaabb_it_start(const mush_bakaabb*);
+mush_bakaabb_iter* mush_bakaabb_it_start(const mush_bakaabb*, void*);
 void               mush_bakaabb_it_stop (mush_bakaabb_iter*);
 
 bool mush_bakaabb_it_done(const mush_bakaabb_iter*, const mush_bakaabb*);

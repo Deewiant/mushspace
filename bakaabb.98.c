@@ -56,15 +56,15 @@ size_t mush_bakaabb_size(const mush_bakaabb* bak) {
 	return kh_size(hash);
 }
 
-mush_bakaabb_iter* mush_bakaabb_it_start(const mush_bakaabb* bak) {
-	mush_bakaabb_iter* it = malloc(sizeof *it);
+mush_bakaabb_iter* mush_bakaabb_it_start(const mush_bakaabb* bak, void* vp) {
+	mush_bakaabb_iter* it = vp ? vp : malloc(sizeof *it);
 	if (it) {
 		const khash_t(mushcoords) *hash = bak->data;
 		*it = (mush_bakaabb_iter){ kh_begin(hash) };
 	}
 	return it;
 }
-void mush_bakaabb_it_stop(mush_bakaabb_iter* it) { free(it); }
+void mush_bakaabb_it_stop(mush_bakaabb_iter* it) { (void)it; }
 
 bool mush_bakaabb_it_done(const mush_bakaabb_iter* it, const mush_bakaabb* bak)
 {

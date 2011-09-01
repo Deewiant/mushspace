@@ -397,7 +397,7 @@ int mushspace_get_tight_bounds(
 		// it.
 		mush_bounds bak_bounds = {space->bak.bounds.end, space->bak.bounds.beg};
 
-		mush_bakaabb_iter *it = mush_bakaabb_it_start(&space->bak);
+		mush_bakaabb_iter *it = mush_bakaabb_it_start(&space->bak, NULL);
 		if (!it)
 			return MUSH_ERR_OOM;
 
@@ -411,6 +411,7 @@ int mushspace_get_tight_bounds(
 			mushcoords_max_into(&bak_bounds.end, c);
 		}
 		mush_bakaabb_it_stop(it);
+		free(it);
 
 		space->bak.bounds = bak_bounds;
 
@@ -715,7 +716,7 @@ incorporated:
 			}
 		}
 
-		mush_bakaabb_iter *it = mush_bakaabb_it_start(&space->bak);
+		mush_bakaabb_iter *it = mush_bakaabb_it_start(&space->bak, NULL);
 		if (!it)
 			return false;
 
@@ -736,6 +737,7 @@ incorporated:
 				mush_aabb_put(box, c, v);
 		}
 		mush_bakaabb_it_stop(it);
+		free(it);
 	}
 	return true;
 }
