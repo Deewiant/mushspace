@@ -40,15 +40,9 @@ int mushspace_put(mushspace*, mushcoords, mushcell);
 
 void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
 
-#if MUSHSPACE_93
 // Returns false if the space is completely empty. In that case, the values of
 // *beg and *end are undefined.
-bool
-#else
-// If the space is completely empty, beg->x > end->x.
-int
-#endif
-mushspace_get_tight_bounds(
+bool mushspace_get_tight_bounds(
 #if MUSHSPACE_93
 	const
 #endif

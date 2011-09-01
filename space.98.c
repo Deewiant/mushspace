@@ -354,7 +354,7 @@ void mushspace_get_loose_bounds(
 	}
 }
 
-int mushspace_get_tight_bounds(
+bool mushspace_get_tight_bounds(
 	mushspace* space, mushcoords* beg, mushcoords* end)
 {
 	bool last_beg_was_space = mushspace_get(space, space->last_beg) == ' ',
@@ -418,11 +418,7 @@ int mushspace_get_tight_bounds(
 	}
 	space->last_beg = *beg;
 	space->last_end = *end;
-
-	if (!found_nonspace)
-		beg->x = 1 + (end->x = 0);
-
-	return MUSH_ERR_NONE;
+	return found_nonspace;
 }
 static void mushspace_find_bounds(
 	mushspace* space, mushcoords* beg, mushcoords* end, mushdim axis,
