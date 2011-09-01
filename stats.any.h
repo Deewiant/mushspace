@@ -18,7 +18,8 @@ typedef struct mushstats {
 		subsumed_contains,
 		subsumed_fusables,
 		subsumed_disjoint,
-		subsumed_overlaps;
+		subsumed_overlaps,
+		empty_boxes_dropped;
 #else
 	char unused;
 #endif
@@ -34,6 +35,7 @@ typedef enum {
 	MushStat_subsumed_fusables,
 	MushStat_subsumed_disjoint,
 	MushStat_subsumed_overlaps,
+	MushStat_empty_boxes_dropped,
 } MushStat;
 
 void mushstats_add(

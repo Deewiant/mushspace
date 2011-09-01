@@ -20,6 +20,7 @@ void mushstats_add(
 	CASE(subsumed_fusables)
 	CASE(subsumed_disjoint)
 	CASE(subsumed_overlaps)
+	CASE(empty_boxes_dropped)
 #undef CASE
 	default: assert(0);
 	}
