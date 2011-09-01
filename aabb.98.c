@@ -86,6 +86,12 @@ void mush_aabb_put(mush_aabb* aabb, mushcoords p, mushcell c) {
 	aabb->data[mush_aabb_get_idx(aabb, p)] = c;
 }
 
+mushcell mush_aabb_get_no_offset(const mush_aabb* aabb, mushcoords c) {
+	// Can't assert contains(c + beg) since no_offset usage typically means that
+	// our beg/end don't match data.
+	return aabb->data[mush_aabb_get_idx_no_offset(aabb, c)];
+}
+
 size_t mush_aabb_get_idx(const mush_aabb* a, mushcoords c) {
 	return mush_aabb_get_idx_no_offset(a, mushcoords_sub(c, a->bounds.beg));
 }

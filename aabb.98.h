@@ -31,6 +31,7 @@ typedef struct mush_aabb {
 #define mush_aabb_volume_on         MUSHSPACE_CAT(mush_aabb,_volume_on)
 #define mush_aabb_get               MUSHSPACE_CAT(mush_aabb,_get)
 #define mush_aabb_put               MUSHSPACE_CAT(mush_aabb,_put)
+#define mush_aabb_get_no_offset     MUSHSPACE_CAT(mush_aabb,_get_no_offset)
 #define mush_aabb_get_idx           MUSHSPACE_CAT(mush_aabb,_get_idx)
 #define mush_aabb_get_idx_no_offset MUSHSPACE_CAT(mush_aabb,_get_idx_no_offset)
 #define mush_aabb_consume           MUSHSPACE_CAT(mush_aabb,_consume)
@@ -47,6 +48,8 @@ size_t mush_aabb_volume_on(const mush_aabb*, mushdim);
 
 mushcell mush_aabb_get(const mush_aabb*, mushcoords);
 void     mush_aabb_put(      mush_aabb*, mushcoords, mushcell);
+
+mushcell mush_aabb_get_no_offset(const mush_aabb*, mushcoords);
 
 size_t mush_aabb_get_idx          (const mush_aabb*, mushcoords);
 size_t mush_aabb_get_idx_no_offset(const mush_aabb*, mushcoords);
