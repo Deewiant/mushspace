@@ -11,6 +11,10 @@
 		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) \
 			x.v[i] = mushcell_##NAME(x.v[i], b.v[i]); \
 		return x; \
+	} \
+	void mushcoords_##NAME##_into(mushcoords* a, mushcoords b) { \
+		for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) \
+			a->v[i] = mushcell_##NAME(a->v[i], b.v[i]); \
 	}
 
 #define DEFINE_CLAMPED_OP(NAME) \
