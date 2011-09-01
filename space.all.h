@@ -16,13 +16,17 @@
 
 typedef struct mushspace mushspace;
 
-#define mushspace_get MUSHSPACE_CAT(mushspace,_get)
-#define mushspace_put MUSHSPACE_CAT(mushspace,_put)
+#define mushspace_size        MUSHSPACE_CAT(mushspace,_size)
+#define mushspace_allocate    MUSHSPACE_CAT(mushspace,_allocate)
+#define mushspace_free        MUSHSPACE_CAT(mushspace,_free)
+#define mushspace_get         MUSHSPACE_CAT(mushspace,_get)
+#define mushspace_put         MUSHSPACE_CAT(mushspace,_put)
+#define mushspace_load_string MUSHSPACE_CAT(mushspace,_load_string)
 
-extern const size_t MUSHSPACE_CAT(mushspace,_size);
+extern const size_t mushspace_size;
 
-mushspace *MUSHSPACE_CAT(mushspace,_allocate)(void*, mushstats*);
-void       MUSHSPACE_CAT(mushspace,_free)    (mushspace*);
+mushspace *mushspace_allocate(void*, mushstats*);
+void       mushspace_free    (mushspace*);
 
 mushcell mushspace_get(
 #ifndef MUSH_ENABLE_STATS
@@ -39,7 +43,7 @@ int mushspace_put(mushspace*, mushcoords, mushcell);
 //                   with itself. For instance, trying to binary-load 5
 //                   gigabytes of non-space data into a 32-bit space would
 //                   cause this error.
-int MUSHSPACE_CAT(mushspace,_load_string)
+int mushspace_load_string
 	( mushspace*, const char*, size_t len
 #ifndef MUSHSPACE_93
 	, mushcoords* end, mushcoords target, bool binary

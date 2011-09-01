@@ -12,9 +12,9 @@ struct mushspace {
 	mush_staticaabb box;
 };
 
-const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
+const size_t mushspace_size = sizeof(mushspace);
 
-mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
+mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (space) {
 		space->stats = stats ? stats : malloc(sizeof *space->stats);
@@ -23,7 +23,7 @@ mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
 	return space;
 }
 
-void MUSHSPACE_CAT(mushspace,_free)(mushspace* space) { free(space->stats); }
+void mushspace_free(mushspace* space) { free(space->stats); }
 
 mushcell mushspace_get(mushspace* space, mushcoords c) {
 	mushstats_add(space->stats, MushStat_lookups, 1);
@@ -45,7 +45,7 @@ static bool mushspace2_93_newline(bool* got_cr, mushcoords* pos) {
 	pos->x = 0;
 	return ++pos->y >= 25;
 }
-int mushspace2_93_load_string(mushspace* space, const char* str, size_t len) {
+int mushspace_load_string(mushspace* space, const char* str, size_t len) {
 	bool got_cr = false;
 	mushcoords pos = MUSHCOORDS(0,0,0);
 

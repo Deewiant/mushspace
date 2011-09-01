@@ -80,7 +80,7 @@ typedef struct mush_bounded_pos {
 	mushcoords *pos;
 } mush_bounded_pos;
 
-const size_t MUSHSPACE_CAT(mushspace,_size) = sizeof(mushspace);
+const size_t mushspace_size = sizeof(mushspace);
 
 #define mushspace_get_caabb_idx     MUSHSPACE_CAT(mushspace,_get_caabb_idx)
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
@@ -252,7 +252,7 @@ static void mushspace_load_arr(mush_arr_mushcell, void*,
                                mushstats*);
 static void mushspace_load_blank(size_t, void*);
 
-mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
+mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (space) {
 		space->invalidatees = NULL;
@@ -270,7 +270,7 @@ mushspace* MUSHSPACE_CAT(mushspace,_allocate)(void* vp, mushstats* stats) {
 	return space;
 }
 
-void MUSHSPACE_CAT(mushspace,_free)(mushspace* space) {
+void mushspace_free(mushspace* space) {
 	for (size_t i = space->box_count; i--;)
 		free(space->boxen[i].data);
 	free(space->boxen);
@@ -1649,9 +1649,8 @@ typedef struct {
 	#endif
 } mushspace_load_arr_auxdata;
 
-int MUSHSPACE_CAT(mushspace,_load_string)(
-	mushspace* space, const char* str, size_t len,
-	mushcoords* end, mushcoords target, bool binary)
+int mushspace_load_string(mushspace* space, const char* str, size_t len,
+                          mushcoords* end, mushcoords target, bool binary)
 {
 	mush_arr_mush_aabb aabbs;
 	mushspace_get_aabbs(str, len, target, binary, &aabbs);
