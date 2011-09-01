@@ -25,7 +25,6 @@ MUSH_DECL_CONST_DYN_ARRAY(mush_bounds)
 #define mush_bounds_can_fuse        MUSHSPACE_CAT(mush_bounds,_can_fuse)
 #define mush_bounds_tessellate      MUSHSPACE_CAT(mush_bounds,_tessellate)
 #define mush_bounds_tessellate1     MUSHSPACE_CAT(mush_bounds,_tessellate1)
-
 #define mush_bounds_on_same_primary_axis \
 	MUSHSPACE_CAT(mush_bounds,_on_same_primary_axis)
 

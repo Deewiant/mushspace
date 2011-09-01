@@ -33,15 +33,12 @@ typedef union mushcoords {
 
 #define MUSHCOORDS(a,b,c) ((mushcoords)MUSHCOORDS_INIT(a,b,c))
 
-#define mushcoords_sub   MUSHSPACE_CAT(mushcoords,_sub)
-#define mushcoords_equal MUSHSPACE_CAT(mushcoords,_equal)
-
+#define mushcoords_sub          MUSHSPACE_CAT(mushcoords,_sub)
+#define mushcoords_equal        MUSHSPACE_CAT(mushcoords,_equal)
 #define mushcoords_adds_clamped MUSHSPACE_CAT(mushcoords,_adds_clamped)
 #define mushcoords_subs_clamped MUSHSPACE_CAT(mushcoords,_subs_clamped)
-
-#define mushcoords_max_into MUSHSPACE_CAT(mushcoords,_max_into)
-#define mushcoords_min_into MUSHSPACE_CAT(mushcoords,_min_into)
-
+#define mushcoords_max_into     MUSHSPACE_CAT(mushcoords,_max_into)
+#define mushcoords_min_into     MUSHSPACE_CAT(mushcoords,_min_into)
 #define mushcoords_get_end_of_contiguous_range \
 	MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
 

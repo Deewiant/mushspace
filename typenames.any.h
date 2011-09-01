@@ -10,8 +10,8 @@
 #endif
 
 #define MUSHSPACE_CATHELPER(a,b) a##b
-#define MUSHSPACE_CAT(a,b)  MUSHSPACE_CATHELPER(a,b)
-#define MUSHSPACE_NAME(x)   MUSHSPACE_CAT(MUSHSPACE_CAT(x,MUSHSPACE_DIM),\
-                                          MUSHSPACE_STRUCT_SUFFIX)
+#define MUSHSPACE_CAT(a,b) MUSHSPACE_CATHELPER(a,b)
+#define MUSHSPACE_NAME(x)  MUSHSPACE_CAT(MUSHSPACE_CAT(x,MUSHSPACE_DIM),\
+                                         MUSHSPACE_STRUCT_SUFFIX)
 
 #endif

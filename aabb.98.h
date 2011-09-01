@@ -24,23 +24,19 @@ typedef struct mush_aabb {
 #endif
 } mush_aabb;
 
-#define mush_aabb_make        MUSHSPACE_CAT(mush_aabb,_make)
-#define mush_aabb_make_unsafe MUSHSPACE_CAT(mush_aabb,_make_unsafe)
-#define mush_aabb_finalize    MUSHSPACE_CAT(mush_aabb,_finalize)
-#define mush_aabb_alloc       MUSHSPACE_CAT(mush_aabb,_alloc)
-
-#define mush_aabb_volume_on MUSHSPACE_CAT(mush_aabb,_volume_on)
-
-#define mush_aabb_get MUSHSPACE_CAT(mush_aabb,_get)
-#define mush_aabb_put MUSHSPACE_CAT(mush_aabb,_put)
-
+#define mush_aabb_make              MUSHSPACE_CAT(mush_aabb,_make)
+#define mush_aabb_make_unsafe       MUSHSPACE_CAT(mush_aabb,_make_unsafe)
+#define mush_aabb_finalize          MUSHSPACE_CAT(mush_aabb,_finalize)
+#define mush_aabb_alloc             MUSHSPACE_CAT(mush_aabb,_alloc)
+#define mush_aabb_volume_on         MUSHSPACE_CAT(mush_aabb,_volume_on)
+#define mush_aabb_get               MUSHSPACE_CAT(mush_aabb,_get)
+#define mush_aabb_put               MUSHSPACE_CAT(mush_aabb,_put)
 #define mush_aabb_get_idx           MUSHSPACE_CAT(mush_aabb,_get_idx)
 #define mush_aabb_get_idx_no_offset MUSHSPACE_CAT(mush_aabb,_get_idx_no_offset)
-
-#define mush_aabb_consume      MUSHSPACE_CAT(mush_aabb,_consume)
-#define mush_aabb_subsume      MUSHSPACE_CAT(mush_aabb,_subsume)
-#define mush_aabb_subsume_area MUSHSPACE_CAT(mush_aabb,_subsume_area)
-#define mush_aabb_space_area   MUSHSPACE_CAT(mush_aabb,_space_area)
+#define mush_aabb_consume           MUSHSPACE_CAT(mush_aabb,_consume)
+#define mush_aabb_subsume           MUSHSPACE_CAT(mush_aabb,_subsume)
+#define mush_aabb_subsume_area      MUSHSPACE_CAT(mush_aabb,_subsume_area)
+#define mush_aabb_space_area        MUSHSPACE_CAT(mush_aabb,_space_area)
 
 void mush_aabb_make       (mush_aabb*, const mush_bounds*);
 void mush_aabb_make_unsafe(mush_aabb*, const mush_bounds*);
