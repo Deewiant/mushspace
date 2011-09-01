@@ -25,6 +25,7 @@
 		return x; \
 	}
 
+DEFINE_OP(add)
 DEFINE_OP(sub)
 
 #if !MUSHSPACE_93
