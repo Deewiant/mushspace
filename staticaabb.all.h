@@ -80,6 +80,8 @@ typedef struct mush_staticaabb {
 #define mush_staticaabb_get_idx  MUSHSPACE_CAT(mush_staticaabb,_get_idx)
 #define mush_staticaabb_get_no_offset \
 	MUSHSPACE_CAT(mush_staticaabb,_get_no_offset)
+#define mush_staticaabb_getter_no_offset \
+	MUSHSPACE_CAT(mush_staticaabb,_getter_no_offset)
 #define mush_staticaabb_get_idx_no_offset \
 	MUSHSPACE_CAT(mush_staticaabb,_get_idx_no_offset)
 
@@ -91,6 +93,8 @@ mushcell mush_staticaabb_get(const mush_staticaabb*, mushcoords);
 void     mush_staticaabb_put(      mush_staticaabb*, mushcoords, mushcell);
 
 mushcell mush_staticaabb_get_no_offset(const mush_staticaabb*, mushcoords);
+
+mushcell mush_staticaabb_getter_no_offset(const void*, mushcoords);
 
 size_t mush_staticaabb_get_idx          (mushcoords);
 size_t mush_staticaabb_get_idx_no_offset(mushcoords);

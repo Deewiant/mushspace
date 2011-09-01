@@ -28,6 +28,10 @@ mushcell mush_staticaabb_get_no_offset(
 	return aabb->array[mush_staticaabb_get_idx_no_offset(p)];
 }
 
+mushcell mush_staticaabb_getter_no_offset(const void* aabb, mushcoords c) {
+	return mush_staticaabb_get_no_offset(aabb, c);
+}
+
 size_t mush_staticaabb_get_idx(mushcoords c) {
 	return mush_staticaabb_get_idx_no_offset(
 		mushcoords_sub(c, MUSH_STATICAABB_BEG));
