@@ -82,7 +82,6 @@ typedef struct mush_bounded_pos {
 
 const size_t mushspace_sizeof = sizeof(mushspace);
 
-#define mushspace_find_bounds       MUSHSPACE_CAT(mushspace,_find_bounds)
 #define mushspace_find_beg_in       MUSHSPACE_CAT(mushspace,_find_beg_in)
 #define mushspace_find_end_in       MUSHSPACE_CAT(mushspace,_find_end_in)
 #define mushspace_invalidate_all    MUSHSPACE_CAT(mushspace,_invalidate_all)
@@ -132,9 +131,6 @@ const size_t mushspace_sizeof = sizeof(mushspace);
 	MUSHSPACE_CAT(mushspace,_consume_and_subsume)
 #define mushspace_irrelevize_subsumption_order \
 	MUSHSPACE_CAT(mushspace,_irrelevize_subsumption_order)
-
-static void mushspace_find_bounds(
-	mushspace*, mushcoords*, mushcoords*, mushdim, bool*, bool*);
 
 static bool mushspace_find_beg_in(
 	mushcoords*, mushdim, const mush_bounds*,
@@ -382,8 +378,32 @@ bool mushspace_get_tight_bounds(
 
 	bool changed = false;
 
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		mushspace_find_bounds(space, beg, end, i, &found_nonspace, &changed);
+	for (mushdim axis = 0; axis < MUSHSPACE_DIM; ++axis) {
+		found_nonspace |=
+			!mushspace_find_beg_in(
+				beg, axis, &MUSH_STATICAABB_BOUNDS,
+				mush_staticaabb_getter_no_offset, &space->static_box);
+
+		mushspace_find_end_in(
+			end, axis, &MUSH_STATICAABB_BOUNDS,
+			mush_staticaabb_getter_no_offset, &space->static_box);
+
+		for (size_t i = 0; i < space->box_count; ++i) {
+			if (
+				mushspace_find_beg_in(
+					beg, axis, &space->boxen[i].bounds,
+					mush_aabb_getter_no_offset, &space->boxen[i]))
+			{
+				mushspace_remove_boxes(space, i, i);
+				mushstats_add(space->stats, MushStat_empty_boxes_dropped, 1);
+				changed = true;
+				continue;
+			}
+			found_nonspace = true;
+			mushspace_find_end_in(end, axis, &space->boxen[i].bounds,
+										 mush_aabb_getter_no_offset, &space->boxen[i]);
+		}
+	}
 
 	if (changed)
 		mushspace_invalidate_all(space);
@@ -417,39 +437,6 @@ bool mushspace_get_tight_bounds(
 	space->last_beg = *beg;
 	space->last_end = *end;
 	return found_nonspace;
-}
-static void mushspace_find_bounds(
-	mushspace* space, mushcoords* beg, mushcoords* end, mushdim axis,
-	bool* found_nonspace, bool* changed)
-{
-	bool found =
-		!mushspace_find_beg_in(
-			beg, axis, &MUSH_STATICAABB_BOUNDS,
-			mush_staticaabb_getter_no_offset, &space->static_box);
-
-	mushspace_find_end_in(end, axis, &MUSH_STATICAABB_BOUNDS,
-	                      mush_staticaabb_getter_no_offset, &space->static_box);
-
-	size_t dropped_empties = 0;
-
-	for (size_t i = 0; i < space->box_count; ++i) {
-		if (mushspace_find_beg_in(beg, axis, &space->boxen[i].bounds,
-		                          mush_aabb_getter_no_offset, &space->boxen[i]))
-		{
-			mushspace_remove_boxes(space, i, i);
-			++dropped_empties;
-			continue;
-		}
-		found = true;
-		mushspace_find_end_in(end, axis, &space->boxen[i].bounds,
-		                      mush_aabb_getter_no_offset, &space->boxen[i]);
-	}
-
-	mushstats_add(space->stats, MushStat_empty_boxes_dropped,
-	              (uint64_t)dropped_empties);
-
-	*found_nonspace |= found;
-	*changed        |= dropped_empties > 0;
 }
 static bool mushspace_find_beg_in(
 	mushcoords* beg, mushdim axis, const mush_bounds* bounds,
