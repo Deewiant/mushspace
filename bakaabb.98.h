@@ -36,7 +36,7 @@ typedef struct mush_bakaabb_iter mush_bakaabb_iter;
 extern const size_t mush_bakaabb_iter_sizeof;
 
 bool mush_bakaabb_init(mush_bakaabb*, mushcoords);
-void mush_bakaabb_free(mush_bakaabb* bak);
+void mush_bakaabb_free(mush_bakaabb*);
 
 mushcell mush_bakaabb_get(const mush_bakaabb*, mushcoords);
 bool     mush_bakaabb_put(      mush_bakaabb*, mushcoords, mushcell);
