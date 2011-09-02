@@ -85,6 +85,7 @@ const size_t mushspace_sizeof = sizeof(mushspace);
 #define mushspace_find_bounds       MUSHSPACE_CAT(mushspace,_find_bounds)
 #define mushspace_find_beg_in       MUSHSPACE_CAT(mushspace,_find_beg_in)
 #define mushspace_find_end_in       MUSHSPACE_CAT(mushspace,_find_end_in)
+#define mushspace_invalidate_all    MUSHSPACE_CAT(mushspace,_invalidate_all)
 #define mushspace_get_caabb_idx     MUSHSPACE_CAT(mushspace,_get_caabb_idx)
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_remove_boxes      MUSHSPACE_CAT(mushspace,_remove_boxes)
@@ -142,6 +143,8 @@ static bool mushspace_find_beg_in(
 static void mushspace_find_end_in(
 	mushcoords*, mushdim, const mush_bounds*,
 	mushcell(*)(const void*, mushcoords), const void*);
+
+static void mushspace_invalidate_all(mushspace*);
 
 static mush_aabb* mushspace_find_box(const mushspace*, mushcoords);
 
@@ -607,6 +610,14 @@ static void mushspace_find_end_in(
 	default: assert (false);
 	#undef CHECK
 	}
+}
+
+static void mushspace_invalidate_all(mushspace* space) {
+	void (**i)(void*) = space->invalidatees;
+	void  **d         = space->invalidatees_data;
+	if (i)
+		while (*i)
+			(*i++)(*d++);
 }
 
 static mush_caabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
