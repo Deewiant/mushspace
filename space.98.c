@@ -359,12 +359,12 @@ void mushspace_get_loose_bounds(
 bool mushspace_get_tight_bounds(
 	mushspace* space, mushcoords* beg, mushcoords* end)
 {
-	bool last_beg_was_space = mushspace_get(space, space->last_beg) == ' ',
-	     last_end_was_space = mushspace_get(space, space->last_end) == ' ',
+	bool last_beg_space = mushspace_get_nostats(space, space->last_beg) == ' ',
+	     last_end_space = mushspace_get_nostats(space, space->last_end) == ' ',
 	     found_nonspace = true;
 
-	if (last_beg_was_space == last_end_was_space) {
-		if (last_beg_was_space) {
+	if (last_beg_space == last_end_space) {
+		if (last_beg_space) {
 			*beg = MUSHCOORDS(MUSHCELL_MAX, MUSHCELL_MAX, MUSHCELL_MAX);
 			*end = MUSHCOORDS(MUSHCELL_MIN, MUSHCELL_MIN, MUSHCELL_MIN);
 			found_nonspace = false;
@@ -373,7 +373,7 @@ bool mushspace_get_tight_bounds(
 			*end = space->last_end;
 		}
 	} else {
-		if (last_beg_was_space)
+		if (last_beg_space)
 			*beg = *end = space->last_end;
 		else
 			*beg = *end = space->last_beg;
