@@ -20,7 +20,11 @@ mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	if (!space)
 		return NULL;
 
-	space->stats = stats ? stats : malloc(sizeof *space->stats);
+	if (!(space->stats = stats ? stats : malloc(sizeof *space->stats))) {
+		free(space);
+		return NULL;
+	}
+
 	mushcell_space(space->box.array, MUSH_ARRAY_LEN(space->box.array));
 	return space;
 }

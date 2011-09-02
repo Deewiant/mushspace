@@ -270,8 +270,12 @@ mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	if (!space)
 		return NULL;
 
+	if (!(space->stats = stats ? stats : malloc(sizeof *space->stats))) {
+		free(space);
+		return NULL;
+	}
+
 	space->invalidatees = NULL;
-	space->stats        = stats ? stats : malloc(sizeof *space->stats);
 
 	space->box_count = 0;
 	space->boxen     = NULL;
