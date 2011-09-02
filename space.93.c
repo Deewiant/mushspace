@@ -28,14 +28,18 @@ void mushspace_free(mushspace* space) { free(space->stats); }
 
 mushcell mushspace_get(mushspace* space, mushcoords c) {
 	mushstats_add(space->stats, MushStat_lookups, 1);
-
+	return mushspace_get_nostats(space, c);
+}
+mushcell mushspace_get_nostats(const mushspace* space, mushcoords c) {
 	return mush_staticaabb_contains(c) ? mush_staticaabb_get(&space->box, c)
 	                                   : ' ';
 }
 
 int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	mushstats_add(space->stats, MushStat_assignments, 1);
-
+	return mushspace_put_nostats(space, p, c);
+}
+int mushspace_put_nostats(mushspace* space, mushcoords p, mushcell c) {
 	if (mush_staticaabb_contains(p))
 		mush_staticaabb_put(&space->box, p, c);
 	return MUSH_ERR_NONE;
