@@ -292,7 +292,6 @@ void mushspace_free(mushspace* space) {
 		free(space->boxen[i].data);
 	free(space->boxen);
 	mush_bakaabb_free(&space->bak);
-	free(space->stats);
 }
 
 mushcell mushspace_get(mushspace* space, mushcoords c) {

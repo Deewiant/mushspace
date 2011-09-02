@@ -24,7 +24,7 @@ mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	return space;
 }
 
-void mushspace_free(mushspace* space) { free(space->stats); }
+void mushspace_free(mushspace* space) { (void)space; }
 
 mushcell mushspace_get(mushspace* space, mushcoords c) {
 	mushstats_add(space->stats, MushStat_lookups, 1);
