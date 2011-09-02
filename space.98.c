@@ -275,6 +275,10 @@ mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 		space->boxen     = NULL;
 		space->bak.data  = NULL;
 
+		// Placate valgrind and such: it's not necessary to define these before
+		// the first use.
+		space->last_beg = space->last_end = MUSHCOORDS(0,0,0);
+
 		mush_anamnesic_ring_init(&space->recent_buf);
 
 		mushcell_space(
