@@ -267,23 +267,24 @@ static void mushspace_load_blank(size_t, void*);
 
 mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
-	if (space) {
-		space->invalidatees = NULL;
-		space->stats        = stats ? stats : malloc(sizeof *space->stats);
+	if (!space)
+		return NULL;
 
-		space->box_count = 0;
-		space->boxen     = NULL;
-		space->bak.data  = NULL;
+	space->invalidatees = NULL;
+	space->stats        = stats ? stats : malloc(sizeof *space->stats);
 
-		// Placate valgrind and such: it's not necessary to define these before
-		// the first use.
-		space->last_beg = space->last_end = MUSHCOORDS(0,0,0);
+	space->box_count = 0;
+	space->boxen     = NULL;
+	space->bak.data  = NULL;
 
-		mush_anamnesic_ring_init(&space->recent_buf);
+	// Placate valgrind and such: it's not necessary to define these before the
+	// first use.
+	space->last_beg = space->last_end = MUSHCOORDS(0,0,0);
 
-		mushcell_space(
-			space->static_box.array, MUSH_ARRAY_LEN(space->static_box.array));
-	}
+	mush_anamnesic_ring_init(&space->recent_buf);
+
+	mushcell_space(
+		space->static_box.array, MUSH_ARRAY_LEN(space->static_box.array));
 	return space;
 }
 

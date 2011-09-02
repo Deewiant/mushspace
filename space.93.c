@@ -17,10 +17,11 @@ const size_t mushspace_sizeof = sizeof(mushspace);
 
 mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
-	if (space) {
-		space->stats = stats ? stats : malloc(sizeof *space->stats);
-		mushcell_space(space->box.array, MUSH_ARRAY_LEN(space->box.array));
-	}
+	if (!space)
+		return NULL;
+
+	space->stats = stats ? stats : malloc(sizeof *space->stats);
+	mushcell_space(space->box.array, MUSH_ARRAY_LEN(space->box.array));
 	return space;
 }
 
