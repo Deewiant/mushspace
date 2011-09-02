@@ -385,13 +385,8 @@ bool mushspace_get_tight_bounds(
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		mushspace_find_bounds(space, beg, end, i, &found_nonspace, &changed);
 
-	if (changed) {
-		void (**i)(void*) = space->invalidatees;
-		void  **d         = space->invalidatees_data;
-		if (i)
-			while (*i)
-				(*i++)(*d++);
-	}
+	if (changed)
+		mushspace_invalidate_all(space);
 
 	if (space->bak.data && mush_bakaabb_size(&space->bak) > 0) {
 		found_nonspace = true;
@@ -1097,11 +1092,7 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 	mushstats_new_max(space->stats, MushStat_max_boxes_live,
 	                  (uint64_t)space->box_count);
 
-	void (**i)(void*) = space->invalidatees;
-	void  **d         = space->invalidatees_data;
-	if (i)
-		while (*i)
-			(*i++)(*d++);
+	mushspace_invalidate_all(space);
 
 	return &space->boxen[space->box_count-1];
 }
