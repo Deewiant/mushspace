@@ -299,6 +299,42 @@ void mushspace_free(mushspace* space) {
 	mush_bakaabb_free(&space->bak);
 }
 
+mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
+	mushspace *copy = vp ? vp : malloc(sizeof *copy);
+	if (!copy)
+		return NULL;
+
+	// Easiest to do here, so we don't have to worry about whether we need to
+	// free copy->stats or not.
+	if (space->bak.data && !mush_bakaabb_copy(&copy->bak, &space->bak)) {
+		free(copy);
+		return NULL;
+	}
+
+	copy->stats = stats ? stats : malloc(sizeof *copy->stats);
+	if (!copy->stats) {
+		free(copy);
+		return NULL;
+	}
+
+	memcpy(copy, space, sizeof *copy);
+
+	copy->boxen = malloc(copy->box_count * sizeof *copy->boxen);
+	memcpy(copy->boxen, space->boxen, copy->box_count * sizeof *copy->boxen);
+
+	for (size_t i = 0; i < copy->box_count; ++i) {
+		mush_aabb *box = &copy->boxen[i];
+		const mushcell *orig = box->data;
+		box->data = malloc(box->size * sizeof *box->data);
+		memcpy(box->data, orig, box->size * sizeof *box->data);
+	}
+
+	// Invalidatees refer to the original space, not the copy.
+	copy->invalidatees = NULL;
+
+	return copy;
+}
+
 mushcell mushspace_get(mushspace* space, mushcoords c) {
 	mushstats_add(space->stats, MushStat_lookups, 1);
 	return mushspace_get_nostats(space, c);

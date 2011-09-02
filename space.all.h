@@ -19,6 +19,7 @@ typedef struct mushspace mushspace;
 #define mushspace_sizeof           MUSHSPACE_CAT(mushspace,_sizeof)
 #define mushspace_allocate         MUSHSPACE_CAT(mushspace,_allocate)
 #define mushspace_free             MUSHSPACE_CAT(mushspace,_free)
+#define mushspace_copy             MUSHSPACE_CAT(mushspace,_copy)
 #define mushspace_get              MUSHSPACE_CAT(mushspace,_get)
 #define mushspace_get_nostats      MUSHSPACE_CAT(mushspace,_get_nostats)
 #define mushspace_put              MUSHSPACE_CAT(mushspace,_put)
@@ -33,6 +34,7 @@ extern const size_t mushspace_sizeof;
 
 mushspace *mushspace_allocate(void*, mushstats*);
 void       mushspace_free    (mushspace*);
+mushspace *mushspace_copy    (void*, const mushspace*, mushstats*);
 
 mushcell mushspace_get        (      mushspace*, mushcoords);
 mushcell mushspace_get_nostats(const mushspace*, mushcoords);

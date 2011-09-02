@@ -31,6 +31,21 @@ mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 
 void mushspace_free(mushspace* space) { (void)space; }
 
+mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
+	mushspace *copy = vp ? vp : malloc(sizeof *copy);
+	if (!copy)
+		return NULL;
+
+	copy->stats = stats ? stats : malloc(sizeof *copy->stats);
+	if (!copy->stats) {
+		free(copy);
+		return NULL;
+	}
+
+	memcpy(copy, space, sizeof *copy);
+	return copy;
+}
+
 mushcell mushspace_get(mushspace* space, mushcoords c) {
 	mushstats_add(space->stats, MushStat_lookups, 1);
 	return mushspace_get_nostats(space, c);
