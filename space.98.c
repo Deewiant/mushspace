@@ -2540,3 +2540,28 @@ static void mushspace_load_blank(size_t blanks, void* p) {
 	}
 	aux->str = str;
 }
+
+bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
+	size_t n = 0;
+	void (**is)(void*) = space->invalidatees;
+	if (is)
+		while (*is++)
+			++n;
+
+	is = realloc(is, n * sizeof *is);
+	if (!is)
+		return false;
+
+	void **id = realloc(space->invalidatees_data, n * sizeof *id);
+	if (!id) {
+		free(is);
+		return false;
+	}
+
+	space->invalidatees      = is;
+	space->invalidatees_data = id;
+
+	is[n] = i;
+	id[n] = d;
+	return true;
+}
