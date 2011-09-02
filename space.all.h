@@ -26,6 +26,7 @@ typedef struct mushspace mushspace;
 #define mushspace_get_loose_bounds MUSHSPACE_CAT(mushspace,_get_loose_bounds)
 #define mushspace_get_tight_bounds MUSHSPACE_CAT(mushspace,_get_tight_bounds)
 #define mushspace_load_string      MUSHSPACE_CAT(mushspace,_load_string)
+#define mushspace_put_binary       MUSHSPACE_CAT(mushspace,_put_binary)
 
 extern const size_t mushspace_sizeof;
 
@@ -61,4 +62,10 @@ int mushspace_load_string
 #endif
 	);
 
+void mushspace_put_binary(const mushspace*, mushcoords, mushcoords,
+                          void(*)(mushcell, void*),
+#if MUSHSPACE_DIM > 1
+                          void(*)(unsigned char, void*),
+#endif
+                          void*);
 #endif
