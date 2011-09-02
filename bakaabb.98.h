@@ -22,6 +22,7 @@ typedef struct mush_bakaabb_iter mush_bakaabb_iter;
 #define mush_bakaabb_iter_sizeof MUSHSPACE_CAT(mush_bakaabb_iter,_sizeof)
 #define mush_bakaabb_init        MUSHSPACE_CAT(mush_bakaabb,_init)
 #define mush_bakaabb_free        MUSHSPACE_CAT(mush_bakaabb,_free)
+#define mush_bakaabb_copy        MUSHSPACE_CAT(mush_bakaabb,_copy)
 #define mush_bakaabb_get         MUSHSPACE_CAT(mush_bakaabb,_get)
 #define mush_bakaabb_put         MUSHSPACE_CAT(mush_bakaabb,_put)
 #define mush_bakaabb_size        MUSHSPACE_CAT(mush_bakaabb,_size)
@@ -37,6 +38,7 @@ extern const size_t mush_bakaabb_iter_sizeof;
 
 bool mush_bakaabb_init(mush_bakaabb*, mushcoords);
 void mush_bakaabb_free(mush_bakaabb*);
+bool mush_bakaabb_copy(mush_bakaabb*, const mush_bakaabb*);
 
 mushcell mush_bakaabb_get(const mush_bakaabb*, mushcoords);
 bool     mush_bakaabb_put(      mush_bakaabb*, mushcoords, mushcell);

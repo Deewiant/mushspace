@@ -26,6 +26,12 @@ bool mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
 void mush_bakaabb_free(mush_bakaabb* bak) {
 	kh_destroy(mushcoords, bak->data);
 }
+bool mush_bakaabb_copy(mush_bakaabb* copy, const mush_bakaabb* bak) {
+	if (!kh_copy(mushcoords, copy->data, bak->data))
+		return false;
+	copy->bounds = bak->bounds;
+	return true;
+}
 
 mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
 	const khash_t(mushcoords) *hash = bak->data;
