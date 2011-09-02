@@ -162,6 +162,26 @@ static const double __ac_HASH_UPPER = 0.77;
 			free(h);                                                       \
 		}                                                                 \
 	}                                                                    \
+	static inline bool AC_CAT(kh_copy_,name)(khash_t(name) *h, const khash_t(name) *o) \
+	{                                                                    \
+		memcpy(h, o, sizeof *h);                                          \
+		if (h->flags) {                                                   \
+			h->flags = malloc(((h->n_buckets>>4) + 1) * sizeof *h->flags); \
+			if (!h->flags) return false;                                   \
+			memcpy(h->flags, o->flags, ((h->n_buckets>>4) + 1) * sizeof *h->flags); \
+		}                                                                 \
+		if (h->keys) {                                                    \
+			h->keys = malloc(h->n_buckets * sizeof *h->keys);              \
+			if (!h->keys) return false;                                    \
+			memcpy(h->keys, o->keys, h->n_buckets * sizeof *h->keys);      \
+			if (kh_is_map) {                                               \
+				h->vals = malloc(h->n_buckets * sizeof *h->vals);           \
+				if (!h->vals) return false;                                 \
+				memcpy(h->vals, o->vals, h->n_buckets * sizeof *h->vals);   \
+			}                                                              \
+		}                                                                 \
+		return true;                                                      \
+	}                                                                    \
 	static inline void AC_CAT(kh_clear_,name)(khash_t(name) *h)          \
 	{                                                                    \
 		if (h && h->flags) {                                              \
@@ -322,6 +342,7 @@ static inline khint_t __ac_X31_hash_string(const char *s)
 
 #define kh_init(name) AC_CAT(kh_init_,name)()
 #define kh_destroy(name, h) AC_CAT(kh_destroy_,name)(h)
+#define kh_copy(name, h, o) AC_CAT(kh_copy_,name)(h, o)
 #define kh_clear(name, h) AC_CAT(kh_clear_,name)(h)
 #define kh_resize(name, h, s) AC_CAT(kh_resize_,name)(h, s)
 #define kh_put(name, h, k, r) AC_CAT(kh_put_,name)(h, k, r)
