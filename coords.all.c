@@ -5,6 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+void mushcoords_max_into(mushcoords* a, mushcoords b) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+		a->v[i] = mushcell_max(a->v[i], b.v[i]);
+}
+void mushcoords_min_into(mushcoords* a, mushcoords b) {
+	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+		a->v[i] = mushcell_min(a->v[i], b.v[i]);
+}
+
 #define DEFINE_OP(NAME) \
 	mushcoords mushcoords_##NAME(mushcoords a, mushcoords b) { \
 		mushcoords x = a; \
@@ -43,15 +52,6 @@ bool mushcoords_equal(mushcoords a, mushcoords b) {
 #endif
 #endif
 	;
-}
-
-void mushcoords_max_into(mushcoords* a, mushcoords b) {
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		a->v[i] = mushcell_max(a->v[i], b.v[i]);
-}
-void mushcoords_min_into(mushcoords* a, mushcoords b) {
-	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-		a->v[i] = mushcell_min(a->v[i], b.v[i]);
 }
 
 mushcoords mushcoords_get_end_of_contiguous_range(

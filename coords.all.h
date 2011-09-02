@@ -50,14 +50,14 @@ mushcoords mushcoords_sub(mushcoords, mushcoords);
 
 void mushcoords_sub_into(mushcoords*, mushcoords);
 
+void mushcoords_max_into(mushcoords*, mushcoords);
+void mushcoords_min_into(mushcoords*, mushcoords);
+
 #if !MUSHSPACE_93
 mushcoords mushcoords_adds_clamped(mushcoords, mushcell);
 mushcoords mushcoords_subs_clamped(mushcoords, mushcell);
 
 bool mushcoords_equal(mushcoords, mushcoords);
-
-void mushcoords_max_into(mushcoords*, mushcoords);
-void mushcoords_min_into(mushcoords*, mushcoords);
 
 mushcoords mushcoords_get_end_of_contiguous_range(
 	mushcoords  end_pt,
