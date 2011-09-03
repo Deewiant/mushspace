@@ -7,6 +7,8 @@
 #define mushspace_put_textual_add_ws \
 	MUSHSPACE_CAT(mushspace,_put_textual_add_ws)
 
+const size_t mushspace_sizeof = sizeof(mushspace);
+
 static bool mushspace_put_textual_row(
 	const mushcell*, size_t*, const unsigned char*, size_t*,
 	void(*)(const mushcell*, size_t, void*), void(*)(unsigned char, void*),

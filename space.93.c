@@ -7,8 +7,6 @@
 
 #include "stdlib.any.h"
 
-const size_t mushspace_sizeof = sizeof(mushspace);
-
 mushspace* mushspace_allocate(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (!space)

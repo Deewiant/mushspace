@@ -54,8 +54,6 @@ typedef struct mush_bounded_pos {
 	mushcoords *pos;
 } mush_bounded_pos;
 
-const size_t mushspace_sizeof = sizeof(mushspace);
-
 #define mushspace_find_beg_in       MUSHSPACE_CAT(mushspace,_find_beg_in)
 #define mushspace_find_end_in       MUSHSPACE_CAT(mushspace,_find_end_in)
 #define mushspace_invalidate_all    MUSHSPACE_CAT(mushspace,_invalidate_all)
