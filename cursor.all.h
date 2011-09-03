@@ -7,7 +7,9 @@
 
 #define mushcursor MUSHSPACE_NAME(mushcursor)
 
-typedef struct mushcursor mushcursor;
+typedef struct mushcursor {
+	mushspace *space;
+} mushcursor;
 
 #define mushcursor_sizeof MUSHSPACE_CAT(mushcursor,_sizeof)
 #define mushcursor_init   MUSHSPACE_CAT(mushcursor,_init)

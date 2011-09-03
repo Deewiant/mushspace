@@ -2,10 +2,6 @@
 
 #include "cursor.all.h"
 
-struct mushcursor {
-	mushspace *space;
-};
-
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
 mushcursor* mushcursor_init(
