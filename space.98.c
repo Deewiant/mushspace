@@ -6,12 +6,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "anamnesic_ring.98.h"
-#include "aabb.98.h"
-#include "bakaabb.98.h"
-#include "coords.all.h"
-#include "staticaabb.all.h"
-#include "stats.any.h"
 #include "stdlib.any.h"
 
 // Threshold for switching to mush_bakaabb. Only limits mushspace_put, not
@@ -46,26 +40,6 @@
 #define ACCEPTABLE_WASTE_Y (MUSHSPACE_DIM >= 2 ? NEWBOX_PAD : 1)
 #define ACCEPTABLE_WASTE_Z (MUSHSPACE_DIM >= 3 ? NEWBOX_PAD : 1)
 #define ACCEPTABLE_WASTE   (5 * ACCEPTABLE_WASTE_Y * ACCEPTABLE_WASTE_Z)
-
-struct mushspace {
-	mush_anamnesic_ring recent_buf;
-	bool just_placed_big;
-	mushcoords big_sequence_start, first_placed_big;
-
-	void (**invalidatees)(void*);
-	void  **invalidatees_data;
-
-	mushcoords last_beg, last_end;
-
-	mushstats *stats;
-
-	size_t box_count;
-
-	mush_aabb    *boxen;
-	mush_bakaabb  bak;
-
-	mush_staticaabb static_box;
-};
 
 MUSH_DECL_DYN_ARRAY(mushcell)
 MUSH_DECL_DYN_ARRAY(mush_aabb)

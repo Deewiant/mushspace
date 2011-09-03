@@ -5,13 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "staticaabb.all.h"
 #include "stdlib.any.h"
-
-struct mushspace {
-	mushstats *stats;
-	mush_staticaabb box;
-};
 
 const size_t mushspace_sizeof = sizeof(mushspace);
 

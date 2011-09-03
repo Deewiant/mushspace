@@ -9,12 +9,42 @@
 #include "config.h"
 #include "coords.all.h"
 #include "errors.any.h"
+#include "staticaabb.all.h"
 #include "stats.any.h"
 #include "typenames.any.h"
 
+#if !MUSHSPACE_93
+#include "anamnesic_ring.98.h"
+#include "aabb.98.h"
+#include "bakaabb.98.h"
+#endif
+
 #define mushspace MUSHSPACE_NAME(mushspace)
 
-typedef struct mushspace mushspace;
+typedef struct mushspace {
+#if MUSHSPACE_93
+	mushstats *stats;
+	mush_staticaabb box;
+#else
+	mush_anamnesic_ring recent_buf;
+	bool just_placed_big;
+	mushcoords big_sequence_start, first_placed_big;
+
+	void (**invalidatees)(void*);
+	void  **invalidatees_data;
+
+	mushcoords last_beg, last_end;
+
+	mushstats *stats;
+
+	size_t box_count;
+
+	mush_aabb    *boxen;
+	mush_bakaabb  bak;
+
+	mush_staticaabb static_box;
+#endif
+} mushspace;
 
 #define mushspace_sizeof           MUSHSPACE_CAT(mushspace,_sizeof)
 #define mushspace_allocate         MUSHSPACE_CAT(mushspace,_allocate)
