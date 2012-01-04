@@ -26,6 +26,9 @@ typedef struct mushcursor {
 #endif
 	mushspace *space;
 	mushcoords pos;
+#if !MUSHSPACE_93
+	size_t     box_idx;
+#endif
 } mushcursor;
 
 #define mushcursor_sizeof MUSHSPACE_CAT(mushcursor,_sizeof)
