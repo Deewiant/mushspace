@@ -18,5 +18,6 @@ mushcursor* mushcursor_init(
 		return NULL;
 
 	cursor->space = space;
+	cursor->pos   = pos;
 	return cursor;
 }

@@ -25,6 +25,7 @@ typedef struct mushcursor {
 	MushCursorMode mode;
 #endif
 	mushspace *space;
+	mushcoords pos;
 } mushcursor;
 
 #define mushcursor_sizeof MUSHSPACE_CAT(mushcursor,_sizeof)
