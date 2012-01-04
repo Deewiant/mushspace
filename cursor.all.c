@@ -2,6 +2,12 @@
 
 #include "cursor.all.h"
 
+#if MUSHSPACE_93
+#define STATIC_BOX(sp) (&(sp)->box)
+#else
+#define STATIC_BOX(sp) (&(sp)->static_box)
+#endif
+
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
 mushcursor* mushcursor_init(
