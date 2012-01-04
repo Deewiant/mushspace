@@ -7,7 +7,17 @@
 
 #define mushcursor MUSHSPACE_NAME(mushcursor)
 
+// What kind of an area is the cursor in?
+typedef enum MushCursorMode {
+	MushCursorMode_static,
+	MushCursorMode_dynamic,
+	MushCursorMode_bak,
+} MushCursorMode;
+
 typedef struct mushcursor {
+#if !MUSHSPACE_93
+	MushCursorMode mode;
+#endif
 	mushspace *space;
 } mushcursor;
 
