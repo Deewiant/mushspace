@@ -10,8 +10,10 @@
 // What kind of an area is the cursor in?
 typedef enum MushCursorMode {
 	MushCursorMode_static,
+#if !MUSHSPACE_93
 	MushCursorMode_dynamic,
 	MushCursorMode_bak,
+#endif
 } MushCursorMode;
 
 #if MUSHSPACE_93
