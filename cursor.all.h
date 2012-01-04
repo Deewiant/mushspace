@@ -14,6 +14,12 @@ typedef enum MushCursorMode {
 	MushCursorMode_bak,
 } MushCursorMode;
 
+#if MUSHSPACE_93
+#define MUSHCURSOR_MODE(x) MushCursorMode_static
+#else
+#define MUSHCURSOR_MODE(x) ((x)->mode)
+#endif
+
 typedef struct mushcursor {
 #if !MUSHSPACE_93
 	MushCursorMode mode;
