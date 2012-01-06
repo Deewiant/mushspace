@@ -60,6 +60,7 @@ typedef struct mushspace {
 #define mushspace_put_binary       MUSHSPACE_CAT(mushspace,_put_binary)
 #define mushspace_put_textual      MUSHSPACE_CAT(mushspace,_put_textual)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
+#define mushspace_find_box_and_idx MUSHSPACE_CAT(mushspace,_find_box_and_idx)
 
 extern const size_t mushspace_sizeof;
 
@@ -109,6 +110,8 @@ int mushspace_put_textual(const mushspace*, mushcoords, mushcoords,
 
 #if !MUSHSPACE_93
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
+
+mush_aabb* mushspace_find_box_and_idx(const mushspace*, mushcoords, size_t*);
 #endif
 
 #endif

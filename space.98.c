@@ -622,9 +622,16 @@ static mush_caabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
 }
 
 static mush_aabb* mushspace_find_box(const mushspace* space, mushcoords c) {
+	size_t i;
+	return mushspace_find_box_and_idx(space, c, &i);
+}
+
+mush_aabb* mushspace_find_box_and_idx(
+	const mushspace* space, mushcoords c, size_t* pi)
+{
 	for (size_t i = 0; i < space->box_count; ++i)
 		if (mush_bounds_contains(&space->boxen[i].bounds, c))
-			return &space->boxen[i];
+			return &space->boxen[*pi = i];
 	return NULL;
 }
 
