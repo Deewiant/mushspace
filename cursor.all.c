@@ -35,7 +35,7 @@ mushcell mushcursor_get(mushcursor* cursor) {
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
-		return mush_aabb_get(&sp->boxen[cursor->box_idx], cursor->pos);
+		return mush_aabb_get(cursor->box, cursor->pos);
 
 	case MushCursorMode_bak:
 		return mush_bakaabb_get(&sp->bak, cursor->pos);

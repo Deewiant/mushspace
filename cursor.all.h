@@ -30,6 +30,7 @@ typedef struct mushcursor {
 	mushcoords pos;
 #if !MUSHSPACE_93
 	size_t     box_idx;
+	mush_aabb *box;
 #endif
 } mushcursor;
 
