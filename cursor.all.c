@@ -30,6 +30,10 @@ mushcursor* mushcursor_init(
 	if (!cursor)
 		return NULL;
 
+#if !MUSHSPACE_93
+	mushspace_add_invalidatee(space, mushcursor_recalibrate_void, cursor);
+#endif
+
 	cursor->space = space;
 	cursor->pos   = pos;
 	return cursor;
