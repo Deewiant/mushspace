@@ -10,13 +10,15 @@
 #define STATIC_BOX(sp) (&(sp)->static_box)
 #endif
 
-#define mushcursor_in_box  MUSHSPACE_CAT(mushcursor,_in_box)
-#define mushcursor_get_box MUSHSPACE_CAT(mushcursor,_get_box)
+#define mushcursor_in_box           MUSHSPACE_CAT(mushcursor,_in_box)
+#define mushcursor_get_box          MUSHSPACE_CAT(mushcursor,_get_box)
+#define mushcursor_recalibrate_void MUSHSPACE_CAT(mushcursor,_recalibrate_void)
 
 static bool mushcursor_in_box(const mushcursor*);
 
 #if !MUSHSPACE_93
 static bool mushcursor_get_box(mushcursor*, mushcoords);
+static void mushcursor_recalibrate_void(void*);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
@@ -99,3 +101,21 @@ mushcell mushcursor_get(mushcursor* cursor) {
 	}
 	assert (false);
 }
+
+void mushcursor_recalibrate(mushcursor* cursor) {
+#if MUSHSPACE_93
+	(void)cursor;
+#else
+	if (!mushcursor_get_box(cursor, cursor->pos)) {
+		// Just grab a box which we aren't contained in: get/set can handle it
+		// and skip_markers can sort it out. Prefer static because it's the
+		// fastest to work with.
+		cursor->mode = MushCursorMode_static;
+	}
+#endif
+}
+#if !MUSHSPACE_93
+static void mushcursor_recalibrate_void(void* cursor) {
+	mushcursor_recalibrate(cursor);
+}
+#endif
