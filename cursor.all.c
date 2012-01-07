@@ -77,17 +77,19 @@ static bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 #endif
 
 mushcell mushcursor_get(mushcursor* cursor) {
-	mushspace *sp = cursor->space;
-
 #if MUSHSPACE_93
 	assert (mushcursor_in_box(cursor));
 #else
 	if (!mushcursor_in_box(cursor) && !mushcursor_get_box(cursor, cursor->pos))
 	{
-		mushstats_add(sp->stats, MushStat_lookups, 1);
+		mushstats_add(cursor->space->stats, MushStat_lookups, 1);
 		return ' ';
 	}
 #endif
+	return mushcursor_get_unsafe(cursor);
+}
+mushcell mushcursor_get_unsafe(mushcursor* cursor) {
+	mushspace *sp = cursor->space;
 
 	mushstats_add(sp->stats, MushStat_lookups, 1);
 

@@ -37,13 +37,15 @@ typedef struct mushcursor {
 #define mushcursor_sizeof      MUSHSPACE_CAT(mushcursor,_sizeof)
 #define mushcursor_init        MUSHSPACE_CAT(mushcursor,_init)
 #define mushcursor_get         MUSHSPACE_CAT(mushcursor,_get)
+#define mushcursor_get_unsafe  MUSHSPACE_CAT(mushcursor,_get_unsafe)
 #define mushcursor_recalibrate MUSHSPACE_CAT(mushcursor,_recalibrate)
 
 extern const size_t mushcursor_sizeof;
 
 mushcursor* mushcursor_init(mushspace*, mushcoords, mushcoords, void*);
 
-mushcell mushcursor_get(mushcursor*);
+mushcell mushcursor_get       (mushcursor*);
+mushcell mushcursor_get_unsafe(mushcursor*);
 
 void mushcursor_recalibrate(mushcursor*);
 
