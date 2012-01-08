@@ -10,6 +10,10 @@
 #define STATIC_BOX(sp) (&(sp)->static_box)
 #endif
 
+#define mushcursor_in_box MUSHSPACE_CAT(mushcursor,_in_box)
+
+static bool mushcursor_in_box(const mushcursor*);
+
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
 mushcursor* mushcursor_init(
@@ -22,6 +26,22 @@ mushcursor* mushcursor_init(
 	cursor->space = space;
 	cursor->pos   = pos;
 	return cursor;
+}
+
+static bool mushcursor_in_box(const mushcursor* cursor) {
+	switch (MUSHCURSOR_MODE(cursor)) {
+	case MushCursorMode_static:
+		return mush_staticaabb_contains(cursor->pos);
+
+#if !MUSHSPACE_93
+	case MushCursorMode_dynamic:
+		return mush_bounds_contains(&cursor->box->bounds, cursor->pos);
+
+	case MushCursorMode_bak:
+		return mush_bounds_contains(&cursor->space->bak.bounds, cursor->pos);
+#endif
+	}
+	assert (false);
 }
 
 mushcell mushcursor_get(mushcursor* cursor) {
