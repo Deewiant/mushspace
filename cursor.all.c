@@ -10,9 +10,14 @@
 #define STATIC_BOX(sp) (&(sp)->static_box)
 #endif
 
-#define mushcursor_in_box MUSHSPACE_CAT(mushcursor,_in_box)
+#define mushcursor_in_box  MUSHSPACE_CAT(mushcursor,_in_box)
+#define mushcursor_get_box MUSHSPACE_CAT(mushcursor,_get_box)
 
 static bool mushcursor_in_box(const mushcursor*);
+
+#if !MUSHSPACE_93
+static bool mushcursor_get_box(mushcursor*, mushcoords);
+#endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
@@ -43,6 +48,27 @@ static bool mushcursor_in_box(const mushcursor* cursor) {
 	}
 	assert (false);
 }
+
+#if !MUSHSPACE_93
+static bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
+	if (mush_staticaabb_contains(pos)) {
+		cursor->mode = MushCursorMode_static;
+		return true;
+	}
+
+	mushspace *sp = cursor->space;
+
+	if ((cursor->box = mushspace_find_box_and_idx(sp, pos, &cursor->box_idx))) {
+		cursor->mode = MushCursorMode_dynamic;
+		return true;
+	}
+	if (sp->bak.data && mush_bounds_contains(&sp->bak.bounds, pos)) {
+		cursor->mode = MushCursorMode_bak;
+		return true;
+	}
+	return false;
+}
+#endif
 
 mushcell mushcursor_get(mushcursor* cursor) {
 	mushspace *sp = cursor->space;
