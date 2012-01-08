@@ -81,6 +81,7 @@ static bool mushcursor_in_box(const mushcursor* cursor) {
 static bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 	if (mush_staticaabb_contains(pos)) {
 		cursor->mode = MushCursorMode_static;
+		mushcursor_tessellate(cursor, pos);
 		return true;
 	}
 
@@ -88,10 +89,12 @@ static bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 
 	if ((cursor->box = mushspace_find_box_and_idx(sp, pos, &cursor->box_idx))) {
 		cursor->mode = MushCursorMode_dynamic;
+		mushcursor_tessellate(cursor, pos);
 		return true;
 	}
 	if (sp->bak.data && mush_bounds_contains(&sp->bak.bounds, pos)) {
 		cursor->mode = MushCursorMode_bak;
+		mushcursor_tessellate(cursor, pos);
 		return true;
 	}
 	return false;
