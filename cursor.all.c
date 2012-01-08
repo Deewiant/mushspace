@@ -47,6 +47,16 @@ static bool mushcursor_in_box(const mushcursor* cursor) {
 mushcell mushcursor_get(mushcursor* cursor) {
 	mushspace *sp = cursor->space;
 
+#if MUSHSPACE_93
+	assert (mushcursor_in_box(cursor));
+#else
+	if (!mushcursor_in_box(cursor))
+	{
+		mushstats_add(sp->stats, MushStat_lookups, 1);
+		return ' ';
+	}
+#endif
+
 	mushstats_add(sp->stats, MushStat_lookups, 1);
 
 	switch (MUSHCURSOR_MODE(cursor)) {
