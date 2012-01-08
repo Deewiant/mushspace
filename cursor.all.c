@@ -76,7 +76,7 @@ mushcell mushcursor_get(mushcursor* cursor) {
 #if MUSHSPACE_93
 	assert (mushcursor_in_box(cursor));
 #else
-	if (!mushcursor_in_box(cursor))
+	if (!mushcursor_in_box(cursor) && !mushcursor_get_box(cursor, cursor->pos))
 	{
 		mushstats_add(sp->stats, MushStat_lookups, 1);
 		return ' ';
