@@ -27,15 +27,32 @@ typedef struct mushcursor {
 	MushCursorMode mode;
 #endif
 	mushspace *space;
-	mushcoords pos;
+	union {
+		// For dynamic mode.
+		struct {
+			// For static mode (only rel_pos).
+			mushcoords rel_pos;
+
 #if !MUSHSPACE_93
-	size_t     box_idx;
-	mush_aabb *box;
+			mush_bounds rel_bounds;
+			mushcoords  obeg;
+			mush_aabb  *box;
+			size_t      box_idx;
 #endif
+		};
+#if !MUSHSPACE_93
+		// For bak mode.
+		struct {
+			mushcoords  actual_pos;
+			mush_bounds actual_bounds;
+		};
+#endif
+	};
 } mushcursor;
 
 #define mushcursor_sizeof      MUSHSPACE_CAT(mushcursor,_sizeof)
 #define mushcursor_init        MUSHSPACE_CAT(mushcursor,_init)
+#define mushcursor_get_pos     MUSHSPACE_CAT(mushcursor,_get_pos)
 #define mushcursor_get         MUSHSPACE_CAT(mushcursor,_get)
 #define mushcursor_get_unsafe  MUSHSPACE_CAT(mushcursor,_get_unsafe)
 #define mushcursor_recalibrate MUSHSPACE_CAT(mushcursor,_recalibrate)
@@ -43,6 +60,8 @@ typedef struct mushcursor {
 extern const size_t mushcursor_sizeof;
 
 mushcursor* mushcursor_init(mushspace*, mushcoords, mushcoords, void*);
+
+mushcoords mushcursor_get_pos(const mushcursor*);
 
 mushcell mushcursor_get       (mushcursor*);
 mushcell mushcursor_get_unsafe(mushcursor*);

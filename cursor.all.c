@@ -35,21 +35,41 @@ mushcursor* mushcursor_init(
 #endif
 
 	cursor->space = space;
-	cursor->pos   = pos;
+
+#if MUSHSPACE_93
+	cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
+#else
+	if (!mushcursor_get_box(cursor, pos))
+		assert (false && "TODO");
+#endif
 	return cursor;
+}
+
+mushcoords mushcursor_get_pos(const mushcursor* cursor) {
+	switch (MUSHCURSOR_MODE(cursor)) {
+	case MushCursorMode_static:
+		return mushcoords_add(cursor->rel_pos, MUSH_STATICAABB_BEG);
+#if !MUSHSPACE_93
+	case MushCursorMode_dynamic:
+		return mushcoords_add(cursor->rel_pos, cursor->obeg);
+	case MushCursorMode_bak:
+		return cursor->actual_pos;
+#endif
+	}
+	assert (false);
 }
 
 static bool mushcursor_in_box(const mushcursor* cursor) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		return mush_staticaabb_contains(cursor->pos);
+		return mush_bounds_contains(&MUSH_STATICAABB_REL_BOUNDS, cursor->rel_pos);
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
-		return mush_bounds_contains(&cursor->box->bounds, cursor->pos);
+		return mush_bounds_contains(&cursor->rel_bounds, cursor->rel_pos);
 
 	case MushCursorMode_bak:
-		return mush_bounds_contains(&cursor->space->bak.bounds, cursor->pos);
+		return mush_bounds_contains(&cursor->actual_bounds, cursor->actual_pos);
 #endif
 	}
 	assert (false);
@@ -80,7 +100,8 @@ mushcell mushcursor_get(mushcursor* cursor) {
 #if MUSHSPACE_93
 	assert (mushcursor_in_box(cursor));
 #else
-	if (!mushcursor_in_box(cursor) && !mushcursor_get_box(cursor, cursor->pos))
+	if (!mushcursor_in_box(cursor)
+	 && !mushcursor_get_box(cursor, mushcursor_get_pos(cursor)))
 	{
 		mushstats_add(cursor->space->stats, MushStat_lookups, 1);
 		return ' ';
@@ -95,14 +116,14 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
 
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		return mush_staticaabb_get(STATIC_BOX(sp), cursor->pos);
+		return mush_staticaabb_get_no_offset(STATIC_BOX(sp), cursor->rel_pos);
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
-		return mush_aabb_get(cursor->box, cursor->pos);
+		return mush_aabb_get_no_offset(cursor->box, cursor->rel_pos);
 
 	case MushCursorMode_bak:
-		return mush_bakaabb_get(&sp->bak, cursor->pos);
+		return mush_bakaabb_get(&sp->bak, cursor->actual_pos);
 #endif
 	}
 	assert (false);
@@ -112,7 +133,7 @@ void mushcursor_recalibrate(mushcursor* cursor) {
 #if MUSHSPACE_93
 	(void)cursor;
 #else
-	if (!mushcursor_get_box(cursor, cursor->pos)) {
+	if (!mushcursor_get_box(cursor, mushcursor_get_pos(cursor))) {
 		// Just grab a box which we aren't contained in: get/set can handle it
 		// and skip_markers can sort it out. Prefer static because it's the
 		// fastest to work with.
