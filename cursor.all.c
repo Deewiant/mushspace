@@ -13,12 +13,14 @@
 #define mushcursor_in_box           MUSHSPACE_CAT(mushcursor,_in_box)
 #define mushcursor_get_box          MUSHSPACE_CAT(mushcursor,_get_box)
 #define mushcursor_recalibrate_void MUSHSPACE_CAT(mushcursor,_recalibrate_void)
+#define mushcursor_tessellate       MUSHSPACE_CAT(mushcursor,_tessellate)
 
 static bool mushcursor_in_box(const mushcursor*);
 
 #if !MUSHSPACE_93
 static bool mushcursor_get_box(mushcursor*, mushcoords);
 static void mushcursor_recalibrate_void(void*);
+static void mushcursor_tessellate(mushcursor*, mushcoords);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
@@ -144,5 +146,59 @@ void mushcursor_recalibrate(mushcursor* cursor) {
 #if !MUSHSPACE_93
 static void mushcursor_recalibrate_void(void* cursor) {
 	mushcursor_recalibrate(cursor);
+}
+#endif
+
+#if !MUSHSPACE_93
+static void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
+	mushspace *sp = cursor->space;
+
+	switch (MUSHCURSOR_MODE(cursor)) {
+	case MushCursorMode_static:
+		cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
+		break;
+
+	case MushCursorMode_bak:
+		cursor->actual_pos    = pos;
+		cursor->actual_bounds = sp->bak.bounds;
+
+		// bak is the lowest, so we tessellate with all boxes.
+		mush_bounds_tessellate1(
+			&cursor->actual_bounds, pos, &MUSH_STATICAABB_BOUNDS);
+		mush_bounds_tessellate(
+			&cursor->actual_bounds, pos,
+			(mush_carr_mush_bounds)
+				{(const mush_bounds*)sp->boxen, sp->box_count});
+		break;
+
+	case MushCursorMode_dynamic: {
+		// cursor->box now becomes only a view. it shares its data array with the
+		// original box, but has different bounds. In addition, it is weird: its
+		// width and height are not its own, so that index calculation in the
+		// _no_offset functions works correctly.
+		//
+		// BE CAREFUL! Only the *_no_offset functions work properly on it, since
+		// the others (notably, _get_idx and thereby _get and _put) tend to
+		// depend on the bounds matching the data and the width/height being
+		// sensible.
+
+		mush_bounds *bounds = &cursor->box->bounds;
+		cursor->obeg = bounds->beg;
+
+		// Here we need to tessellate only with the boxes above cursor->box.
+		mush_bounds_tessellate1(bounds, pos, &MUSH_STATICAABB_BOUNDS);
+		for (size_t i = 0; i < cursor->box_idx; ++i)
+			if (mush_bounds_overlaps(bounds, &sp->boxen[i].bounds))
+				mush_bounds_tessellate1(bounds, pos, &sp->boxen[i].bounds);
+
+		cursor->rel_pos    = mushcoords_sub(pos, cursor->obeg);
+		cursor->rel_bounds =
+			(mush_bounds){mushcoords_sub(bounds->beg, cursor->obeg),
+			              mushcoords_sub(bounds->end, cursor->obeg)};
+		break;
+	}
+
+	default: assert (false);
+	}
 }
 #endif
