@@ -32,6 +32,13 @@ mushcell mush_staticaabb_get_no_offset(
 	return aabb->array[mush_staticaabb_get_idx_no_offset(p)];
 }
 
+void mush_staticaabb_put_no_offset(
+	mush_staticaabb* aabb, mushcoords p, mushcell c)
+{
+	assert (mush_staticaabb_contains(mushcoords_add(p, MUSH_STATICAABB_BEG)));
+	aabb->array[mush_staticaabb_get_idx_no_offset(p)] = c;
+}
+
 mushcell mush_staticaabb_getter_no_offset(const void* aabb, mushcoords c) {
 	return mush_staticaabb_get_no_offset(aabb, c);
 }
