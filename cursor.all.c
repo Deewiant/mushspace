@@ -102,9 +102,7 @@ static bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 #endif
 
 mushcell mushcursor_get(mushcursor* cursor) {
-#if MUSHSPACE_93
-	assert (mushcursor_in_box(cursor));
-#else
+#if !MUSHSPACE_93
 	if (!mushcursor_in_box(cursor)
 	 && !mushcursor_get_box(cursor, mushcursor_get_pos(cursor)))
 	{
@@ -115,6 +113,8 @@ mushcell mushcursor_get(mushcursor* cursor) {
 	return mushcursor_get_unsafe(cursor);
 }
 mushcell mushcursor_get_unsafe(mushcursor* cursor) {
+	assert (mushcursor_in_box(cursor));
+
 	mushspace *sp = cursor->space;
 
 	mushstats_add(sp->stats, MushStat_lookups, 1);
