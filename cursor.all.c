@@ -134,6 +134,17 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
 	assert (false);
 }
 
+void mushcursor_put(mushcursor* cursor, mushcell c) {
+#if !MUSHSPACE_93
+	if (!mushcursor_in_box(cursor)) {
+		mushcoords pos = mushcursor_get_pos(cursor);
+		if (!mushcursor_get_box(cursor, pos))
+			mushspace_put(cursor->space, pos, c);
+	}
+#endif
+	mushcursor_put_unsafe(cursor, c);
+}
+
 void mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 	assert (mushcursor_in_box(cursor));
 

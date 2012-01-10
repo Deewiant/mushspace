@@ -55,6 +55,7 @@ typedef struct mushcursor {
 #define mushcursor_get_pos     MUSHSPACE_CAT(mushcursor,_get_pos)
 #define mushcursor_get         MUSHSPACE_CAT(mushcursor,_get)
 #define mushcursor_get_unsafe  MUSHSPACE_CAT(mushcursor,_get_unsafe)
+#define mushcursor_put         MUSHSPACE_CAT(mushcursor,_put)
 #define mushcursor_put_unsafe  MUSHSPACE_CAT(mushcursor,_put_unsafe)
 #define mushcursor_recalibrate MUSHSPACE_CAT(mushcursor,_recalibrate)
 
@@ -66,6 +67,7 @@ mushcoords mushcursor_get_pos(const mushcursor*);
 
 mushcell mushcursor_get       (mushcursor*);
 mushcell mushcursor_get_unsafe(mushcursor*);
+void     mushcursor_put       (mushcursor*, mushcell);
 void     mushcursor_put_unsafe(mushcursor*, mushcell);
 
 void mushcursor_recalibrate(mushcursor*);
