@@ -61,6 +61,23 @@ mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 	assert (false);
 }
 
+void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
+	switch (MUSHCURSOR_MODE(cursor)) {
+	case MushCursorMode_static:
+		cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
+		return;
+#if !MUSHSPACE_93
+	case MushCursorMode_dynamic:
+		cursor->rel_pos = mushcoords_sub(pos, cursor->obeg);
+		return;
+	case MushCursorMode_bak:
+		cursor->actual_pos = pos;
+		return;
+#endif
+	}
+	assert (false);
+}
+
 static bool mushcursor_in_box(const mushcursor* cursor) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
