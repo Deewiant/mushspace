@@ -25,6 +25,7 @@ MUSH_DECL_CONST_DYN_ARRAY(mush_bounds)
 #define mush_bounds_can_fuse        MUSHSPACE_CAT(mush_bounds,_can_fuse)
 #define mush_bounds_tessellate      MUSHSPACE_CAT(mush_bounds,_tessellate)
 #define mush_bounds_tessellate1     MUSHSPACE_CAT(mush_bounds,_tessellate1)
+#define mush_bounds_ray_intersects  MUSHSPACE_CAT(mushcoords,_ray_intersects)
 #define mush_bounds_on_same_primary_axis \
 	MUSHSPACE_CAT(mush_bounds,_on_same_primary_axis)
 
@@ -61,4 +62,6 @@ void mush_bounds_tessellate(mush_bounds*, mushcoords, mush_carr_mush_bounds);
 // version exists to avoid heap allocation in some cases.
 void mush_bounds_tessellate1(mush_bounds*, mushcoords, const mush_bounds*);
 
+bool mush_bounds_ray_intersects(mushcoords, mushcoords,
+                                const mush_bounds*, mushucell*, mushcoords*);
 #endif
