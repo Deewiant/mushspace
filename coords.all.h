@@ -53,6 +53,7 @@ typedef union mushcoords {
 mushcoords mushcoords_add(mushcoords, mushcoords);
 mushcoords mushcoords_sub(mushcoords, mushcoords);
 
+void mushcoords_add_into(mushcoords*, mushcoords);
 void mushcoords_sub_into(mushcoords*, mushcoords);
 
 void mushcoords_max_into(mushcoords*, mushcoords);
