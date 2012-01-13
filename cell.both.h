@@ -24,14 +24,16 @@ typedef uint8_t mushucell;
 #define mushcell_sub_into mushcell_93_sub_into
 #define mushcell_space    mushcell_93_space
 
-#define MUSHCELL_MIN 0
-#define MUSHCELL_MAX UINT8_MAX
+#define MUSHCELL_MIN  0
+#define MUSHCELL_MAX  UINT8_MAX
+#define MUSHUCELL_MAX MUSHCELL_MAX
 #else
 typedef          long mushcell;
 typedef unsigned long mushucell;
 
-#define MUSHCELL_MIN LONG_MIN
-#define MUSHCELL_MAX LONG_MAX
+#define  MUSHCELL_MIN  LONG_MIN
+#define  MUSHCELL_MAX  LONG_MAX
+#define MUSHUCELL_MAX ULONG_MAX
 #endif
 
 // For things that range from 0 to MUSHSPACE_DIM or thereabouts.
