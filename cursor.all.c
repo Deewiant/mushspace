@@ -25,12 +25,12 @@ static void mushcursor_tessellate(mushcursor*, mushcoords);
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
-mushcursor* mushcursor_init(
-	mushspace* space, mushcoords pos, mushcoords delta, void* vp)
+int mushcursor_init(
+	mushspace* space, mushcoords pos, mushcoords delta, void** vp)
 {
-	mushcursor *cursor = vp ? vp : malloc(sizeof *cursor);
+	mushcursor *cursor = *vp ? *vp : (*vp = malloc(sizeof *cursor));
 	if (!cursor)
-		return NULL;
+		return MUSH_ERR_OOM;
 
 #if !MUSHSPACE_93
 	mushspace_add_invalidatee(space, mushcursor_recalibrate_void, cursor);
@@ -45,7 +45,7 @@ mushcursor* mushcursor_init(
 	if (!mushcursor_get_box(cursor, pos))
 		assert (false && "TODO");
 #endif
-	return cursor;
+	return MUSH_ERR_NONE;
 }
 
 mushcoords mushcursor_get_pos(const mushcursor* cursor) {

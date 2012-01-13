@@ -62,7 +62,7 @@ typedef struct mushcursor {
 
 extern const size_t mushcursor_sizeof;
 
-mushcursor* mushcursor_init(mushspace*, mushcoords, mushcoords, void*);
+int mushcursor_init(mushspace*, mushcoords, mushcoords, void**);
 
 mushcoords mushcursor_get_pos(const mushcursor*);
 void       mushcursor_set_pos(      mushcursor*, mushcoords);
