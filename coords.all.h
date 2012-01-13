@@ -59,6 +59,7 @@ void mushcoords_max_into(mushcoords*, mushcoords);
 void mushcoords_min_into(mushcoords*, mushcoords);
 
 #if !MUSHSPACE_93
+// "s" for "scalar".
 mushcoords mushcoords_muls(mushcoords, mushcell);
 
 mushcoords mushcoords_adds_clamped(mushcoords, mushcell);
