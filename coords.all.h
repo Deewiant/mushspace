@@ -38,6 +38,8 @@ typedef union mushcoords {
 #define mushcoords_add_into     MUSHSPACE_CAT(mushcoords,_add_into)
 #define mushcoords_sub_into     MUSHSPACE_CAT(mushcoords,_sub_into)
 #define mushcoords_equal        MUSHSPACE_CAT(mushcoords,_equal)
+#define mushcoords_adds         MUSHSPACE_CAT(mushcoords,_adds)
+#define mushcoords_subs         MUSHSPACE_CAT(mushcoords,_subs)
 #define mushcoords_adds_clamped MUSHSPACE_CAT(mushcoords,_adds_clamped)
 #define mushcoords_subs_clamped MUSHSPACE_CAT(mushcoords,_subs_clamped)
 #define mushcoords_max_into     MUSHSPACE_CAT(mushcoords,_max_into)
