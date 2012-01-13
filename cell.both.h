@@ -17,6 +17,7 @@ typedef uint8_t mushucell;
 #define mushcell_min_into mushcell_93_min_into
 #define mushcell_add      mushcell_93_add
 #define mushcell_sub      mushcell_93_sub
+#define mushcell_mul      mushcell_93_mul
 #define mushcell_inc      mushcell_93_inc
 #define mushcell_dec      mushcell_93_dec
 #define mushcell_add_into mushcell_93_add_into
@@ -47,6 +48,7 @@ void     mushcell_min_into(mushcell*, mushcell);
 // intended.
 mushcell mushcell_add (mushcell,  mushcell);
 mushcell mushcell_sub (mushcell,  mushcell);
+mushcell mushcell_mul (mushcell,  mushcell);
 mushcell mushcell_inc (mushcell);
 mushcell mushcell_dec (mushcell);
 void mushcell_add_into(mushcell*, mushcell);
