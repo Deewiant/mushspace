@@ -4,6 +4,7 @@
 #define MUSHSPACE_CELL_H
 
 #include <limits.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -65,5 +66,27 @@ mushcell mushcell_sub_clamped(mushcell, mushcell);
 
 // This doesn't really belong here but it's the best place for now.
 void mushcell_space(mushcell*, size_t);
+
+#if !MUSHSPACE_93
+// Mathy stuff used for ray intersection calculations, also somewhat
+// questionably belonging here.
+
+// Solves for x in the equation ax = b (mod 2^(sizeof(mushucell) * 8)), given a
+// and b. a must be nonzero.
+//
+// Returns false if there was no solution.
+//
+// If there is a solution, returns true. A solution is stored in *x.
+//
+// The second pointer parameter, "gcd_lg", holds the binary logarithm of the
+// number of solutions: that is, lg(gcd(a, 2^(sizeof(mushucell) * 8))). The
+// solution count іtself can be constructed by raising two to that power, since
+// it is guaranteed to be a power of two.
+//
+// Further solutions can be formed by adding 2^(sizeof(mushucell) * 8 - gcd_lg)
+// to the one solution given.
+bool mushucell_mod_div(mushucell a, mushucell b, mushucell* x,
+                       uint_fast8_t* gcd_lg);
+#endif
 
 #endif
