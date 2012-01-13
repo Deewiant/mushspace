@@ -42,6 +42,7 @@ void mushcoords_min_into(mushcoords* a, mushcoords b) {
 
 DEFINE_OP(add)
 DEFINE_OP(sub)
+DEFINE_OP(mul)
 
 #if !MUSHSPACE_93
 

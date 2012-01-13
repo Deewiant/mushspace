@@ -35,11 +35,14 @@ typedef union mushcoords {
 
 #define mushcoords_add          MUSHSPACE_CAT(mushcoords,_add)
 #define mushcoords_sub          MUSHSPACE_CAT(mushcoords,_sub)
+#define mushcoords_mul          MUSHSPACE_CAT(mushcoords,_mul)
 #define mushcoords_add_into     MUSHSPACE_CAT(mushcoords,_add_into)
 #define mushcoords_sub_into     MUSHSPACE_CAT(mushcoords,_sub_into)
+#define mushcoords_mul_into     MUSHSPACE_CAT(mushcoords,_mul_into)
 #define mushcoords_equal        MUSHSPACE_CAT(mushcoords,_equal)
 #define mushcoords_adds         MUSHSPACE_CAT(mushcoords,_adds)
 #define mushcoords_subs         MUSHSPACE_CAT(mushcoords,_subs)
+#define mushcoords_muls         MUSHSPACE_CAT(mushcoords,_muls)
 #define mushcoords_adds_clamped MUSHSPACE_CAT(mushcoords,_adds_clamped)
 #define mushcoords_subs_clamped MUSHSPACE_CAT(mushcoords,_subs_clamped)
 #define mushcoords_max_into     MUSHSPACE_CAT(mushcoords,_max_into)
@@ -56,6 +59,8 @@ void mushcoords_max_into(mushcoords*, mushcoords);
 void mushcoords_min_into(mushcoords*, mushcoords);
 
 #if !MUSHSPACE_93
+mushcoords mushcoords_muls(mushcoords, mushcell);
+
 mushcoords mushcoords_adds_clamped(mushcoords, mushcell);
 mushcoords mushcoords_subs_clamped(mushcoords, mushcell);
 
