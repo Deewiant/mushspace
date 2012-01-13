@@ -46,6 +46,16 @@ typedef struct mushspace {
 #endif
 } mushspace;
 
+// What kind of an area is the cursor in? Defined here because
+// mushspace_jump_to_box uses it.
+typedef enum MushCursorMode {
+	MushCursorMode_static,
+#if !MUSHSPACE_93
+	MushCursorMode_dynamic,
+	MushCursorMode_bak,
+#endif
+} MushCursorMode;
+
 #define mushspace_sizeof           MUSHSPACE_CAT(mushspace,_sizeof)
 #define mushspace_allocate         MUSHSPACE_CAT(mushspace,_allocate)
 #define mushspace_free             MUSHSPACE_CAT(mushspace,_free)
