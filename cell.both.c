@@ -20,9 +20,8 @@ mushcell mushcell_add(mushcell a, mushcell b) {
 mushcell mushcell_sub(mushcell a, mushcell b) {
 	return (mushcell)((mushucell)a - (mushucell)b);
 }
-mushcell mushcell_inc(mushcell n) {
-	return mushcell_add(n, 1);
-}
+mushcell mushcell_inc(mushcell n) { return mushcell_add(n, 1); }
+mushcell mushcell_dec(mushcell n) { return mushcell_sub(n, 1); }
 void mushcell_add_into(mushcell* a, mushcell b) { *a = mushcell_add(*a, b); }
 void mushcell_sub_into(mushcell* a, mushcell b) { *a = mushcell_sub(*a, b); }
 
