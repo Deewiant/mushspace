@@ -175,4 +175,44 @@ static mushucell mushucell_mod_inv(mushucell a) {
 	assert (x != 0);
 	return x;
 }
+
+uint_fast8_t mushucell_gcd_lg(mushucell n) {
+	assert (n != 0);
+
+	// We can abuse the two's complement representation of integers to do this
+	// in a clever way: the result we want is exactly the trailing zero bit
+	// count of n.
+
+#ifdef __GNUC__
+	if (sizeof(mushucell) == sizeof(unsigned))
+		return __builtin_clz(n);
+	if (sizeof(mushucell) == sizeof(unsigned long))
+		return __builtin_clzl(n);
+	if (sizeof(mushucell) == sizeof(unsigned long long))
+		return __builtin_clzll(n);
+#endif
+
+	// Odd numbers have a trivial gcd of 1.
+	if (n%2 != 0)
+		return 0;
+
+	// Algorithm adapted from:
+	//
+	// http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightBinSearch
+	// (Credits to Matt Whitlock and Andrew Shapira)
+	uint_fast8_t c = 1;
+
+	uint_fast8_t mask_bits = sizeof(mushucell) * 8 / 2;
+	mushucell mask = MUSHUCELL_MAX >> mask_bits;
+
+	while (mask > 1) {
+		if ((n & mask) == 0) {
+			n >>= mask_bits;
+			c += mask_bits;
+		}
+		mask_bits /= 2;
+		mask >>= mask_bits;
+	}
+	return c - (uint_fast8_t)(n & 1);
+}
 #endif // !MUSHSPACE_93

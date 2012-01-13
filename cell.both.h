@@ -87,6 +87,10 @@ void mushcell_space(mushcell*, size_t);
 // to the one solution given.
 bool mushucell_mod_div(mushucell a, mushucell b, mushucell* x,
                        uint_fast8_t* gcd_lg);
+
+// gcd(2^(sizeof(mushucell)*8), n) = 2^m: this returns m, i.e. the binary
+// logarithm of the gcd. Asserts if n is zero.
+uint_fast8_t mushucell_gcd_lg(mushucell n);
 #endif
 
 #endif
