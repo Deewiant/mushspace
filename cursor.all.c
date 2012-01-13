@@ -193,6 +193,24 @@ void mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 	assert (false);
 }
 
+void mushcursor_advance(mushcursor* cursor, mushcoords delta) {
+#if !MUSHSPACE_93
+	if (MUSHCURSOR_MODE(cursor) == MushCursorMode_bak)
+		mushcoords_add_into(&cursor->actual_pos, delta);
+	else
+#endif
+		mushcoords_add_into(&cursor->rel_pos, delta);
+}
+
+void mushcursor_retreat(mushcursor* cursor, mushcoords delta) {
+#if !MUSHSPACE_93
+	if (MUSHCURSOR_MODE(cursor) == MushCursorMode_bak)
+		mushcoords_sub_into(&cursor->actual_pos, delta);
+	else
+#endif
+		mushcoords_sub_into(&cursor->rel_pos, delta);
+}
+
 void mushcursor_recalibrate(mushcursor* cursor) {
 #if MUSHSPACE_93
 	(void)cursor;
