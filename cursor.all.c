@@ -39,6 +39,7 @@ mushcursor* mushcursor_init(
 	cursor->space = space;
 
 #if MUSHSPACE_93
+	(void)delta;
 	cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
 #else
 	if (!mushcursor_get_box(cursor, pos))
