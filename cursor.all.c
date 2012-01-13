@@ -42,8 +42,13 @@ int mushcursor_init(
 	(void)delta;
 	cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
 #else
-	if (!mushcursor_get_box(cursor, pos))
-		assert (false && "TODO");
+	if (!mushcursor_get_box(cursor, pos)) {
+		if (!mushspace_jump_to_box(space, &pos, delta, &cursor->mode,
+		                           &cursor->box, &cursor->box_idx))
+			return MUSH_ERR_INFINITE_LOOP;
+
+		mushcursor_tessellate(cursor, pos);
+	}
 #endif
 	return MUSH_ERR_NONE;
 }
