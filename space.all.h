@@ -71,6 +71,7 @@ typedef enum MushCursorMode {
 #define mushspace_put_textual      MUSHSPACE_CAT(mushspace,_put_textual)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_find_box_and_idx MUSHSPACE_CAT(mushspace,_find_box_and_idx)
+#define mushspace_jump_to_box      MUSHSPACE_CAT(mushspace,_jump_to_box)
 
 extern const size_t mushspace_sizeof;
 
@@ -122,6 +123,9 @@ int mushspace_put_textual(const mushspace*, mushcoords, mushcoords,
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
 
 mush_aabb* mushspace_find_box_and_idx(const mushspace*, mushcoords, size_t*);
+
+bool mushspace_jump_to_box(mushspace*, mushcoords*, mushcoords,
+                           MushCursorMode*, mush_aabb**, size_t*);
 #endif
 
 #endif
