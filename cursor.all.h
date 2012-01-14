@@ -51,6 +51,7 @@ typedef struct mushcursor {
 #define mushcursor_put_unsafe  MUSHSPACE_CAT(mushcursor,_put_unsafe)
 #define mushcursor_advance     MUSHSPACE_CAT(mushcursor,_advance)
 #define mushcursor_retreat     MUSHSPACE_CAT(mushcursor,_retreat)
+#define mushcursor_skip_spaces MUSHSPACE_CAT(mushcursor,_skip_spaces)
 #define mushcursor_recalibrate MUSHSPACE_CAT(mushcursor,_recalibrate)
 
 extern const size_t mushcursor_sizeof;
@@ -67,6 +68,8 @@ void     mushcursor_put_unsafe(mushcursor*, mushcell);
 
 void mushcursor_advance(mushcursor*, mushcoords);
 void mushcursor_retreat(mushcursor*, mushcoords);
+
+int mushcursor_skip_spaces(mushcursor*, mushcoords);
 
 void mushcursor_recalibrate(mushcursor*);
 
