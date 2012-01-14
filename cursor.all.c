@@ -19,7 +19,9 @@
 static bool mushcursor_in_box(const mushcursor*);
 static bool mushcursor_skip_spaces_here(mushcursor*, mushcoords);
 
-#if !MUSHSPACE_93
+#if MUSHSPACE_93
+static void mushcursor2_93_wrap(mushcursor*);
+#else
 static bool mushcursor_get_box(mushcursor*, mushcoords);
 static void mushcursor_recalibrate_void(void*);
 static void mushcursor_tessellate(mushcursor*, mushcoords);
@@ -242,7 +244,12 @@ static bool mushcursor_skip_spaces_here(mushcursor* cursor, mushcoords delta) {
 	return true;
 }
 
-#if !MUSHSPACE_93
+#if MUSHSPACE_93
+static void mushcursor2_93_wrap(mushcursor* cursor) {
+	cursor->rel_pos.x %= MUSH_STATICAABB_SIZE.x;
+	cursor->rel_pos.y %= MUSH_STATICAABB_SIZE.y;
+}
+#else
 static void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 	mushspace *sp = cursor->space;
 
