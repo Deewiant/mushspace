@@ -257,6 +257,48 @@ find_box:;
 	return MUSH_ERR_NONE;
 }
 
+int mushcursor_skip_to_last_space(mushcursor* cursor, mushcoords delta) {
+#if !MUSHSPACE_93
+	mushcoords pos;
+#endif
+
+	if (!mushcursor_in_box(cursor)) {
+#if MUSHSPACE_93
+		goto wrap;
+#else
+		// We should retreat only if we saw at least one space, so don't jump
+		// into the loop just because we fell out of the box: that doesn't
+		// necessarily mean a space.
+		if (!mushcursor_get_box(cursor, pos = mushcursor_get_pos(cursor)))
+			goto jump_to_box;
+#endif
+	}
+
+	if (mushcursor_get_unsafe(cursor) != ' ')
+		return MUSH_ERR_NONE;
+
+	while (!mushcursor_skip_spaces_here(cursor, delta)) {
+#if MUSHSPACE_93
+wrap:
+		mushcursor2_93_wrap(cursor);
+#else
+		if (mushcursor_get_box(cursor, pos = mushcursor_get_pos(cursor)))
+			continue;
+
+jump_to_box:
+		if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
+		                           &cursor->box, &cursor->box_idx))
+			return MUSH_ERR_INFINITE_LOOP;
+
+		mushcursor_tessellate(cursor, pos);
+#endif
+	}
+	assert (mushcursor_get(cursor) != ' ');
+	mushcursor_retreat(cursor, delta);
+	assert (mushcursor_get(cursor) == ' ');
+	return MUSH_ERR_NONE;
+}
+
 static bool mushcursor_skip_spaces_here(mushcursor* cursor, mushcoords delta) {
 	assert (mushcursor_in_box(cursor));
 
