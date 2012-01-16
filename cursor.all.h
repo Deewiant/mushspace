@@ -59,6 +59,8 @@ typedef struct mushcursor {
 
 #if MUSHSPACE_93
 #define mushcursor_skip_markers mushcursor2_93_skip_markers_98
+
+void mushcursor2_93_wrap(mushcursor*);
 #else
 #define mushcursor_skip_markers MUSHSPACE_CAT(mushcursor,_skip_markers)
 #endif
