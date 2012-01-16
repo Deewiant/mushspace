@@ -37,8 +37,10 @@ static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
 \
 	if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode, \
 	                           &cursor->box, &cursor->box_idx)) \
+	{ \
+		mushcursor_set_infloop_pos(cursor, pos); \
 		return MUSH_ERR_INFINITE_LOOP; \
-\
+	} \
 	mushcursor_tessellate(cursor, pos); \
 } while (0)
 
@@ -70,8 +72,10 @@ int mushcursor_init(
 	if (!mushcursor_get_box(cursor, pos)) {
 		if (!mushspace_jump_to_box(space, &pos, delta, &cursor->mode,
 		                           &cursor->box, &cursor->box_idx))
+		{
+			mushcursor_set_infloop_pos(cursor, pos);
 			return MUSH_ERR_INFINITE_LOOP;
-
+		}
 		mushcursor_tessellate(cursor, pos);
 	}
 #endif
@@ -325,8 +329,10 @@ wrap:
 jump_to_box:
 		if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
 		                           &cursor->box, &cursor->box_idx))
+		{
+			mushcursor_set_infloop_pos(cursor, pos);
 			return MUSH_ERR_INFINITE_LOOP;
-
+		}
 		mushcursor_tessellate(cursor, pos);
 #endif
 	}
