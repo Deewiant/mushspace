@@ -41,18 +41,19 @@ typedef struct mushcursor {
 	};
 } mushcursor;
 
-#define mushcursor_sizeof      MUSHSPACE_CAT(mushcursor,_sizeof)
-#define mushcursor_init        MUSHSPACE_CAT(mushcursor,_init)
-#define mushcursor_get_pos     MUSHSPACE_CAT(mushcursor,_get_pos)
-#define mushcursor_set_pos     MUSHSPACE_CAT(mushcursor,_set_pos)
-#define mushcursor_get         MUSHSPACE_CAT(mushcursor,_get)
-#define mushcursor_get_unsafe  MUSHSPACE_CAT(mushcursor,_get_unsafe)
-#define mushcursor_put         MUSHSPACE_CAT(mushcursor,_put)
-#define mushcursor_put_unsafe  MUSHSPACE_CAT(mushcursor,_put_unsafe)
-#define mushcursor_advance     MUSHSPACE_CAT(mushcursor,_advance)
-#define mushcursor_retreat     MUSHSPACE_CAT(mushcursor,_retreat)
-#define mushcursor_skip_spaces MUSHSPACE_CAT(mushcursor,_skip_spaces)
-#define mushcursor_recalibrate MUSHSPACE_CAT(mushcursor,_recalibrate)
+#define mushcursor_sizeof          MUSHSPACE_CAT(mushcursor,_sizeof)
+#define mushcursor_init            MUSHSPACE_CAT(mushcursor,_init)
+#define mushcursor_get_pos         MUSHSPACE_CAT(mushcursor,_get_pos)
+#define mushcursor_set_pos         MUSHSPACE_CAT(mushcursor,_set_pos)
+#define mushcursor_get             MUSHSPACE_CAT(mushcursor,_get)
+#define mushcursor_get_unsafe      MUSHSPACE_CAT(mushcursor,_get_unsafe)
+#define mushcursor_put             MUSHSPACE_CAT(mushcursor,_put)
+#define mushcursor_put_unsafe      MUSHSPACE_CAT(mushcursor,_put_unsafe)
+#define mushcursor_advance         MUSHSPACE_CAT(mushcursor,_advance)
+#define mushcursor_retreat         MUSHSPACE_CAT(mushcursor,_retreat)
+#define mushcursor_skip_spaces     MUSHSPACE_CAT(mushcursor,_skip_spaces)
+#define mushcursor_skip_semicolons MUSHSPACE_CAT(mushcursor,_skip_semicolons)
+#define mushcursor_recalibrate     MUSHSPACE_CAT(mushcursor,_recalibrate)
 #define mushcursor_skip_to_last_space \
 	MUSHSPACE_CAT(mushcursor,_skip_to_last_space)
 
@@ -71,6 +72,7 @@ void     mushcursor_put_unsafe(mushcursor*, mushcell);
 void mushcursor_advance(mushcursor*, mushcoords);
 void mushcursor_retreat(mushcursor*, mushcoords);
 
+int mushcursor_skip_semicolons   (mushcursor*, mushcoords);
 int mushcursor_skip_spaces       (mushcursor*, mushcoords);
 int mushcursor_skip_to_last_space(mushcursor*, mushcoords);
 

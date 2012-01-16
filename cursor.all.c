@@ -313,6 +313,31 @@ static bool mushcursor_skip_spaces_here(mushcursor* cursor, mushcoords delta) {
 	return true;
 }
 
+int mushcursor_skip_semicolons(mushcursor* cursor, mushcoords delta) {
+	if (!mushcursor_in_box(cursor))
+		goto find_box;
+
+	bool in_mid = false;
+	while (!mushcursor_skip_semicolons_here(cursor, delta, &in_mid)) {
+find_box:;
+#if MUSHSPACE_93
+		mushcursor2_93_wrap(cursor);
+#else
+		mushcoords pos = mushcursor_get_pos(cursor);
+		if (mushcursor_get_box(cursor, pos))
+			continue;
+
+		if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
+		                           &cursor->box, &cursor->box_idx))
+			return MUSH_ERR_INFINITE_LOOP;
+
+		mushcursor_tessellate(cursor, pos);
+#endif
+	}
+	assert (mushcursor_get(cursor) != ';');
+	return MUSH_ERR_NONE;
+}
+
 static bool mushcursor_skip_semicolons_here(
 	mushcursor* cursor, mushcoords delta, bool* in_mid)
 {
