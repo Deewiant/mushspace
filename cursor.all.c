@@ -15,9 +15,12 @@
 #define mushcursor_recalibrate_void MUSHSPACE_CAT(mushcursor,_recalibrate_void)
 #define mushcursor_skip_spaces_here MUSHSPACE_CAT(mushcursor,_skip_spaces_here)
 #define mushcursor_tessellate       MUSHSPACE_CAT(mushcursor,_tessellate)
+#define mushcursor_skip_semicolons_here \
+	MUSHSPACE_CAT(mushcursor,_skip_semicolons_here)
 
 static bool mushcursor_in_box(const mushcursor*);
-static bool mushcursor_skip_spaces_here(mushcursor*, mushcoords);
+static bool mushcursor_skip_spaces_here    (mushcursor*, mushcoords);
+static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
 
 #if MUSHSPACE_93
 static void mushcursor2_93_wrap(mushcursor*);
@@ -306,6 +309,33 @@ static bool mushcursor_skip_spaces_here(mushcursor* cursor, mushcoords delta) {
 		mushcursor_advance(cursor, delta);
 		if (!mushcursor_in_box(cursor))
 			return false;
+	}
+	return true;
+}
+
+static bool mushcursor_skip_semicolons_here(
+	mushcursor* cursor, mushcoords delta, bool* in_mid)
+{
+	assert (mushcursor_in_box(cursor));
+
+	if (*in_mid)
+		goto continue_prev;
+
+	while (mushcursor_get_unsafe(cursor) == ';') {
+		do {
+			mushcursor_advance(cursor, delta);
+			if (!mushcursor_in_box(cursor)) {
+				*in_mid = true;
+				return false;
+			}
+continue_prev:;
+		} while (mushcursor_get_unsafe(cursor) != ';');
+
+		mushcursor_advance(cursor, delta);
+		if (!mushcursor_in_box(cursor)) {
+			*in_mid = false;
+			return false;
+		}
 	}
 	return true;
 }
