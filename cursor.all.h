@@ -57,6 +57,12 @@ typedef struct mushcursor {
 #define mushcursor_skip_to_last_space \
 	MUSHSPACE_CAT(mushcursor,_skip_to_last_space)
 
+#if MUSHSPACE_93
+#define mushcursor_skip_markers mushcursor2_93_skip_markers_98
+#else
+#define mushcursor_skip_markers MUSHSPACE_CAT(mushcursor,_skip_markers)
+#endif
+
 extern const size_t mushcursor_sizeof;
 
 int mushcursor_init(mushspace*, mushcoords, mushcoords, void**);
@@ -72,6 +78,7 @@ void     mushcursor_put_unsafe(mushcursor*, mushcell);
 void mushcursor_advance(mushcursor*, mushcoords);
 void mushcursor_retreat(mushcursor*, mushcoords);
 
+int mushcursor_skip_markers      (mushcursor*, mushcoords);
 int mushcursor_skip_semicolons   (mushcursor*, mushcoords);
 int mushcursor_skip_spaces       (mushcursor*, mushcoords);
 int mushcursor_skip_to_last_space(mushcursor*, mushcoords);
