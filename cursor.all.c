@@ -22,6 +22,27 @@ static bool mushcursor_in_box(const mushcursor*);
 static bool mushcursor_skip_spaces_here    (mushcursor*, mushcoords);
 static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
 
+#ifdef MUSH_ENABLE_INFINITE_LOOP_DETECTION
+
+#define INFLOOP_DECLS \
+	mushcoords first_exit; \
+	bool is_first_exit = true;
+
+#define INFLOOP_DETECT(pos) do { \
+	if (is_first_exit) { \
+		is_first_exit = false; \
+		first_exit = pos; \
+	} else if (mushcoords_equal(pos, first_exit)) { \
+		mushcursor_set_infloop_pos(cursor, pos); \
+		return MUSH_ERR_INFINITE_LOOP; \
+	} \
+} while (0)
+
+#else
+#define INFLOOP_DECLS
+#define INFLOOP_DETECT(pos)
+#endif
+
 #if MUSHSPACE_93
 
 #define FIND_BOX(cursor, delta) do { \
