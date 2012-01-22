@@ -262,6 +262,14 @@ bool mush_bounds_ray_intersects(
 	// when everything overflows.
 	mushdim axis2 = 0;
 
+	// Not used yet, but defined here so that we don't goto across the
+	// initialization: the move count to be written to *pmove_count.
+	//
+	// The move count can plausibly be MUSHUCELL_MAX so we need an auxiliary
+	// boolean to keep track of whether we have a solution.
+	mushucell best_move_count;
+	bool       got_move_count = false;
+
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (!delta.v[i])
 			continue;
@@ -324,11 +332,6 @@ bool mush_bounds_ray_intersects(
 			goto method2;
 		}
 	}
-
-	// The move count can plausibly be MUSHUCELL_MAX so we need an auxiliary
-	// boolean to keep track of whether we have a solution.
-	mushucell best_move_count;
-	bool       got_move_count = false;
 
 	// Now we know which method is cheaper, so use that one and get working. If
 	// they're equal, we can pick either. Method 2 seems computationally a bit
