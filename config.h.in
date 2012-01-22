@@ -3,8 +3,7 @@
 #ifndef MUSH_CONFIG_H
 #define MUSH_CONFIG_H
 
-#define MUSH_ENABLE_STATS_@STATS@
-#ifdef MUSH_ENABLE_STATS_y
+#if '@STATS@' == 'y'
 #define MUSH_ENABLE_STATS
 #endif
 
