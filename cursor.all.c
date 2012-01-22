@@ -21,6 +21,7 @@
 static bool mushcursor_in_box(const mushcursor*);
 static bool mushcursor_skip_spaces_here    (mushcursor*, mushcoords);
 static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
+static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 
 #ifdef MUSH_ENABLE_INFINITE_LOOP_DETECTION
 
@@ -68,7 +69,6 @@ static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
 static bool mushcursor_get_box(mushcursor*, mushcoords);
 static void mushcursor_recalibrate_void(void*);
 static void mushcursor_tessellate(mushcursor*, mushcoords);
-static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
@@ -469,13 +469,15 @@ static void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 	default: assert (false);
 	}
 }
+#endif
 
 static void mushcursor_set_infloop_pos(mushcursor* cursor, mushcoords pos) {
+#if !MUSHSPACE_93
 	// Since we are "nowhere", we can set an arbitrary mode: any functionality
 	// that cares about the mode handles the not-in-a-box case anyway. To save
 	// simply the position as-is (no need to mess with relative coordinates),
 	// use the bak mode.
 	cursor->mode = MushCursorMode_bak;
+#endif
 	mushcursor_set_pos(cursor, pos);
 }
-#endif
