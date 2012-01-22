@@ -350,12 +350,15 @@ int mushcursor_skip_to_last_space(mushcursor* cursor, mushcoords delta) {
 	while (!mushcursor_skip_spaces_here(cursor, delta)) {
 #if MUSHSPACE_93
 wrap:
+		INFLOOP_DETECT(cursor->rel_pos);
 		mushcursor2_93_wrap(cursor);
 #else
 		if (mushcursor_get_box(cursor, pos = mushcursor_get_pos(cursor)))
 			continue;
 
 jump_to_box:
+		INFLOOP_DETECT(pos);
+
 		if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
 		                           &cursor->box, &cursor->box_idx))
 		{
