@@ -39,9 +39,15 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 	} \
 } while (0)
 
+#define INFLOOP_CHECK_DELTA do { \
+	if (mushcoords_equal(delta, MUSHCOORDS(0,0,0))) \
+		return MUSH_ERR_INFINITE_LOOP; \
+} while (0)
+
 #else
 #define INFLOOP_DECLS
 #define INFLOOP_DETECT(pos)
+#define INFLOOP_CHECK_DELTA
 #endif
 
 #if MUSHSPACE_93
