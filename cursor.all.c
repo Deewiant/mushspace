@@ -47,6 +47,7 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 #if MUSHSPACE_93
 
 #define FIND_BOX(cursor, delta) do { \
+	INFLOOP_DETECT(cursor->rel_pos); \
 	mushcursor2_93_wrap(cursor); \
 } while (0)
 
@@ -56,6 +57,8 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 	mushcoords pos = mushcursor_get_pos(cursor); \
 	if (mushcursor_get_box(cursor, pos)) \
 		continue; \
+\
+	INFLOOP_DETECT(pos); \
 \
 	if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode, \
 	                           &cursor->box, &cursor->box_idx)) \
