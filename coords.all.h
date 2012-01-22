@@ -59,14 +59,14 @@ void mushcoords_sub_into(mushcoords*, mushcoords);
 void mushcoords_max_into(mushcoords*, mushcoords);
 void mushcoords_min_into(mushcoords*, mushcoords);
 
+bool mushcoords_equal(mushcoords, mushcoords);
+
 #if !MUSHSPACE_93
 // "s" for "scalar".
 mushcoords mushcoords_muls(mushcoords, mushcell);
 
 mushcoords mushcoords_adds_clamped(mushcoords, mushcell);
 mushcoords mushcoords_subs_clamped(mushcoords, mushcell);
-
-bool mushcoords_equal(mushcoords, mushcoords);
 
 mushcoords mushcoords_get_end_of_contiguous_range(
 	mushcoords  end_pt,
