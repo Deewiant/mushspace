@@ -1077,7 +1077,8 @@ static mush_aabb* mushspace_really_place_box(mushspace* space, mush_aabb* aabb)
 	subsumees.ptr      = malloc(space->box_count * sizeof *subsumees.ptr);
 	size_t *candidates = malloc(space->box_count * sizeof *candidates);
 
-	if (!subsumees.ptr || !candidates) {
+	// If space->box_count is zero, malloc can validly return NULL.
+	if ((!subsumees.ptr || !candidates) && space->box_count != 0) {
 		free(subsumees.ptr);
 		free(candidates);
 		return NULL;
