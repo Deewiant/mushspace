@@ -875,7 +875,7 @@ static bool mushspace_get_box_along_recent_line_for(
 
 	// Find the axis along which the first two recent placements are aligned, if
 	// any, and note whether it was along the positive or negative direction.
-	bool positive;
+	bool positive = *&positive;
 	mushdim axis = MUSHSPACE_DIM;
 
 	for (mushdim d = 0; d < MUSHSPACE_DIM; ++d) {
@@ -959,7 +959,7 @@ static bool mushspace_extend_big_sequence_start_for(
 	//
 	// Where B are boxes, s is space->big_sequence_start, and c is c.
 
-	bool positive;
+	bool positive = *&positive;
 	mushdim axis = MUSHSPACE_DIM;
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
@@ -1021,7 +1021,7 @@ static bool mushspace_extend_first_placed_big_for(
 	(void)space; (void)c; (void)last; (void)aabb;
 	return false;
 #else
-	bool positive;
+	bool positive = *&positive;
 	mushdim axis = MUSHSPACE_DIM;
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
