@@ -7,4 +7,8 @@
 #define MUSH_ENABLE_STATS
 #endif
 
+#if '@INFINITE_LOOP_DETECTION@' == 'y'
+#define MUSH_ENABLE_INFINITE_LOOP_DETECTION
+#endif
+
 #endif
