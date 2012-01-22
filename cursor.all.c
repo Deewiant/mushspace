@@ -280,6 +280,8 @@ static void mushcursor_recalibrate_void(void* cursor) {
 #endif
 
 int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta) {
+	INFLOOP_DECLS;
+
 	if (!mushcursor_in_box(cursor))
 		goto find_box;
 
@@ -309,6 +311,8 @@ semicolon:;
 }
 
 int mushcursor_skip_spaces(mushcursor* cursor, mushcoords delta) {
+	INFLOOP_DECLS;
+
 	if (!mushcursor_in_box(cursor))
 		goto find_box;
 
@@ -323,6 +327,7 @@ int mushcursor_skip_to_last_space(mushcursor* cursor, mushcoords delta) {
 #if !MUSHSPACE_93
 	mushcoords pos;
 #endif
+	INFLOOP_DECLS;
 
 	if (!mushcursor_in_box(cursor)) {
 #if MUSHSPACE_93
@@ -375,6 +380,8 @@ static bool mushcursor_skip_spaces_here(mushcursor* cursor, mushcoords delta) {
 }
 
 int mushcursor_skip_semicolons(mushcursor* cursor, mushcoords delta) {
+	INFLOOP_DECLS;
+
 	if (!mushcursor_in_box(cursor))
 		goto find_box;
 
