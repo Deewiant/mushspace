@@ -216,18 +216,18 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
 	assert (false);
 }
 
-void mushcursor_put(mushcursor* cursor, mushcell c) {
+int mushcursor_put(mushcursor* cursor, mushcell c) {
 #if !MUSHSPACE_93
 	if (!mushcursor_in_box(cursor)) {
 		mushcoords pos = mushcursor_get_pos(cursor);
 		if (!mushcursor_get_box(cursor, pos))
-			mushspace_put(cursor->space, pos, c);
+			return mushspace_put(cursor->space, pos, c);
 	}
 #endif
-	mushcursor_put_unsafe(cursor, c);
+	return mushcursor_put_unsafe(cursor, c);
 }
 
-void mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
+int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 	assert (mushcursor_in_box(cursor));
 
 	mushspace *sp = cursor->space;
@@ -237,16 +237,15 @@ void mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
 		mush_staticaabb_put_no_offset(STATIC_BOX(sp), cursor->rel_pos, c);
-		return;
+		return MUSH_ERR_NONE;
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
 		mush_aabb_put_no_offset(cursor->box, cursor->rel_pos, c);
-		return;
+		return MUSH_ERR_NONE;
 
 	case MushCursorMode_bak:
-		mush_bakaabb_put(&sp->bak, cursor->actual_pos, c);
-		return;
+		return mush_bakaabb_put(&sp->bak, cursor->actual_pos, c);
 #endif
 	}
 	assert (false);

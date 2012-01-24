@@ -74,8 +74,8 @@ void       mushcursor_set_pos(      mushcursor*, mushcoords);
 
 mushcell mushcursor_get       (mushcursor*);
 mushcell mushcursor_get_unsafe(mushcursor*);
-void     mushcursor_put       (mushcursor*, mushcell);
-void     mushcursor_put_unsafe(mushcursor*, mushcell);
+int      mushcursor_put       (mushcursor*, mushcell);
+int      mushcursor_put_unsafe(mushcursor*, mushcell);
 
 void mushcursor_advance(mushcursor*, mushcoords);
 void mushcursor_retreat(mushcursor*, mushcoords);
