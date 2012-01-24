@@ -196,6 +196,7 @@ mushcell mushcursor_get(mushcursor* cursor) {
 	 && !mushcursor_get_box(cursor, mushcursor_get_pos(cursor)))
 	{
 		mushstats_add(cursor->space->stats, MushStat_lookups, 1);
+		DEBUG_CHECK(cursor, ' ');
 		return ' ';
 	}
 #endif
@@ -208,27 +209,36 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
 
 	mushstats_add(sp->stats, MushStat_lookups, 1);
 
+	mushcell c;
+
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		return mush_staticaabb_get_no_offset(STATIC_BOX(sp), cursor->rel_pos);
+		c = mush_staticaabb_get_no_offset(STATIC_BOX(sp), cursor->rel_pos);
+		break;
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
-		return mush_aabb_get_no_offset(cursor->box, cursor->rel_pos);
+		c = mush_aabb_get_no_offset(cursor->box, cursor->rel_pos);
+		break;
 
 	case MushCursorMode_bak:
-		return mush_bakaabb_get(&sp->bak, cursor->actual_pos);
+		c = mush_bakaabb_get(&sp->bak, cursor->actual_pos);
+		break;
 #endif
 	}
-	assert (false);
+	DEBUG_CHECK(cursor, c);
+	return c;
 }
 
 int mushcursor_put(mushcursor* cursor, mushcell c) {
 #if !MUSHSPACE_93
 	if (!mushcursor_in_box(cursor)) {
 		mushcoords pos = mushcursor_get_pos(cursor);
-		if (!mushcursor_get_box(cursor, pos))
-			return mushspace_put(cursor->space, pos, c);
+		if (!mushcursor_get_box(cursor, pos)) {
+			int ret = mushspace_put(cursor->space, pos, c);
+			DEBUG_CHECK(cursor, c);
+			return ret;
+		}
 	}
 #endif
 	return mushcursor_put_unsafe(cursor, c);
@@ -241,21 +251,27 @@ int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 
 	mushstats_add(sp->stats, MushStat_assignments, 1);
 
+	int ret;
+
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
 		mush_staticaabb_put_no_offset(STATIC_BOX(sp), cursor->rel_pos, c);
-		return MUSH_ERR_NONE;
+		ret = MUSH_ERR_NONE;
+		break;
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
 		mush_aabb_put_no_offset(cursor->box, cursor->rel_pos, c);
-		return MUSH_ERR_NONE;
+		ret = MUSH_ERR_NONE;
+		break;
 
 	case MushCursorMode_bak:
-		return mush_bakaabb_put(&sp->bak, cursor->actual_pos, c);
+		ret = mush_bakaabb_put(&sp->bak, cursor->actual_pos, c);
+		break;
 #endif
 	}
-	assert (false);
+	DEBUG_CHECK(cursor, c);
+	return ret;
 }
 
 void mushcursor_advance(mushcursor* cursor, mushcoords delta) {
