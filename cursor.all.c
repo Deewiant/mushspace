@@ -50,6 +50,13 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 #define INFLOOP_CHECK_DELTA
 #endif
 
+#ifdef MUSH_ENABLE_EXPENSIVE_CURSOR_DEBUGGING
+#define DEBUG_CHECK(cursor, c) \
+	assert (mushspace_get(cursor->space, mushcursor_get_pos(cursor)) == c)
+#else
+#define DEBUG_CHECK(cursor, c)
+#endif
+
 #if MUSHSPACE_93
 
 #define FIND_BOX(cursor, delta, error_code) do { \
