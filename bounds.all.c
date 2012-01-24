@@ -125,6 +125,7 @@ void mush_bounds_tessellate1(
 	mush_bounds* bounds, mushcoords pos, const mush_bounds* avoid)
 {
 	assert (mush_bounds_contains(bounds, pos));
+	assert (mush_bounds_overlaps(bounds, avoid));
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		// This could be improved, consider for instance the bottommost box in

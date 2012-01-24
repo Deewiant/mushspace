@@ -58,8 +58,12 @@ bool mush_bounds_can_fuse(const mush_bounds*, const mush_bounds*);
 // course, be already contained between the beg and end.
 void mush_bounds_tessellate(mush_bounds*, mushcoords, mush_carr_mush_bounds);
 
-// Since the algorithm is currently just a fold over the boxes, this simpler
-// version exists to avoid heap allocation in some cases.
+// Since the algorithm is (currently) just a fold over the boxes, this simpler
+// version exists to simplify usage in some cases.
+//
+// It requires that the given bounds overlap with the area to be avoided. This
+// is because there's no sense in avoiding part of an axis just because there's
+// a non-overlapping box there.
 void mush_bounds_tessellate1(mush_bounds*, mushcoords, const mush_bounds*);
 
 bool mush_bounds_ray_intersects(mushcoords, mushcoords,
