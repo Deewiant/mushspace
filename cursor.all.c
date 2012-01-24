@@ -500,9 +500,9 @@ static void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 
 		// Here we need to tessellate only with the boxes above cursor->box.
 		mush_bounds_tessellate1(bounds, pos, &MUSH_STATICAABB_BOUNDS);
-		for (size_t i = 0; i < cursor->box_idx; ++i)
-			if (mush_bounds_overlaps(bounds, &sp->boxen[i].bounds))
-				mush_bounds_tessellate1(bounds, pos, &sp->boxen[i].bounds);
+		mush_bounds_tessellate(bounds, pos,
+			(mush_carr_mush_bounds)
+				{(const mush_bounds*)sp->boxen, cursor->box_idx});
 
 		cursor->rel_pos    = mushcoords_sub(pos, cursor->obeg);
 		cursor->rel_bounds =
