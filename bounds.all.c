@@ -118,7 +118,8 @@ void mush_bounds_tessellate(
 	assert (mush_bounds_contains(bounds, pos));
 
 	for (size_t i = 0; i < bs.len; ++i)
-		mush_bounds_tessellate1(bounds, pos, &bs.ptr[i]);
+		if (mush_bounds_overlaps(bounds, &bs.ptr[i]))
+			mush_bounds_tessellate1(bounds, pos, &bs.ptr[i]);
 }
 void mush_bounds_tessellate1(
 	mush_bounds* bounds, mushcoords pos, const mush_bounds* avoid)
