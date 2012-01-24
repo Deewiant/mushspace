@@ -35,13 +35,13 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 		first_exit = pos; \
 	} else if (mushcoords_equal(pos, first_exit)) { \
 		mushcursor_set_infloop_pos(cursor, pos); \
-		return MUSH_ERR_INFINITE_LOOP; \
+		return MUSH_ERR_INFINITE_LOOP_SPACES; \
 	} \
 } while (0)
 
 #define INFLOOP_CHECK_DELTA do { \
 	if (mushcoords_equal(delta, MUSHCOORDS(0,0,0))) \
-		return MUSH_ERR_INFINITE_LOOP; \
+		return MUSH_ERR_INFINITE_LOOP_SPACES; \
 } while (0)
 
 #else
@@ -52,14 +52,14 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 
 #if MUSHSPACE_93
 
-#define FIND_BOX(cursor, delta) do { \
+#define FIND_BOX(cursor, delta, error_code) do { \
 	INFLOOP_DETECT(cursor->rel_pos); \
 	mushcursor2_93_wrap(cursor); \
 } while (0)
 
 #else
 
-#define FIND_BOX(cursor, delta) do { \
+#define FIND_BOX(cursor, delta, error_code) do { \
 	mushcoords pos = mushcursor_get_pos(cursor); \
 	if (mushcursor_get_box(cursor, pos)) \
 		continue; \
@@ -70,7 +70,7 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 	                           &cursor->box, &cursor->box_idx)) \
 	{ \
 		mushcursor_set_infloop_pos(cursor, pos); \
-		return MUSH_ERR_INFINITE_LOOP; \
+		return error_code; \
 	} \
 	mushcursor_tessellate(cursor, pos); \
 } while (0)
@@ -104,7 +104,7 @@ int mushcursor_init(
 		                           &cursor->box, &cursor->box_idx))
 		{
 			mushcursor_set_infloop_pos(cursor, pos);
-			return MUSH_ERR_INFINITE_LOOP;
+			return MUSH_ERR_INFINITE_LOOP_SPACES;
 		}
 		mushcursor_tessellate(cursor, pos);
 	}
@@ -302,7 +302,7 @@ int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta) {
 
 	do {
 		while (!mushcursor_skip_spaces_here(cursor, delta))
-			find_box: FIND_BOX(cursor, delta);
+			find_box: FIND_BOX(cursor, delta, MUSH_ERR_INFINITE_LOOP_SPACES);
 
 		if (mushcursor_get_unsafe(cursor) != ';')
 			break;
@@ -310,7 +310,7 @@ semicolon:;
 
 		bool in_mid = false;
 		while (!mushcursor_skip_semicolons_here(cursor, delta, &in_mid))
-			FIND_BOX(cursor, delta);
+			FIND_BOX(cursor, delta, MUSH_ERR_INFINITE_LOOP_SEMICOLONS);
 
 	} while (mushcursor_get_unsafe(cursor) == ' ');
 
@@ -327,7 +327,7 @@ int mushcursor_skip_spaces(mushcursor* cursor, mushcoords delta) {
 		goto find_box;
 
 	while (!mushcursor_skip_spaces_here(cursor, delta))
-		find_box: FIND_BOX(cursor, delta);
+		find_box: FIND_BOX(cursor, delta, MUSH_ERR_INFINITE_LOOP_SPACES);
 
 	assert (mushcursor_get(cursor) != ' ');
 	return MUSH_ERR_NONE;
@@ -371,7 +371,7 @@ jump_to_box:
 		                           &cursor->box, &cursor->box_idx))
 		{
 			mushcursor_set_infloop_pos(cursor, pos);
-			return MUSH_ERR_INFINITE_LOOP;
+			return MUSH_ERR_INFINITE_LOOP_SPACES;
 		}
 		mushcursor_tessellate(cursor, pos);
 #endif
@@ -402,7 +402,7 @@ int mushcursor_skip_semicolons(mushcursor* cursor, mushcoords delta) {
 
 	bool in_mid = false;
 	while (!mushcursor_skip_semicolons_here(cursor, delta, &in_mid))
-		find_box: FIND_BOX(cursor, delta);
+		find_box: FIND_BOX(cursor, delta, MUSH_ERR_INFINITE_LOOP_SEMICOLONS);
 	assert (mushcursor_get(cursor) != ';');
 	return MUSH_ERR_NONE;
 }
