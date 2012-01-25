@@ -115,12 +115,14 @@ static bool mushspace2_93_newline(bool* got_cr, mushcoords* pos) {
 	pos->x = 0;
 	return ++pos->y >= 25;
 }
-int mushspace_load_string(mushspace* space, const char* str, size_t len) {
+int mushspace_load_string(
+	mushspace* space, const unsigned char* str, size_t len)
+{
 	bool got_cr = false;
 	mushcoords pos = MUSHCOORDS(0,0,0);
 
 	for (size_t i = 0; i < len; ++i) {
-		char c = str[i];
+		unsigned char c = str[i];
 
 		switch (c) {
 		case '\r': got_cr = true; break;

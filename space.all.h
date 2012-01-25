@@ -107,7 +107,7 @@ bool mushspace_get_tight_bounds(
 //                   gigabytes of non-space data into a 32-bit space would
 //                   cause this error.
 int mushspace_load_string
-	( mushspace*, const char*, size_t len
+	( mushspace*, const unsigned char*, size_t len
 #ifndef MUSHSPACE_93
 	, mushcoords* end, mushcoords target, bool binary
 #endif

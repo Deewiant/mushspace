@@ -215,7 +215,8 @@ static void mushspace_get_next_in1(
 	mush_cell_idx*, mush_cell_idx*);
 
 static void mushspace_get_aabbs(
-	const char*, size_t, mushcoords target, bool binary, mush_arr_mush_aabb*);
+	const unsigned char*, size_t, mushcoords target, bool binary,
+	mush_arr_mush_aabb*);
 
 #if MUSHSPACE_DIM >= 2
 static bool mushspace_newline(
@@ -224,7 +225,7 @@ static bool mushspace_newline(
 #endif
 
 static size_t mushspace_get_aabbs_binary(
-	const char*, size_t len, mushcoords target, mush_bounds*);
+	const unsigned char*, size_t len, mushcoords target, mush_bounds*);
 
 static void mushspace_binary_load_arr(mush_arr_mushcell, void*);
 static void mushspace_binary_load_blank(size_t, void*);
@@ -1985,7 +1986,7 @@ static void mushspace_get_next_in1(
 
 #define mushspace_load_arr_auxdata MUSHSPACE_CAT(mushspace,_load_arr_auxdata)
 typedef struct {
-	const char *str, *str_end;
+	const unsigned char *str, *str_end;
 
 	#if MUSHSPACE_DIM >= 2
 		mushcell x, target_x, aabb_beg_x;
@@ -1995,8 +1996,9 @@ typedef struct {
 	#endif
 } mushspace_load_arr_auxdata;
 
-int mushspace_load_string(mushspace* space, const char* str, size_t len,
-                          mushcoords* end, mushcoords target, bool binary)
+int mushspace_load_string(
+	mushspace* space, const unsigned char* str, size_t len,
+	mushcoords* end, mushcoords target, bool binary)
 {
 	mush_arr_mush_aabb aabbs;
 	mushspace_get_aabbs(str, len, target, binary, &aabbs);
@@ -2083,7 +2085,7 @@ int mushspace_load_string(mushspace* space, const char* str, size_t len,
 		mush_aabb_finalize(&aabb);
 	}
 
-	const char *str_end = str + len;
+	const unsigned char *str_end = str + len;
 
 	if (binary)
 		mushspace_map_no_place(
@@ -2119,7 +2121,7 @@ int mushspace_load_string(mushspace* space, const char* str, size_t len,
 // If nothing would be loaded, aabbs_out->ptr is set to NULL and an error code
 // (an int) is written into aabbs_out->len.
 static void mushspace_get_aabbs(
-	const char* str, size_t len, mushcoords target, bool binary,
+	const unsigned char* str, size_t len, mushcoords target, bool binary,
 	mush_arr_mush_aabb* aabbs_out)
 {
 	static mush_aabb aabbs[1 << MUSHSPACE_DIM];
@@ -2193,7 +2195,8 @@ static void mushspace_get_aabbs(
 		} while (0)
 	#endif
 
-	for (const char* str_end = str + len; str < str_end; ++str) switch (*str) {
+	for (const unsigned char* str_end = str + len; str < str_end; ++str)
+	switch (*str) {
 	default:
 		#if MUSHSPACE_DIM >= 2
 			if (got_cr)
@@ -2330,7 +2333,8 @@ static bool mushspace_newline(
 #endif
 
 static size_t mushspace_get_aabbs_binary(
-	const char* str, size_t len, mushcoords target, mush_bounds* bounds)
+	const unsigned char* str, size_t len,
+	mushcoords target, mush_bounds* bounds)
 {
 	size_t a = 0;
 	mushcoords beg = target, end = target;
@@ -2367,16 +2371,16 @@ static size_t mushspace_get_aabbs_binary(
 }
 
 static void mushspace_binary_load_arr(mush_arr_mushcell arr, void* p) {
-	const char **strp = p, *str = *strp;
+	const unsigned char **strp = p, *str = *strp;
 	for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
-		char c = *str++;
+		unsigned char c = *str++;
 		if (c != ' ')
 			*arr.ptr = c;
 	}
 	*strp = str;
 }
 static void mushspace_binary_load_blank(size_t blanks, void* p) {
-	const char **strp = p, *str = *strp;
+	const unsigned char **strp = p, *str = *strp;
 	while (blanks) {
 		if (*str != ' ')
 			break;
@@ -2397,7 +2401,7 @@ static void mushspace_load_arr(
 	#endif
 
 	mushspace_load_arr_auxdata *aux = p;
-	const char *str = aux->str, *str_end = aux->str_end;
+	const unsigned char *str = aux->str, *str_end = aux->str_end;
 
 	// x and y are used only for skipping leading spaces/newlines and thus
 	// aren't really representative of the cursor position at any point.
@@ -2413,7 +2417,7 @@ static void mushspace_load_arr(
 	for (size_t i = 0; i < arr.len;) {
 		assert (str < str_end);
 
-		const char c = *str++;
+		const unsigned char c = *str++;
 		switch (c) {
 		default:
 			arr.ptr[i++] = c;
@@ -2553,7 +2557,7 @@ end:
 }
 static void mushspace_load_blank(size_t blanks, void* p) {
 	mushspace_load_arr_auxdata *aux = p;
-	const char *str = aux->str;
+	const unsigned char *str = aux->str;
 	while (blanks) {
 		if (!(*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f'))
 			break;
