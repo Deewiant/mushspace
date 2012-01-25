@@ -8,7 +8,6 @@
 #include "config.h"
 
 typedef struct mushstats {
-#ifdef MUSH_ENABLE_STATS
 	uint64_t
 		boxes_incorporated,
 		boxes_placed,
@@ -18,9 +17,6 @@ typedef struct mushstats {
 		subsumed_disjoint,
 		subsumed_overlaps,
 		empty_boxes_dropped;
-#else
-	char unused;
-#endif
 } mushstats;
 
 typedef enum {
@@ -34,16 +30,7 @@ typedef enum {
 	MushStat_empty_boxes_dropped,
 } MushStat;
 
-void mushstats_add(
-#ifndef MUSH_ENABLE_STATS
-	const
-#endif
-	mushstats*, MushStat, uint64_t);
-
-void mushstats_new_max(
-#ifndef MUSH_ENABLE_STATS
-	const
-#endif
-	mushstats*, MushStat, uint64_t);
+void mushstats_add    (mushstats*, MushStat, uint64_t);
+void mushstats_new_max(mushstats*, MushStat, uint64_t);
 
 #endif

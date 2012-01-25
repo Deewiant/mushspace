@@ -3,10 +3,6 @@
 #ifndef MUSH_CONFIG_H
 #define MUSH_CONFIG_H
 
-#if '@STATS@' == 'y'
-#define MUSH_ENABLE_STATS
-#endif
-
 #if '@INFINITE_LOOP_DETECTION@' == 'y'
 #define MUSH_ENABLE_INFINITE_LOOP_DETECTION
 #endif
