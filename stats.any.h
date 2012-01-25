@@ -10,8 +10,6 @@
 typedef struct mushstats {
 #ifdef MUSH_ENABLE_STATS
 	uint64_t
-		lookups,
-		assignments,
 		boxes_incorporated,
 		boxes_placed,
 		max_boxes_live,
@@ -26,8 +24,6 @@ typedef struct mushstats {
 } mushstats;
 
 typedef enum {
-	MushStat_lookups,
-	MushStat_assignments,
 	MushStat_boxes_incorporated,
 	MushStat_boxes_placed,
 	MushStat_max_boxes_live,

@@ -12,8 +12,6 @@ void mushstats_add(
 #ifdef MUSH_ENABLE_STATS
 	switch (stat) {
 #define CASE(x) case MushStat_##x: stats->x += val; break;
-	CASE(lookups)
-	CASE(assignments)
 	CASE(boxes_incorporated)
 	CASE(boxes_placed)
 	CASE(subsumed_contains)

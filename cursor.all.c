@@ -195,7 +195,6 @@ mushcell mushcursor_get(mushcursor* cursor) {
 	if (!mushcursor_in_box(cursor)
 	 && !mushcursor_get_box(cursor, mushcursor_get_pos(cursor)))
 	{
-		mushstats_add(cursor->space->stats, MushStat_lookups, 1);
 		DEBUG_CHECK(cursor, ' ');
 		return ' ';
 	}
@@ -206,8 +205,6 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
 	assert (mushcursor_in_box(cursor));
 
 	mushspace *sp = cursor->space;
-
-	mushstats_add(sp->stats, MushStat_lookups, 1);
 
 	mushcell c;
 
@@ -250,8 +247,6 @@ int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 	assert (mushcursor_in_box(cursor));
 
 	mushspace *sp = cursor->space;
-
-	mushstats_add(sp->stats, MushStat_assignments, 1);
 
 	int ret;
 

@@ -39,7 +39,6 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
 }
 
 mushcell mushspace_get(mushspace* space, mushcoords c) {
-	mushstats_add(space->stats, MushStat_lookups, 1);
 	return mushspace_get_nostats(space, c);
 }
 mushcell mushspace_get_nostats(const mushspace* space, mushcoords c) {
@@ -48,7 +47,6 @@ mushcell mushspace_get_nostats(const mushspace* space, mushcoords c) {
 }
 
 int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
-	mushstats_add(space->stats, MushStat_assignments, 1);
 	return mushspace_put_nostats(space, p, c);
 }
 int mushspace_put_nostats(mushspace* space, mushcoords p, mushcell c) {

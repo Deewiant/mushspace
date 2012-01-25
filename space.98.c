@@ -308,7 +308,6 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
 }
 
 mushcell mushspace_get(mushspace* space, mushcoords c) {
-	mushstats_add(space->stats, MushStat_lookups, 1);
 	return mushspace_get_nostats(space, c);
 }
 mushcell mushspace_get_nostats(const mushspace* space, mushcoords c) {
@@ -326,7 +325,6 @@ mushcell mushspace_get_nostats(const mushspace* space, mushcoords c) {
 }
 
 int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
-	mushstats_add(space->stats, MushStat_assignments, 1);
 	return mushspace_put_nostats(space, p, c);
 }
 int mushspace_put_nostats(mushspace* space, mushcoords p, mushcell c) {
@@ -2389,10 +2387,8 @@ static void mushspace_binary_load_arr(
 	const char **strp = p, *str = *strp;
 	for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
 		char c = *str++;
-		if (c != ' ') {
+		if (c != ' ')
 			*arr.ptr = c;
-			mushstats_add(stats, MushStat_assignments, 1);
-		}
 	}
 	*strp = str;
 }
@@ -2438,7 +2434,6 @@ static void mushspace_load_arr(
 		switch (c) {
 		default:
 			arr.ptr[i++] = c;
-			mushstats_add(stats, MushStat_assignments, 1);
 			break;
 
 		case ' ': {
