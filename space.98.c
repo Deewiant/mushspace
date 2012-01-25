@@ -237,7 +237,7 @@ static void mushspace_load_arr(mush_arr_mushcell, void*,
                                mushstats*);
 static void mushspace_load_blank(size_t, void*);
 
-mushspace* mushspace_allocate(void* vp, mushstats* stats) {
+mushspace* mushspace_init(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (!space)
 		return NULL;

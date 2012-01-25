@@ -7,7 +7,7 @@
 
 #include "stdlib.any.h"
 
-mushspace* mushspace_allocate(void* vp, mushstats* stats) {
+mushspace* mushspace_init(void* vp, mushstats* stats) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (!space)
 		return NULL;
