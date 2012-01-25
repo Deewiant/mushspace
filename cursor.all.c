@@ -225,6 +225,8 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
 		c = mush_bakaabb_get(&sp->bak, cursor->actual_pos);
 		break;
 #endif
+
+	default: assert (false);
 	}
 	DEBUG_CHECK(cursor, c);
 	return c;
@@ -269,6 +271,8 @@ int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 		ret = mush_bakaabb_put(&sp->bak, cursor->actual_pos, c);
 		break;
 #endif
+
+	default: assert (false);
 	}
 	DEBUG_CHECK(cursor, c);
 	return ret;
