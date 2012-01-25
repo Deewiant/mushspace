@@ -7,9 +7,9 @@ MUSHSRCFLAGS = -std=c1x
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 
-NATIVEFLAGS          = -march=native
-OPTFLAGS             = -flto -O3
-DEBFLAGS-@(OPTIMIZE) = -g
+NATIVEFLAGS = -march=native
+OPTFLAGS    = -flto -O3
+DEBFLAGS    = -g
 endif
 ifeq (@(CC),clang)
 SRCFLAGS     = -Wall -Wextra
@@ -19,15 +19,16 @@ DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 LIBSRCFLAGS  = -pedantic
 
-NATIVEFLAGS          = -march=native
-OPTFLAGS             = -O4
-DEBFLAGS-@(OPTIMIZE) = -g
+NATIVEFLAGS = -march=native
+OPTFLAGS    = -O4
+DEBFLAGS    = -g
 endif
 
 NATIVEFLAGS-@(NATIVE) = $(NATIVEFLAGS)
 OPTFLAGS-@(OPTIMIZE)  = $(OPTFLAGS)
+DEBFLAGS-@(DEBUG)     = $(DEBFLAGS)
 
-BOTHFLAGS = $(DEBFLAGS-n) $(OPTFLAGS-y) $(NATIVEFLAGS-y)
+BOTHFLAGS = $(DEBFLAGS-y) $(OPTFLAGS-y) $(NATIVEFLAGS-y)
 
 CFLAGS    = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS) $(MUSHSRCFLAGS)
 LINKFLAGS = $(GENFLAGS) $(BOTHFLAGS)
