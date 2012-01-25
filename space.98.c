@@ -302,10 +302,7 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
 	return copy;
 }
 
-mushcell mushspace_get(mushspace* space, mushcoords c) {
-	return mushspace_get_nostats(space, c);
-}
-mushcell mushspace_get_nostats(const mushspace* space, mushcoords c) {
+mushcell mushspace_get(const mushspace* space, mushcoords c) {
 	if (mush_staticaabb_contains(c))
 		return mush_staticaabb_get(&space->static_box, c);
 
@@ -320,9 +317,6 @@ mushcell mushspace_get_nostats(const mushspace* space, mushcoords c) {
 }
 
 int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
-	return mushspace_put_nostats(space, p, c);
-}
-int mushspace_put_nostats(mushspace* space, mushcoords p, mushcell c) {
 	if (mush_staticaabb_contains(p)) {
 		mush_staticaabb_put(&space->static_box, p, c);
 		return MUSH_ERR_NONE;
@@ -364,8 +358,8 @@ void mushspace_get_loose_bounds(
 bool mushspace_get_tight_bounds(
 	mushspace* space, mushcoords* beg, mushcoords* end)
 {
-	bool last_beg_space = mushspace_get_nostats(space, space->last_beg) == ' ',
-	     last_end_space = mushspace_get_nostats(space, space->last_end) == ' ',
+	bool last_beg_space = mushspace_get(space, space->last_beg) == ' ',
+	     last_end_space = mushspace_get(space, space->last_end) == ' ',
 	     found_nonspace = true;
 
 	if (last_beg_space == last_end_space) {

@@ -38,7 +38,7 @@ void mushspace_put_binary(const mushspace* space,
 		for (c.y = beg.y;;) {
 #endif
 			for (c.x = beg.x; c.x <= end.x; ++c.x)
-				putcell(mushspace_get_nostats(space, c), putdata);
+				putcell(mushspace_get(space, c), putdata);
 
 #if MUSHSPACE_DIM >= 2
 			if (c.y++ == end.y)
@@ -102,11 +102,11 @@ int mushspace_put_textual(
 					buf = p;
 				}
 
-				switch (buf[i++] = mushspace_get_nostats(space, c)) {
+				switch (buf[i++] = mushspace_get(space, c)) {
 				case '\r':
 					if (c.x < end.x) {
 						++c.x;
-						if (mushspace_get_nostats(space, c) != '\n')
+						if (mushspace_get(space, c) != '\n')
 							--c.x;
 					}
 				case '\n':

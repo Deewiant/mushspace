@@ -79,10 +79,8 @@ mushspace *mushspace_init(void*, mushstats*);
 void       mushspace_free(mushspace*);
 mushspace *mushspace_copy(void*, const mushspace*, mushstats*);
 
-mushcell mushspace_get        (      mushspace*, mushcoords);
-mushcell mushspace_get_nostats(const mushspace*, mushcoords);
-int      mushspace_put        (      mushspace*, mushcoords, mushcell);
-int      mushspace_put_nostats(      mushspace*, mushcoords, mushcell);
+mushcell mushspace_get(const mushspace*, mushcoords);
+int      mushspace_put(      mushspace*, mushcoords, mushcell);
 
 void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
 
