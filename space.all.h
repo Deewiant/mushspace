@@ -23,7 +23,6 @@
 
 typedef struct mushspace {
 #if MUSHSPACE_93
-	mushstats *stats;
 	mush_staticaabb box;
 #else
 	mush_anamnesic_ring recent_buf;
@@ -75,9 +74,17 @@ typedef enum MushCursorMode {
 
 extern const size_t mushspace_sizeof;
 
-mushspace *mushspace_init(void*, mushstats*);
+mushspace *mushspace_init(void*
+#if !MUSHSPACE_93
+                         , mushstats*
+#endif
+);
 void       mushspace_free(mushspace*);
-mushspace *mushspace_copy(void*, const mushspace*, mushstats*);
+mushspace *mushspace_copy(void*, const mushspace*
+#if !MUSHSPACE_93
+                         , mushstats*
+#endif
+);
 
 mushcell mushspace_get(const mushspace*, mushcoords);
 int      mushspace_put(      mushspace*, mushcoords, mushcell);

@@ -7,15 +7,10 @@
 
 #include "stdlib.any.h"
 
-mushspace* mushspace_init(void* vp, mushstats* stats) {
+mushspace* mushspace_init(void* vp) {
 	mushspace *space = vp ? vp : malloc(sizeof *space);
 	if (!space)
 		return NULL;
-
-	if (!(space->stats = stats ? stats : malloc(sizeof *space->stats))) {
-		free(space);
-		return NULL;
-	}
 
 	mushcell_space(space->box.array, MUSH_ARRAY_LEN(space->box.array));
 	return space;
@@ -23,16 +18,10 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
 
 void mushspace_free(mushspace* space) { (void)space; }
 
-mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
+mushspace* mushspace_copy(void* vp, const mushspace* space) {
 	mushspace *copy = vp ? vp : malloc(sizeof *copy);
 	if (!copy)
 		return NULL;
-
-	copy->stats = stats ? stats : malloc(sizeof *copy->stats);
-	if (!copy->stats) {
-		free(copy);
-		return NULL;
-	}
 
 	memcpy(copy, space, sizeof *copy);
 	return copy;
