@@ -184,32 +184,28 @@ static void mushspace_irrelevize_subsumption_order(
 
 static void mushspace_map_no_place(
 	mushspace*, const mush_aabb*, void*,
-	void(*)(mush_arr_mushcell, void*, mushstats*),
-	void(*)(size_t, void*));
+	void(*)(mush_arr_mushcell, void*), void(*)(size_t, void*));
 
 static bool mushspace_map_in_box(
 	mushspace*, mush_bounded_pos, mush_caabb_idx,
-	void*, void(*f)(mush_arr_mushcell, void*, mushstats*));
+	void*, void(*f)(mush_arr_mushcell, void*));
 
 static bool mushspace_map_in_static(
 	mushspace*, mush_bounded_pos,
-	void*, void(*f)(mush_arr_mushcell, void*, mushstats*));
+	void*, void(*f)(mush_arr_mushcell, void*));
 
 static void mushspace_mapex_no_place(
 	mushspace*, const mush_aabb*, void*,
-	void(*)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
-	        mushstats*),
+	void(*)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*),
 	void(*)(size_t, void*));
 
 static bool mushspace_mapex_in_box(
 	mushspace*, mush_bounded_pos, mush_caabb_idx, void*,
-	void(*)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
-	        mushstats*));
+	void(*)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*));
 
 static bool mushspace_mapex_in_static(
 	mushspace*, mush_bounded_pos, void*,
-	void(*)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
-	        mushstats*));
+	void(*)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*));
 
 static bool mushspace_get_next_in(
 	const mushspace*, const mush_aabb*, mushcoords*, size_t*);
@@ -230,11 +226,10 @@ static bool mushspace_newline(
 static size_t mushspace_get_aabbs_binary(
 	const char*, size_t len, mushcoords target, mush_bounds*);
 
-static void mushspace_binary_load_arr(mush_arr_mushcell, void*, mushstats*);
+static void mushspace_binary_load_arr(mush_arr_mushcell, void*);
 static void mushspace_binary_load_blank(size_t, void*);
 static void mushspace_load_arr(mush_arr_mushcell, void*,
-                               size_t, size_t, size_t, size_t, uint8_t*,
-                               mushstats*);
+                               size_t, size_t, size_t, size_t, uint8_t*);
 static void mushspace_load_blank(size_t, void*);
 
 mushspace* mushspace_init(void* vp, mushstats* stats) {
@@ -1546,7 +1541,7 @@ static void mushspace_irrelevize_subsumption_order(
 
 static void mushspace_map_no_place(
 	mushspace* space, const mush_aabb* aabb, void* fg,
-	void(*f)(mush_arr_mushcell, void*, mushstats*), void(*g)(size_t, void*))
+	void(*f)(mush_arr_mushcell, void*), void(*g)(size_t, void*))
 {
 	mushcoords        pos = aabb->bounds.beg;
 	mush_bounded_pos bpos = {&aabb->bounds, &pos};
@@ -1583,7 +1578,7 @@ static void mushspace_map_no_place(
 }
 static bool mushspace_map_in_box(
 	mushspace* space, mush_bounded_pos bpos, mush_caabb_idx cai,
-	void* caller_data, void(*f)(mush_arr_mushcell, void*, mushstats*))
+	void* caller_data, void(*f)(mush_arr_mushcell, void*))
 {
 	// Consider:
 	//     +-----+
@@ -1615,13 +1610,12 @@ static bool mushspace_map_in_box(
 
 	assert (beg_idx <= end_idx);
 
-	f((mush_arr_mushcell){box->data, end_idx - beg_idx + 1},
-	  caller_data, space->stats);
+	f((mush_arr_mushcell){box->data, end_idx - beg_idx + 1}, caller_data);
 	return hit_end;
 }
 static bool mushspace_map_in_static(
 	mushspace* space, mush_bounded_pos bpos,
-	void* caller_data, void(*f)(mush_arr_mushcell, void*, mushstats*))
+	void* caller_data, void(*f)(mush_arr_mushcell, void*))
 {
 	bool hit_end;
 	const size_t
@@ -1633,7 +1627,7 @@ static bool mushspace_map_in_static(
 	assert (beg_idx <= end_idx);
 
 	f((mush_arr_mushcell){space->static_box.array, end_idx - beg_idx + 1},
-	  caller_data, space->stats);
+	  caller_data);
 	return hit_end;
 }
 
@@ -1651,8 +1645,7 @@ static bool mushspace_map_in_static(
 //   reflect that it's done with the line/page.
 static void mushspace_mapex_no_place(
 	mushspace* space, const mush_aabb* aabb, void* fg,
-	void(*f)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
-	        mushstats*),
+	void(*f)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*),
 	void(*g)(size_t, void*))
 {
 	mushcoords        pos = aabb->bounds.beg;
@@ -1692,8 +1685,7 @@ static bool mushspace_mapex_in_box(
 	mushspace* space, mush_bounded_pos bpos,
 	mush_caabb_idx cai,
 	void* caller_data,
-	void(*f)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
-	        mushstats*))
+	void(*f)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*))
 {
 	// Self-initialize: they're used uninitialized in Unefunge (and area in
 	// Befunge). This method appears to silence -Wuninitialized in both GCC and
@@ -1757,7 +1749,7 @@ static bool mushspace_mapex_in_box(
 #endif
 
 	f((mush_arr_mushcell){box->data, end_idx - beg_idx + 1},
-	  caller_data, width, area, line_start, page_start, &hit, space->stats);
+	  caller_data, width, area, line_start, page_start, &hit);
 
 #if MUSHSPACE_DIM >= 2
 	if (hit == 0x01 && pos->y == prev_y) {
@@ -1787,8 +1779,7 @@ bump_z:
 static bool mushspace_mapex_in_static(
 	mushspace* space, mush_bounded_pos bpos,
 	void* caller_data,
-	void(*f)(mush_arr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*,
-	        mushstats*))
+	void(*f)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*))
 {
 	size_t width = *&width, area = *&area, page_start = *&page_start;
 
@@ -1835,7 +1826,7 @@ static bool mushspace_mapex_in_static(
 #endif
 
 	f((mush_arr_mushcell){space->static_box.array, end_idx - beg_idx + 1},
-	  caller_data, width, area, line_start, page_start, &hit, space->stats);
+	  caller_data, width, area, line_start, page_start, &hit);
 
 #if MUSHSPACE_DIM >= 2
 	if (hit == 0x01 && pos->y == prev_y) {
@@ -2381,9 +2372,7 @@ static size_t mushspace_get_aabbs_binary(
 	return a;
 }
 
-static void mushspace_binary_load_arr(
-	mush_arr_mushcell arr, void* p, mushstats* stats)
-{
+static void mushspace_binary_load_arr(mush_arr_mushcell arr, void* p) {
 	const char **strp = p, *str = *strp;
 	for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
 		char c = *str++;
@@ -2405,7 +2394,7 @@ static void mushspace_binary_load_blank(size_t blanks, void* p) {
 static void mushspace_load_arr(
 	mush_arr_mushcell arr, void* p,
 	size_t width, size_t area, size_t line_start, size_t page_start,
-	uint8_t* hit, mushstats* stats)
+	uint8_t* hit)
 {
 	#if MUSHSPACE_DIM == 1
 	(void)width; (void)area; (void)page_start; (void)hit;
