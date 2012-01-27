@@ -9,16 +9,8 @@
 
 MUSH_DECL_CONST_DYN_ARRAY(mushcell)
 
-#define mush_aabb_can_direct_copy MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
-#define mush_aabb_can_direct_copy_area \
-	MUSHSPACE_CAT(mush_aabb,_can_direct_copy_area)
-
 #define mush_aabb_subsume_owners_area \
 	MUSHSPACE_CAT(mush_aabb,_subsume_owners_area)
-
-static bool mush_aabb_can_direct_copy(const mush_aabb*, const mush_aabb*);
-static bool mush_aabb_can_direct_copy_area(
-	const mush_aabb*, const mush_aabb*, const mush_aabb*);
 
 // Copies from data to aabb, given that it's an area contained in owner.
 static void mush_aabb_subsume_owners_area(
@@ -117,7 +109,7 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 	return i;
 }
 
-static bool mush_aabb_can_direct_copy(
+bool mush_aabb_can_direct_copy(
 	const mush_aabb* copier, const mush_aabb* copiee)
 {
 #if MUSHSPACE_DIM == 1
@@ -134,7 +126,7 @@ static bool mush_aabb_can_direct_copy(
 	;
 #endif
 }
-static bool mush_aabb_can_direct_copy_area(
+bool mush_aabb_can_direct_copy_area(
 	const mush_aabb* copier, const mush_aabb* copiee, const mush_aabb* owner)
 {
 #if MUSHSPACE_DIM >= 2
