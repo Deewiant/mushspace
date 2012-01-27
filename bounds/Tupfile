@@ -1,0 +1,6 @@
+# File created: 2012-01-28 00:47:35
+
+include_rules
+
+ROOT = $(TUP_CWD)/..
+include $(ROOT)/mushspace.tup
