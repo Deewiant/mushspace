@@ -49,7 +49,6 @@ MUSH_DECL_DYN_ARRAY(size_t)
 
 #define mushspace_find_beg_in       MUSHSPACE_CAT(mushspace,_find_beg_in)
 #define mushspace_find_end_in       MUSHSPACE_CAT(mushspace,_find_end_in)
-#define mushspace_remove_boxes      MUSHSPACE_CAT(mushspace,_remove_boxes)
 #define mushspace_place_box         MUSHSPACE_CAT(mushspace,_place_box)
 #define mushspace_place_box_for     MUSHSPACE_CAT(mushspace,_place_box_for)
 #define mushspace_get_box_for       MUSHSPACE_CAT(mushspace,_get_box_for)
@@ -93,9 +92,6 @@ static bool mushspace_find_beg_in(
 static void mushspace_find_end_in(
 	mushcoords*, mushdim, const mush_bounds*,
 	mushcell(*)(const void*, mushcoords), const void*);
-
-// Removes the given range of boxes, inclusive.
-static void mushspace_remove_boxes(mushspace*, size_t, size_t);
 
 static bool mushspace_place_box(
 	mushspace*, mush_aabb*, mushcoords*, mush_aabb**);
@@ -633,7 +629,7 @@ bool mushspace_jump_to_box(
 	return true;
 }
 
-static void mushspace_remove_boxes(mushspace* space, size_t i, size_t j) {
+void mushspace_remove_boxes(mushspace* space, size_t i, size_t j) {
 	assert (i <= j);
 	assert (j < space->box_count);
 

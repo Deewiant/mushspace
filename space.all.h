@@ -70,6 +70,7 @@ typedef enum MushCursorMode {
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
 #define mushspace_find_box         MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_find_box_and_idx MUSHSPACE_CAT(mushspace,_find_box_and_idx)
+#define mushspace_remove_boxes     MUSHSPACE_CAT(mushspace,_remove_boxes)
 #define mushspace_jump_to_box      MUSHSPACE_CAT(mushspace,_jump_to_box)
 #define mushspace_get_caabb_idx    MUSHSPACE_CAT(mushspace,_get_caabb_idx)
 
@@ -124,6 +125,9 @@ void mushspace_invalidate_all (mushspace*);
 
 mush_aabb* mushspace_find_box        (const mushspace*, mushcoords);
 mush_aabb* mushspace_find_box_and_idx(const mushspace*, mushcoords, size_t*);
+
+// Removes the given range of boxes, inclusive.
+void mushspace_remove_boxes(mushspace*, size_t, size_t);
 
 bool mushspace_jump_to_box(mushspace*, mushcoords*, mushcoords,
                            MushCursorMode*, mush_aabb**, size_t*);
