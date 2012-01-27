@@ -4,6 +4,10 @@
 
 #include <assert.h>
 
+#if !MUSHSPACE_93
+#include "space/jump-to-box.98.h"
+#endif
+
 #if MUSHSPACE_93
 #define STATIC_BOX(sp) (&(sp)->box)
 #else
