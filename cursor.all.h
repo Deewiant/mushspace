@@ -56,6 +56,7 @@ typedef struct mushcursor {
 #define mushcursor_recalibrate     MUSHSPACE_CAT(mushcursor,_recalibrate)
 #define mushcursor_in_box          MUSHSPACE_CAT(mushcursor,_in_box)
 #define mushcursor_get_box         MUSHSPACE_CAT(mushcursor,_get_box)
+#define mushcursor_tessellate      MUSHSPACE_CAT(mushcursor,_tessellate)
 #define mushcursor_skip_to_last_space \
 	MUSHSPACE_CAT(mushcursor,_skip_to_last_space)
 
@@ -94,5 +95,7 @@ bool mushcursor_in_box(const mushcursor*);
 #if !MUSHSPACE_93
 bool mushcursor_get_box(mushcursor*, mushcoords);
 #endif
+
+void mushcursor_tessellate(mushcursor*, mushcoords);
 
 #endif

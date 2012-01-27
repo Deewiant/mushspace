@@ -16,7 +16,6 @@
 
 #define mushcursor_recalibrate_void MUSHSPACE_CAT(mushcursor,_recalibrate_void)
 #define mushcursor_skip_spaces_here MUSHSPACE_CAT(mushcursor,_skip_spaces_here)
-#define mushcursor_tessellate       MUSHSPACE_CAT(mushcursor,_tessellate)
 #define mushcursor_skip_semicolons_here \
 	MUSHSPACE_CAT(mushcursor,_skip_semicolons_here)
 
@@ -84,7 +83,6 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 } while (0)
 
 static void mushcursor_recalibrate_void(void*);
-static void mushcursor_tessellate(mushcursor*, mushcoords);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
@@ -462,7 +460,7 @@ void mushcursor2_93_wrap(mushcursor* cursor) {
 	cursor->rel_pos.y %= MUSH_STATICAABB_SIZE.y;
 }
 #else
-static void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
+void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 	mushspace *sp = cursor->space;
 
 	switch (MUSHCURSOR_MODE(cursor)) {
