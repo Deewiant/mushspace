@@ -5,5 +5,5 @@ include_rules
 ROOT = $(TUP_CWD)
 include $(ROOT)/mushspace.tup
 
-: *.o bounds/*.o space/*.o |> !ccshared |> libmushspace.so
-: *.o bounds/*.o space/*.o |> !ar |> libmushspace.a
+: *.o aabb/*.o bounds/*.o space/*.o |> !ccshared |> libmushspace.so
+: *.o aabb/*.o bounds/*.o space/*.o |> !ar |> libmushspace.a
