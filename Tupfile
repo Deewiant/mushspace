@@ -2,9 +2,6 @@
 
 include_rules
 
-INCLUDES += $(INCLUDE)$(TUP_CWD)
-INCLUDES += $(INCLUDE)$(TUP_CWD)/config
-
 ROOT = $(TUP_CWD)
 include $(ROOT)/mushspace.tup
 
