@@ -21,7 +21,6 @@
 
 static bool mushcursor_skip_spaces_here    (mushcursor*, mushcoords);
 static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
-static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 
 #ifdef MUSH_ENABLE_INFINITE_LOOP_DETECTION
 
@@ -513,7 +512,7 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 }
 #endif
 
-static void mushcursor_set_infloop_pos(mushcursor* cursor, mushcoords pos) {
+void mushcursor_set_infloop_pos(mushcursor* cursor, mushcoords pos) {
 #if !MUSHSPACE_93
 	// Since we are "nowhere", we can set an arbitrary mode: any functionality
 	// that cares about the mode handles the not-in-a-box case anyway. To save
