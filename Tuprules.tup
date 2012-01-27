@@ -36,11 +36,11 @@ CFLAGS    = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS) $(MUSHSRCFLAGS)
 LINKFLAGS = $(GENFLAGS) $(BOTHFLAGS)
 LIBCFLAGS = $(GENFLAGS) $(OPTFLAGS) $(NATIVEFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
 
-!cc       = |> ^ CC   %f^ @(CC) $(CFLAGS) -c %f -o %o |>
-!cc98     = |> ^ CC98 %f^ @(CC) $(CFLAGS) -c %f -o %o |>
-!cc1d     = |> ^ CC1D %f^ @(CC) $(CFLAGS) $(DEFDIM)1 -c %f -o %o |>
-!cc2d     = |> ^ CC2D %f^ @(CC) $(CFLAGS) $(DEFDIM)2 -c %f -o %o |>
-!cc3d     = |> ^ CC3D %f^ @(CC) $(CFLAGS) $(DEFDIM)3 -c %f -o %o |>
-!cc93     = |> ^ CC93 %f^ @(CC) $(CFLAGS) $(DEFDIM)2 $(DEF93)1 -c %f -o %o |>
+!cc       = |> ^ CC   %f^ @(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
+!cc98     = |> ^ CC98 %f^ @(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
+!cc1d     = |> ^ CC1D %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)1 -c %f -o %o |>
+!cc2d     = |> ^ CC2D %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 -c %f -o %o |>
+!cc3d     = |> ^ CC3D %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)3 -c %f -o %o |>
+!cc93     = |> ^ CC93 %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 $(DEF93)1 -c %f -o %o |>
 !ccshared = |> ^ LD   %o^ @(CC) $(LINKFLAGS) -shared %f -o %o |>
 !ar       = |> ^ AR   %o^ ar rcs %o %f |>
