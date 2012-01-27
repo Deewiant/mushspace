@@ -6,6 +6,7 @@ GENFLAGS     = -fPIC
 MUSHSRCFLAGS = -std=c1x
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
+INCLUDE      = -I
 
 NATIVEFLAGS = -march=native
 OPTFLAGS    = -flto -O3
@@ -18,6 +19,7 @@ MUSHSRCFLAGS = -std=c1x
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 LIBSRCFLAGS  = -pedantic
+INCLUDE      = -I
 
 NATIVEFLAGS = -march=native
 OPTFLAGS    = -O4
