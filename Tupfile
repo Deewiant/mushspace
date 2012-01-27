@@ -2,6 +2,7 @@
 
 include_rules
 
+INCLUDES += $(INCLUDE)$(TUP_CWD)
 INCLUDES += $(INCLUDE)$(TUP_CWD)/config
 
 : foreach *.all.c  | config/config.h |> !cc1d |> %B.1d.o
