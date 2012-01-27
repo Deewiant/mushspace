@@ -65,7 +65,6 @@ typedef enum MushCursorMode {
 #define mushspace_put_nostats      MUSHSPACE_CAT(mushspace,_put_nostats)
 #define mushspace_get_loose_bounds MUSHSPACE_CAT(mushspace,_get_loose_bounds)
 #define mushspace_get_tight_bounds MUSHSPACE_CAT(mushspace,_get_tight_bounds)
-#define mushspace_load_string      MUSHSPACE_CAT(mushspace,_load_string)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
 #define mushspace_find_box         MUSHSPACE_CAT(mushspace,_find_box)
@@ -104,20 +103,6 @@ bool mushspace_get_tight_bounds(
 	const
 #endif
 	mushspace*, mushcoords* beg, mushcoords* end);
-
-// Returns 0 on success or one of the following possible error codes:
-//
-// MUSH_ERR_OOM:     Ran out of memory somewhere.
-// MUSH_ERR_NO_ROOM: The string doesn't fit in the space, i.e. it would overlap
-//                   with itself. For instance, trying to binary-load 5
-//                   gigabytes of non-space data into a 32-bit space would
-//                   cause this error.
-int mushspace_load_string
-	( mushspace*, const unsigned char*, size_t len
-#ifndef MUSHSPACE_93
-	, mushcoords* end, mushcoords target, bool binary
-#endif
-	);
 
 #if !MUSHSPACE_93
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
