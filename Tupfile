@@ -5,19 +5,8 @@ include_rules
 INCLUDES += $(INCLUDE)$(TUP_CWD)
 INCLUDES += $(INCLUDE)$(TUP_CWD)/config
 
-: foreach *.all.c  | config/config.h |> !cc1d |> %B.1d.o
-: foreach *.all.c  | config/config.h |> !cc2d |> %B.2d.o
-: foreach *.all.c  | config/config.h |> !cc3d |> %B.3d.o
-: foreach *.all.c  | config/config.h |> !cc93 |> %B.93.o
-: foreach *.any.c  | config/config.h |> !cc   |> %B.o
-: foreach *.both.c | config/config.h |> !cc98 |> %B.98.o
-: foreach *.both.c | config/config.h |> !cc93 |> %B.93.o
-: foreach *.93.c   | config/config.h |> !cc93 |> %B.o
-: foreach *.98.c   | config/config.h |> !cc1d |> %B.1d.o
-: foreach *.98.c   | config/config.h |> !cc2d |> %B.2d.o
-: foreach *.98.c   | config/config.h |> !cc3d |> %B.3d.o
+ROOT = $(TUP_CWD)
+include $(ROOT)/mushspace.tup
 
 : *.o space/*.o |> !ccshared |> libmushspace.so
 : *.o space/*.o |> !ar |> libmushspace.a
-
-.gitignore
