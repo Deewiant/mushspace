@@ -4,6 +4,8 @@
 
 #include <assert.h>
 
+#include "bounds/ray-intersects.98.h"
+
 bool mushspace_jump_to_box(
 	mushspace* space, mushcoords* pos, mushcoords delta,
 	MushCursorMode* hit_type, mush_aabb** aabb, size_t* aabb_idx)
