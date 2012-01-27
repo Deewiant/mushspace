@@ -67,7 +67,6 @@ typedef enum MushCursorMode {
 #define mushspace_get_tight_bounds MUSHSPACE_CAT(mushspace,_get_tight_bounds)
 #define mushspace_load_string      MUSHSPACE_CAT(mushspace,_load_string)
 #define mushspace_put_binary       MUSHSPACE_CAT(mushspace,_put_binary)
-#define mushspace_put_textual      MUSHSPACE_CAT(mushspace,_put_textual)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_find_box_and_idx MUSHSPACE_CAT(mushspace,_find_box_and_idx)
 #define mushspace_jump_to_box      MUSHSPACE_CAT(mushspace,_jump_to_box)
@@ -119,10 +118,6 @@ void mushspace_put_binary(const mushspace*, mushcoords, mushcoords,
                           void(*)(unsigned char, void*),
 #endif
                           void*);
-int mushspace_put_textual(const mushspace*, mushcoords, mushcoords,
-                          mushcell**, size_t*, unsigned char**, size_t*,
-                          void(*)(const mushcell*, size_t, void*),
-                          void(*)(unsigned char, void*), void*);
 
 #if !MUSHSPACE_93
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
