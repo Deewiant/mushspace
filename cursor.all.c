@@ -14,7 +14,6 @@
 #define STATIC_BOX(sp) (&(sp)->static_box)
 #endif
 
-#define mushcursor_get_box          MUSHSPACE_CAT(mushcursor,_get_box)
 #define mushcursor_recalibrate_void MUSHSPACE_CAT(mushcursor,_recalibrate_void)
 #define mushcursor_skip_spaces_here MUSHSPACE_CAT(mushcursor,_skip_spaces_here)
 #define mushcursor_tessellate       MUSHSPACE_CAT(mushcursor,_tessellate)
@@ -84,7 +83,6 @@ static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 	mushcursor_tessellate(cursor, pos); \
 } while (0)
 
-static bool mushcursor_get_box(mushcursor*, mushcoords);
 static void mushcursor_recalibrate_void(void*);
 static void mushcursor_tessellate(mushcursor*, mushcoords);
 #endif
@@ -169,7 +167,7 @@ bool mushcursor_in_box(const mushcursor* cursor) {
 }
 
 #if !MUSHSPACE_93
-static bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
+bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 	if (mush_staticaabb_contains(pos)) {
 		cursor->mode = MushCursorMode_static;
 		mushcursor_tessellate(cursor, pos);
