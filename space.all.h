@@ -64,7 +64,6 @@ typedef enum MushCursorMode {
 #define mushspace_put              MUSHSPACE_CAT(mushspace,_put)
 #define mushspace_put_nostats      MUSHSPACE_CAT(mushspace,_put_nostats)
 #define mushspace_get_loose_bounds MUSHSPACE_CAT(mushspace,_get_loose_bounds)
-#define mushspace_get_tight_bounds MUSHSPACE_CAT(mushspace,_get_tight_bounds)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
 #define mushspace_find_box         MUSHSPACE_CAT(mushspace,_find_box)
@@ -95,14 +94,6 @@ mushcell mushspace_get(const mushspace*, mushcoords);
 int      mushspace_put(      mushspace*, mushcoords, mushcell);
 
 void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
-
-// Returns false if the space is completely empty. In that case, the values of
-// *beg and *end are undefined.
-bool mushspace_get_tight_bounds(
-#if MUSHSPACE_93
-	const
-#endif
-	mushspace*, mushcoords* beg, mushcoords* end);
 
 #if !MUSHSPACE_93
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
