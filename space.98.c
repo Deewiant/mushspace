@@ -56,7 +56,6 @@ typedef struct mush_bounded_pos {
 #define mushspace_find_beg_in       MUSHSPACE_CAT(mushspace,_find_beg_in)
 #define mushspace_find_end_in       MUSHSPACE_CAT(mushspace,_find_end_in)
 #define mushspace_invalidate_all    MUSHSPACE_CAT(mushspace,_invalidate_all)
-#define mushspace_get_caabb_idx     MUSHSPACE_CAT(mushspace,_get_caabb_idx)
 #define mushspace_find_box          MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_remove_boxes      MUSHSPACE_CAT(mushspace,_remove_boxes)
 #define mushspace_place_box         MUSHSPACE_CAT(mushspace,_place_box)
@@ -604,7 +603,7 @@ static void mushspace_invalidate_all(mushspace* space) {
 			(*i++)(*d++);
 }
 
-static mush_caabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
+mush_caabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
 	return (mush_caabb_idx){&sp->boxen[i], i};
 }
 
