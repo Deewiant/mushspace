@@ -70,6 +70,10 @@ typedef enum MushCursorMode {
 #define mushspace_find_box_and_idx MUSHSPACE_CAT(mushspace,_find_box_and_idx)
 #define mushspace_jump_to_box      MUSHSPACE_CAT(mushspace,_jump_to_box)
 
+#if !MUSHSPACE_93
+typedef struct { const mush_aabb *aabb; size_t idx; } mush_caabb_idx;
+#endif
+
 extern const size_t mushspace_sizeof;
 
 mushspace *mushspace_init(void*
