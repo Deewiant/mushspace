@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "stdlib.any.h"
+#include "types.h"
 
 // Threshold for switching to mush_bakaabb. Only limits mushspace_put, not
 // mushspace_load_string.
@@ -41,7 +42,6 @@
 #define ACCEPTABLE_WASTE_Z (MUSHSPACE_DIM >= 3 ? NEWBOX_PAD : 1)
 #define ACCEPTABLE_WASTE   (5 * ACCEPTABLE_WASTE_Y * ACCEPTABLE_WASTE_Z)
 
-MUSH_DECL_DYN_ARRAY(mushcell)
 MUSH_DECL_DYN_ARRAY(mush_aabb)
 MUSH_DECL_DYN_ARRAY(mush_bounds)
 MUSH_DECL_DYN_ARRAY(size_t)
