@@ -14,7 +14,6 @@
 #define STATIC_BOX(sp) (&(sp)->static_box)
 #endif
 
-#define mushcursor_in_box           MUSHSPACE_CAT(mushcursor,_in_box)
 #define mushcursor_get_box          MUSHSPACE_CAT(mushcursor,_get_box)
 #define mushcursor_recalibrate_void MUSHSPACE_CAT(mushcursor,_recalibrate_void)
 #define mushcursor_skip_spaces_here MUSHSPACE_CAT(mushcursor,_skip_spaces_here)
@@ -22,7 +21,6 @@
 #define mushcursor_skip_semicolons_here \
 	MUSHSPACE_CAT(mushcursor,_skip_semicolons_here)
 
-static bool mushcursor_in_box(const mushcursor*);
 static bool mushcursor_skip_spaces_here    (mushcursor*, mushcoords);
 static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
 static void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
@@ -154,7 +152,7 @@ void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
 	assert (false);
 }
 
-static bool mushcursor_in_box(const mushcursor* cursor) {
+bool mushcursor_in_box(const mushcursor* cursor) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
 		return mush_bounds_contains(&MUSH_STATICAABB_REL_BOUNDS, cursor->rel_pos);
