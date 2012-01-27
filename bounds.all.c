@@ -75,7 +75,6 @@ bool mush_bounds_on_same_primary_axis(
 }
 #endif
 
-#if !MUSHSPACE_93
 bool mush_bounds_can_fuse(const mush_bounds* a, const mush_bounds* b) {
 	bool overlap = mush_bounds_overlaps(a, b);
 
@@ -99,7 +98,6 @@ bool mush_bounds_can_fuse(const mush_bounds* a, const mush_bounds* b) {
 	}
 	return false;
 }
-#endif
 
 void mush_bounds_tessellate(
 	mush_bounds* bounds, mushcoords pos, mush_carr_mush_bounds bs)
