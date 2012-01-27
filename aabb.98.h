@@ -37,8 +37,6 @@ typedef struct mush_aabb {
 #define mush_aabb_get_idx           MUSHSPACE_CAT(mush_aabb,_get_idx)
 #define mush_aabb_get_idx_no_offset MUSHSPACE_CAT(mush_aabb,_get_idx_no_offset)
 #define mush_aabb_can_direct_copy   MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
-#define mush_aabb_subsume           MUSHSPACE_CAT(mush_aabb,_subsume)
-#define mush_aabb_subsume_area      MUSHSPACE_CAT(mush_aabb,_subsume_area)
 #define mush_aabb_space_area        MUSHSPACE_CAT(mush_aabb,_space_area)
 #define mush_aabb_can_direct_copy_area \
 	MUSHSPACE_CAT(mush_aabb,_can_direct_copy_area)
@@ -65,8 +63,6 @@ bool mush_aabb_can_direct_copy(const mush_aabb*, const mush_aabb*);
 bool mush_aabb_can_direct_copy_area(
 	const mush_aabb*, const mush_aabb*, const mush_aabb*);
 
-void mush_aabb_subsume     (mush_aabb*, const mush_aabb*);
-void mush_aabb_subsume_area(mush_aabb*, const mush_aabb*, const mush_aabb*);
-void mush_aabb_space_area  (mush_aabb*, const mush_aabb*);
+void mush_aabb_space_area(mush_aabb*, const mush_aabb*);
 
 #endif
