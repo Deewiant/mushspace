@@ -146,6 +146,9 @@ static bool map_in_static(
 // - Whether a new line or page was just reached, with one bit for each boolean
 //   (LSB for line, next-most for page). This may be updated by the function to
 //   reflect that it's done with the line/page.
+//
+// Does not use bakaabb, and indeed cannot due to the above data not making
+// sense with it.
 void mushspace_mapex_no_place(
 	mushspace* space, const mushaabb* aabb, void* fg,
 	void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*),
