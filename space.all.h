@@ -14,9 +14,9 @@
 #include "typenames.any.h"
 
 #if !MUSHSPACE_93
-#include "anamnesic_ring.98.h"
 #include "aabb.98.h"
 #include "bakaabb.98.h"
+#include "memory.98.h"
 #endif
 
 #define mushspace MUSHSPACE_NAME(mushspace)
@@ -25,7 +25,7 @@ typedef struct mushspace {
 #if MUSHSPACE_93
 	mushstaticaabb box;
 #else
-	mushanamnesic_ring recent_buf;
+	mushmemorybuf recent_buf;
 	bool just_placed_big;
 	mushcoords big_sequence_start, first_placed_big;
 

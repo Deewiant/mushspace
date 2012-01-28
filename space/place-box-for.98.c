@@ -32,7 +32,7 @@ bool mushspace_place_box_for(
 	if (!mushspace_place_box(space, &aabb, &c, placed))
 		return false;
 
-	mushanamnesic_ring_push(
+	mushmemorybuf_push(
 		&space->recent_buf, (mushmemory){.placed = (*placed)->bounds, c});
 
 	return true;
@@ -75,8 +75,8 @@ static bool get_box_along_recent_line_for(
 
 	assert (space->recent_buf.full);
 
-	mushmemory recents[MUSHANAMNESIC_RING_SIZE];
-	mushanamnesic_ring_read(&space->recent_buf, recents);
+	mushmemory recents[MUSHMEMORYBUF_SIZE];
+	mushmemorybuf_read(&space->recent_buf, recents);
 
 	// Find the axis along which the first two recent placements are aligned, if
 	// any, and note whether it was along the positive or negative direction.
@@ -141,8 +141,7 @@ static bool get_box_along_recent_volume_for(
 	assert (space->recent_buf.full);
 	assert (space->just_placed_big);
 
-	const mushbounds *last =
-		&mushanamnesic_ring_last(&space->recent_buf)->placed;
+	const mushbounds *last = &mushmemorybuf_last(&space->recent_buf)->placed;
 
 	if (extend_big_sequence_start_for(space, c, last, aabb))
 		return true;

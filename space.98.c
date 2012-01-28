@@ -30,7 +30,7 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
 	// first use.
 	space->last_beg = space->last_end = MUSHCOORDS(0,0,0);
 
-	mushanamnesic_ring_init(&space->recent_buf);
+	mushmemorybuf_init(&space->recent_buf);
 
 	mushcell_space(
 		space->static_box.array, MUSH_ARRAY_LEN(space->static_box.array));
