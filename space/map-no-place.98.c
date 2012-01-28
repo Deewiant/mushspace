@@ -55,6 +55,20 @@ void mushspace_map_no_place(
 				goto next_pos;
 		}
 
+		if (mushbounds_contains(&space->bak.bounds, pos)) {
+			mushcell *p = mushbakaabb_get_ptr_unsafe(&space->bak, pos);
+			f((musharr_mushcell){p,1}, fg);
+
+			for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
+				if (pos.v[i] != aabb->bounds.end.v[i]) {
+					++pos.v[i];
+					goto next_pos;
+				}
+				pos.v[i] = aabb->bounds.beg.v[i];
+			}
+			return;
+		}
+
 		// No hits for pos: find the next pos we can hit, or stop if there's
 		// nothing left.
 		size_t skipped = 0;
