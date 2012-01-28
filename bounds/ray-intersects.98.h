@@ -5,9 +5,9 @@
 
 #include "bounds.all.h"
 
-#define mush_bounds_ray_intersects MUSHSPACE_CAT(mushcoords,_ray_intersects)
+#define mushbounds_ray_intersects MUSHSPACE_CAT(mushcoords,_ray_intersects)
 
-bool mush_bounds_ray_intersects(mushcoords, mushcoords,
-                                const mush_bounds*, mushucell*, mushcoords*);
+bool mushbounds_ray_intersects(mushcoords, mushcoords,
+                               const mushbounds*, mushucell*, mushcoords*);
 
 #endif

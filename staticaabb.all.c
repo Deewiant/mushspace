@@ -5,54 +5,54 @@
 #include <assert.h>
 #include <stdlib.h>
 
-const mush_bounds
-	MUSH_STATICAABB_BOUNDS =
-		{.beg = MUSH_STATICAABB_BEG_INIT, .end = MUSH_STATICAABB_END_INIT},
-	MUSH_STATICAABB_REL_BOUNDS =
-		{.beg = MUSHCOORDS_INIT(0,0,0), .end = MUSH_STATICAABB_REL_END_INIT};
+const mushbounds
+	MUSHSTATICAABB_BOUNDS =
+		{.beg = MUSHSTATICAABB_BEG_INIT, .end = MUSHSTATICAABB_END_INIT},
+	MUSHSTATICAABB_REL_BOUNDS =
+		{.beg = MUSHCOORDS_INIT(0,0,0),  .end = MUSHSTATICAABB_REL_END_INIT};
 
-bool mush_staticaabb_contains(mushcoords c) {
-	return mush_bounds_contains(&MUSH_STATICAABB_BOUNDS, c);
+bool mushstaticaabb_contains(mushcoords c) {
+	return mushbounds_contains(&MUSHSTATICAABB_BOUNDS, c);
 }
 
-mushcell mush_staticaabb_get(const mush_staticaabb* aabb, mushcoords p) {
-	assert (mush_staticaabb_contains(p));
-	return aabb->array[mush_staticaabb_get_idx(p)];
+mushcell mushstaticaabb_get(const mushstaticaabb* aabb, mushcoords p) {
+	assert (mushstaticaabb_contains(p));
+	return aabb->array[mushstaticaabb_get_idx(p)];
 }
 
-void mush_staticaabb_put(mush_staticaabb* aabb, mushcoords p, mushcell c) {
-	assert (mush_staticaabb_contains(p));
-	aabb->array[mush_staticaabb_get_idx(p)] = c;
+void mushstaticaabb_put(mushstaticaabb* aabb, mushcoords p, mushcell c) {
+	assert (mushstaticaabb_contains(p));
+	aabb->array[mushstaticaabb_get_idx(p)] = c;
 }
 
-mushcell mush_staticaabb_get_no_offset(
-	const mush_staticaabb* aabb, mushcoords p)
+mushcell mushstaticaabb_get_no_offset(
+	const mushstaticaabb* aabb, mushcoords p)
 {
-	assert (mush_staticaabb_contains(mushcoords_add(p, MUSH_STATICAABB_BEG)));
-	return aabb->array[mush_staticaabb_get_idx_no_offset(p)];
+	assert (mushstaticaabb_contains(mushcoords_add(p, MUSHSTATICAABB_BEG)));
+	return aabb->array[mushstaticaabb_get_idx_no_offset(p)];
 }
 
-void mush_staticaabb_put_no_offset(
-	mush_staticaabb* aabb, mushcoords p, mushcell c)
+void mushstaticaabb_put_no_offset(
+	mushstaticaabb* aabb, mushcoords p, mushcell c)
 {
-	assert (mush_staticaabb_contains(mushcoords_add(p, MUSH_STATICAABB_BEG)));
-	aabb->array[mush_staticaabb_get_idx_no_offset(p)] = c;
+	assert (mushstaticaabb_contains(mushcoords_add(p, MUSHSTATICAABB_BEG)));
+	aabb->array[mushstaticaabb_get_idx_no_offset(p)] = c;
 }
 
-mushcell mush_staticaabb_getter_no_offset(const void* aabb, mushcoords c) {
-	return mush_staticaabb_get_no_offset(aabb, c);
+mushcell mushstaticaabb_getter_no_offset(const void* aabb, mushcoords c) {
+	return mushstaticaabb_get_no_offset(aabb, c);
 }
 
-size_t mush_staticaabb_get_idx(mushcoords c) {
-	return mush_staticaabb_get_idx_no_offset(
-		mushcoords_sub(c, MUSH_STATICAABB_BEG));
+size_t mushstaticaabb_get_idx(mushcoords c) {
+	return mushstaticaabb_get_idx_no_offset(
+		mushcoords_sub(c, MUSHSTATICAABB_BEG));
 }
-size_t mush_staticaabb_get_idx_no_offset(mushcoords c) {
+size_t mushstaticaabb_get_idx_no_offset(mushcoords c) {
 	size_t i = c.x;
 #if MUSHSPACE_DIM >= 2
-	i += MUSH_STATICAABB_SIZE.x * c.y;
+	i += MUSHSTATICAABB_SIZE.x * c.y;
 #if MUSHSPACE_DIM >= 3
-	i += MUSH_STATICAABB_SIZE.y * c.z;
+	i += MUSHSTATICAABB_SIZE.y * c.z;
 #endif
 #endif
 	return i;

@@ -4,13 +4,11 @@
 
 #include <assert.h>
 
-static bool find_beg_in(
-	mushcoords*, mushdim, const mush_bounds*,
-	mushcell(*)(const void*, mushcoords), const void*);
+static bool find_beg_in(mushcoords*, mushdim, const mushbounds*,
+                        mushcell(*)(const void*, mushcoords), const void*);
 
-static void find_end_in(
-	mushcoords*, mushdim, const mush_bounds*,
-	mushcell(*)(const void*, mushcoords), const void*);
+static void find_end_in(mushcoords*, mushdim, const mushbounds*,
+                        mushcell(*)(const void*, mushcoords), const void*);
 
 bool mushspace_get_tight_bounds(
 	mushspace* space, mushcoords* beg, mushcoords* end)
@@ -39,15 +37,15 @@ bool mushspace_get_tight_bounds(
 
 	for (mushdim axis = 0; axis < MUSHSPACE_DIM; ++axis) {
 		found_nonspace |=
-			!find_beg_in(beg, axis, &MUSH_STATICAABB_BOUNDS,
-			             mush_staticaabb_getter_no_offset, &space->static_box);
+			!find_beg_in(beg, axis, &MUSHSTATICAABB_BOUNDS,
+			             mushstaticaabb_getter_no_offset, &space->static_box);
 
-		find_end_in(end, axis, &MUSH_STATICAABB_BOUNDS,
-		            mush_staticaabb_getter_no_offset, &space->static_box);
+		find_end_in(end, axis, &MUSHSTATICAABB_BOUNDS,
+		            mushstaticaabb_getter_no_offset, &space->static_box);
 
 		for (size_t i = 0; i < space->box_count; ++i) {
 			if (find_beg_in(beg, axis, &space->boxen[i].bounds,
-			                mush_aabb_getter_no_offset, &space->boxen[i]))
+			                mushaabb_getter_no_offset, &space->boxen[i]))
 			{
 				mushspace_remove_boxes(space, i, i);
 				mushstats_add(space->stats, MushStat_empty_boxes_dropped, 1);
@@ -56,33 +54,33 @@ bool mushspace_get_tight_bounds(
 			}
 			found_nonspace = true;
 			find_end_in(end, axis, &space->boxen[i].bounds,
-			            mush_aabb_getter_no_offset, &space->boxen[i]);
+			            mushaabb_getter_no_offset, &space->boxen[i]);
 		}
 	}
 
 	if (changed)
 		mushspace_invalidate_all(space);
 
-	if (space->bak.data && mush_bakaabb_size(&space->bak) > 0) {
+	if (space->bak.data && mushbakaabb_size(&space->bak) > 0) {
 		found_nonspace = true;
 
 		// Might as well tighten the approximate space->bak.bounds while we're at
 		// it.
-		mush_bounds bak_bounds = {space->bak.bounds.end, space->bak.bounds.beg};
+		mushbounds bak_bounds = {space->bak.bounds.end, space->bak.bounds.beg};
 
-		unsigned char buf[mush_bakaabb_iter_sizeof];
-		mush_bakaabb_iter *it = mush_bakaabb_it_start(&space->bak, buf);
+		unsigned char buf[mushbakaabb_iter_sizeof];
+		mushbakaabb_iter *it = mushbakaabb_it_start(&space->bak, buf);
 
-		for (; !mush_bakaabb_it_done(it, &space->bak);
-		        mush_bakaabb_it_next(it, &space->bak))
+		for (; !mushbakaabb_it_done(it, &space->bak);
+		        mushbakaabb_it_next(it, &space->bak))
 		{
-			assert (mush_bakaabb_it_val(it, &space->bak) != ' ');
+			assert (mushbakaabb_it_val(it, &space->bak) != ' ');
 
-			mushcoords c = mush_bakaabb_it_pos(it, &space->bak);
+			mushcoords c = mushbakaabb_it_pos(it, &space->bak);
 			mushcoords_min_into(&bak_bounds.beg, c);
 			mushcoords_max_into(&bak_bounds.end, c);
 		}
-		mush_bakaabb_it_stop(it);
+		mushbakaabb_it_stop(it);
 
 		space->bak.bounds = bak_bounds;
 
@@ -94,7 +92,7 @@ bool mushspace_get_tight_bounds(
 	return found_nonspace;
 }
 static bool find_beg_in(
-	mushcoords* beg, mushdim axis, const mush_bounds* bounds,
+	mushcoords* beg, mushdim axis, const mushbounds* bounds,
 	mushcell(*getter_no_offset)(const void*, mushcoords), const void* box)
 {
 	if (beg->v[axis] <= bounds->beg.v[axis])
@@ -179,7 +177,7 @@ static bool find_beg_in(
 	return empty_box;
 }
 static void find_end_in(
-	mushcoords* end, mushdim axis, const mush_bounds* bounds,
+	mushcoords* end, mushdim axis, const mushbounds* bounds,
 	mushcell(*getter_no_offset)(const void*, mushcoords), const void* box)
 {
 	if (end->v[axis] >= bounds->end.v[axis])

@@ -3,7 +3,7 @@
 #ifndef MUSHSPACE_SPACE_HEURISTIC_CONSTANTS_H
 #define MUSHSPACE_SPACE_HEURISTIC_CONSTANTS_H
 
-// Threshold for switching to mush_bakaabb. Only limits mushspace_put, not
+// Threshold for switching to mushbakaabb. Only limits mushspace_put, not
 // mushspace_load_string.
 #define MAX_PLACED_BOXEN 64
 

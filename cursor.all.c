@@ -32,7 +32,7 @@ int mushcursor_init(
 {
 	mushcursor *cursor = *vp ? *vp : (*vp = malloc(sizeof *cursor));
 	if (!cursor)
-		return MUSH_ERR_OOM;
+		return MUSHERR_OOM;
 
 #if !MUSHSPACE_93
 	mushspace_add_invalidatee(space, mushcursor_recalibrate_void, cursor);
@@ -42,25 +42,25 @@ int mushcursor_init(
 
 #if MUSHSPACE_93
 	(void)delta;
-	cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
+	cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
 #else
 	if (!mushcursor_get_box(cursor, pos)) {
 		if (!mushspace_jump_to_box(space, &pos, delta, &cursor->mode,
 		                           &cursor->box, &cursor->box_idx))
 		{
 			mushcursor_set_infloop_pos(cursor, pos);
-			return MUSH_ERR_INFINITE_LOOP_SPACES;
+			return MUSHERR_INFINITE_LOOP_SPACES;
 		}
 		mushcursor_tessellate(cursor, pos);
 	}
 #endif
-	return MUSH_ERR_NONE;
+	return MUSHERR_NONE;
 }
 
 mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		return mushcoords_add(cursor->rel_pos, MUSH_STATICAABB_BEG);
+		return mushcoords_add(cursor->rel_pos, MUSHSTATICAABB_BEG);
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
 		return mushcoords_add(cursor->rel_pos, cursor->obeg);
@@ -74,7 +74,7 @@ mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
+		cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
 		return;
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
@@ -91,14 +91,14 @@ void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
 bool mushcursor_in_box(const mushcursor* cursor) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		return mush_bounds_contains(&MUSH_STATICAABB_REL_BOUNDS, cursor->rel_pos);
+		return mushbounds_contains(&MUSHSTATICAABB_REL_BOUNDS, cursor->rel_pos);
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
-		return mush_bounds_contains(&cursor->rel_bounds, cursor->rel_pos);
+		return mushbounds_contains(&cursor->rel_bounds, cursor->rel_pos);
 
 	case MushCursorMode_bak:
-		return mush_bounds_contains(&cursor->actual_bounds, cursor->actual_pos);
+		return mushbounds_contains(&cursor->actual_bounds, cursor->actual_pos);
 #endif
 	}
 	assert (false);
@@ -106,7 +106,7 @@ bool mushcursor_in_box(const mushcursor* cursor) {
 
 #if !MUSHSPACE_93
 bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
-	if (mush_staticaabb_contains(pos)) {
+	if (mushstaticaabb_contains(pos)) {
 		cursor->mode = MushCursorMode_static;
 		mushcursor_tessellate(cursor, pos);
 		return true;
@@ -119,7 +119,7 @@ bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 		mushcursor_tessellate(cursor, pos);
 		return true;
 	}
-	if (sp->bak.data && mush_bounds_contains(&sp->bak.bounds, pos)) {
+	if (sp->bak.data && mushbounds_contains(&sp->bak.bounds, pos)) {
 		cursor->mode = MushCursorMode_bak;
 		mushcursor_tessellate(cursor, pos);
 		return true;
@@ -148,16 +148,16 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
 
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		c = mush_staticaabb_get_no_offset(STATIC_BOX(sp), cursor->rel_pos);
+		c = mushstaticaabb_get_no_offset(STATIC_BOX(sp), cursor->rel_pos);
 		break;
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
-		c = mush_aabb_get_no_offset(cursor->box, cursor->rel_pos);
+		c = mushaabb_get_no_offset(cursor->box, cursor->rel_pos);
 		break;
 
 	case MushCursorMode_bak:
-		c = mush_bakaabb_get(&sp->bak, cursor->actual_pos);
+		c = mushbakaabb_get(&sp->bak, cursor->actual_pos);
 		break;
 #endif
 
@@ -190,18 +190,18 @@ int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		mush_staticaabb_put_no_offset(STATIC_BOX(sp), cursor->rel_pos, c);
-		ret = MUSH_ERR_NONE;
+		mushstaticaabb_put_no_offset(STATIC_BOX(sp), cursor->rel_pos, c);
+		ret = MUSHERR_NONE;
 		break;
 
 #if !MUSHSPACE_93
 	case MushCursorMode_dynamic:
-		mush_aabb_put_no_offset(cursor->box, cursor->rel_pos, c);
-		ret = MUSH_ERR_NONE;
+		mushaabb_put_no_offset(cursor->box, cursor->rel_pos, c);
+		ret = MUSHERR_NONE;
 		break;
 
 	case MushCursorMode_bak:
-		ret = mush_bakaabb_put(&sp->bak, cursor->actual_pos, c);
+		ret = mushbakaabb_put(&sp->bak, cursor->actual_pos, c);
 		break;
 #endif
 
@@ -249,8 +249,8 @@ static void mushcursor_recalibrate_void(void* cursor) {
 
 #if MUSHSPACE_93
 void mushcursor2_93_wrap(mushcursor* cursor) {
-	cursor->rel_pos.x %= MUSH_STATICAABB_SIZE.x;
-	cursor->rel_pos.y %= MUSH_STATICAABB_SIZE.y;
+	cursor->rel_pos.x %= MUSHSTATICAABB_SIZE.x;
+	cursor->rel_pos.y %= MUSHSTATICAABB_SIZE.y;
 }
 #else
 void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
@@ -258,7 +258,7 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
-		cursor->rel_pos = mushcoords_sub(pos, MUSH_STATICAABB_BEG);
+		cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
 		break;
 
 	case MushCursorMode_bak:
@@ -266,12 +266,10 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 		cursor->actual_bounds = sp->bak.bounds;
 
 		// bak is the lowest, so we tessellate with all boxes.
-		mush_bounds_tessellate1(
-			&cursor->actual_bounds, pos, &MUSH_STATICAABB_BOUNDS);
-		mush_bounds_tessellate(
-			&cursor->actual_bounds, pos,
-			(mush_carr_mush_bounds)
-				{(const mush_bounds*)sp->boxen, sp->box_count});
+		mushbounds_tessellate1(&cursor->actual_bounds, pos,
+		                       &MUSHSTATICAABB_BOUNDS);
+		mushbounds_tessellate (&cursor->actual_bounds, pos,
+			(mushcarr_mushbounds){(const mushbounds*)sp->boxen, sp->box_count});
 		break;
 
 	case MushCursorMode_dynamic: {
@@ -285,19 +283,18 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 		// depend on the bounds matching the data and the width/height being
 		// sensible.
 
-		mush_bounds *bounds = &cursor->box->bounds;
+		mushbounds *bounds = &cursor->box->bounds;
 		cursor->obeg = bounds->beg;
 
 		// Here we need to tessellate only with the boxes above cursor->box.
-		mush_bounds_tessellate1(bounds, pos, &MUSH_STATICAABB_BOUNDS);
-		mush_bounds_tessellate(bounds, pos,
-			(mush_carr_mush_bounds)
-				{(const mush_bounds*)sp->boxen, cursor->box_idx});
+		mushbounds_tessellate1(bounds, pos, &MUSHSTATICAABB_BOUNDS);
+		mushbounds_tessellate (bounds, pos,
+			(mushcarr_mushbounds){(const mushbounds*)sp->boxen, cursor->box_idx});
 
 		cursor->rel_pos    = mushcoords_sub(pos, cursor->obeg);
 		cursor->rel_bounds =
-			(mush_bounds){mushcoords_sub(bounds->beg, cursor->obeg),
-			              mushcoords_sub(bounds->end, cursor->obeg)};
+			(mushbounds){mushcoords_sub(bounds->beg, cursor->obeg),
+			             mushcoords_sub(bounds->end, cursor->obeg)};
 		break;
 	}
 

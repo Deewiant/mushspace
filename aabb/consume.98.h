@@ -5,11 +5,11 @@
 
 #include "aabb.98.h"
 
-#define mush_aabb_consume MUSHSPACE_CAT(mush_aabb,_consume)
+#define mushaabb_consume MUSHSPACE_CAT(mushaabb,_consume)
 
 // box should be unallocated and old allocated.
 //
 // box takes ownership of old's array. old must be contained within box.
-bool mush_aabb_consume(mush_aabb* box, mush_aabb* old);
+bool mushaabb_consume(mushaabb* box, mushaabb* old);
 
 #endif

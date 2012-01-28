@@ -9,11 +9,11 @@
 
 // Returns 0 on success or one of the following possible error codes:
 //
-// MUSH_ERR_OOM:     Ran out of memory somewhere.
-// MUSH_ERR_NO_ROOM: The string doesn't fit in the space, i.e. it would overlap
-//                   with itself. For instance, trying to binary-load 5
-//                   gigabytes of non-space data into a 32-bit space would
-//                   cause this error.
+// MUSHERR_OOM:     Ran out of memory somewhere.
+// MUSHERR_NO_ROOM: The string doesn't fit in the space, i.e. it would overlap
+//                  with itself. For instance, trying to binary-load 5
+//                  gigabytes of non-space data into a 32-bit space would
+//                  cause this error.
 int mushspace_load_string
 	( mushspace*, const unsigned char*, size_t len
 #ifndef MUSHSPACE_93

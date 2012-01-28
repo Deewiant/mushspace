@@ -8,7 +8,7 @@
 
 bool mushspace_jump_to_box(
 	mushspace* space, mushcoords* pos, mushcoords delta,
-	MushCursorMode* hit_type, mush_aabb** aabb, size_t* aabb_idx)
+	MushCursorMode* hit_type, mushaabb** aabb, size_t* aabb_idx)
 {
 	assert (!mushspace_find_box(space, *pos));
 
@@ -21,8 +21,7 @@ bool mushspace_jump_to_box(
 
 	// Pick the closest box that we hit, starting from the topmost.
 
-	if (mush_bounds_ray_intersects(*pos, delta, &MUSH_STATICAABB_BOUNDS,
-	                               &m, &c))
+	if (mushbounds_ray_intersects(*pos, delta, &MUSHSTATICAABB_BOUNDS, &m, &c))
 	{
 		pos2       = c;
 		moves      = m;
@@ -34,8 +33,8 @@ bool mushspace_jump_to_box(
 		// The !moves option is necessary: we can't initialize moves and rely on
 		// "m < moves" because m might legitimately be the greatest possible
 		// mushucell value.
-		if (mush_bounds_ray_intersects(*pos, delta, &space->boxen[i].bounds,
-		                               &m, &c)
+		if (mushbounds_ray_intersects(*pos, delta, &space->boxen[i].bounds,
+		                              &m, &c)
 		 && ((m < moves) | !moves))
 		{
 			pos2       = c;
@@ -46,7 +45,7 @@ bool mushspace_jump_to_box(
 	}
 
 	if (space->bak.data
-	 && mush_bounds_ray_intersects(*pos, delta, &space->bak.bounds, &m, &c)
+	 && mushbounds_ray_intersects(*pos, delta, &space->bak.bounds, &m, &c)
 	 && ((m < moves) | !moves))
 	{
 		*pos      = c;

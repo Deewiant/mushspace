@@ -9,10 +9,10 @@
 #include "coords.all.h"
 #include "typenames.any.h"
 
-#define mush_aabb MUSHSPACE_NAME(mush_aabb)
+#define mushaabb MUSHSPACE_NAME(mushaabb)
 
-typedef struct mush_aabb {
-	mush_bounds bounds;
+typedef struct mushaabb {
+	mushbounds bounds;
 	mushcell *data;
 	size_t size;
 
@@ -22,44 +22,44 @@ typedef struct mush_aabb {
 #if MUSHSPACE_DIM >= 3
 	size_t area;
 #endif
-} mush_aabb;
+} mushaabb;
 
-#define mush_aabb_make              MUSHSPACE_CAT(mush_aabb,_make)
-#define mush_aabb_make_unsafe       MUSHSPACE_CAT(mush_aabb,_make_unsafe)
-#define mush_aabb_finalize          MUSHSPACE_CAT(mush_aabb,_finalize)
-#define mush_aabb_alloc             MUSHSPACE_CAT(mush_aabb,_alloc)
-#define mush_aabb_volume_on         MUSHSPACE_CAT(mush_aabb,_volume_on)
-#define mush_aabb_get               MUSHSPACE_CAT(mush_aabb,_get)
-#define mush_aabb_put               MUSHSPACE_CAT(mush_aabb,_put)
-#define mush_aabb_get_no_offset     MUSHSPACE_CAT(mush_aabb,_get_no_offset)
-#define mush_aabb_put_no_offset     MUSHSPACE_CAT(mush_aabb,_put_no_offset)
-#define mush_aabb_getter_no_offset  MUSHSPACE_CAT(mush_aabb,_getter_no_offset)
-#define mush_aabb_get_idx           MUSHSPACE_CAT(mush_aabb,_get_idx)
-#define mush_aabb_get_idx_no_offset MUSHSPACE_CAT(mush_aabb,_get_idx_no_offset)
-#define mush_aabb_can_direct_copy   MUSHSPACE_CAT(mush_aabb,_can_direct_copy)
-#define mush_aabb_can_direct_copy_area \
-	MUSHSPACE_CAT(mush_aabb,_can_direct_copy_area)
+#define mushaabb_make              MUSHSPACE_CAT(mushaabb,_make)
+#define mushaabb_make_unsafe       MUSHSPACE_CAT(mushaabb,_make_unsafe)
+#define mushaabb_finalize          MUSHSPACE_CAT(mushaabb,_finalize)
+#define mushaabb_alloc             MUSHSPACE_CAT(mushaabb,_alloc)
+#define mushaabb_volume_on         MUSHSPACE_CAT(mushaabb,_volume_on)
+#define mushaabb_get               MUSHSPACE_CAT(mushaabb,_get)
+#define mushaabb_put               MUSHSPACE_CAT(mushaabb,_put)
+#define mushaabb_get_no_offset     MUSHSPACE_CAT(mushaabb,_get_no_offset)
+#define mushaabb_put_no_offset     MUSHSPACE_CAT(mushaabb,_put_no_offset)
+#define mushaabb_getter_no_offset  MUSHSPACE_CAT(mushaabb,_getter_no_offset)
+#define mushaabb_get_idx           MUSHSPACE_CAT(mushaabb,_get_idx)
+#define mushaabb_get_idx_no_offset MUSHSPACE_CAT(mushaabb,_get_idx_no_offset)
+#define mushaabb_can_direct_copy   MUSHSPACE_CAT(mushaabb,_can_direct_copy)
+#define mushaabb_can_direct_copy_area \
+	MUSHSPACE_CAT(mushaabb,_can_direct_copy_area)
 
-void mush_aabb_make       (mush_aabb*, const mush_bounds*);
-void mush_aabb_make_unsafe(mush_aabb*, const mush_bounds*);
-void mush_aabb_finalize   (mush_aabb*);
-bool mush_aabb_alloc      (mush_aabb*);
+void mushaabb_make       (mushaabb*, const mushbounds*);
+void mushaabb_make_unsafe(mushaabb*, const mushbounds*);
+void mushaabb_finalize   (mushaabb*);
+bool mushaabb_alloc      (mushaabb*);
 
-size_t mush_aabb_volume_on(const mush_aabb*, mushdim);
+size_t mushaabb_volume_on(const mushaabb*, mushdim);
 
-mushcell mush_aabb_get(const mush_aabb*, mushcoords);
-void     mush_aabb_put(      mush_aabb*, mushcoords, mushcell);
+mushcell mushaabb_get(const mushaabb*, mushcoords);
+void     mushaabb_put(      mushaabb*, mushcoords, mushcell);
 
-mushcell mush_aabb_get_no_offset(const mush_aabb*, mushcoords);
-void     mush_aabb_put_no_offset(      mush_aabb*, mushcoords, mushcell);
+mushcell mushaabb_get_no_offset(const mushaabb*, mushcoords);
+void     mushaabb_put_no_offset(      mushaabb*, mushcoords, mushcell);
 
-mushcell mush_aabb_getter_no_offset(const void*, mushcoords);
+mushcell mushaabb_getter_no_offset(const void*, mushcoords);
 
-size_t mush_aabb_get_idx          (const mush_aabb*, mushcoords);
-size_t mush_aabb_get_idx_no_offset(const mush_aabb*, mushcoords);
+size_t mushaabb_get_idx          (const mushaabb*, mushcoords);
+size_t mushaabb_get_idx_no_offset(const mushaabb*, mushcoords);
 
-bool mush_aabb_can_direct_copy(const mush_aabb*, const mush_aabb*);
-bool mush_aabb_can_direct_copy_area(
-	const mush_aabb*, const mush_aabb*, const mush_aabb*);
+bool mushaabb_can_direct_copy(const mushaabb*, const mushaabb*);
+bool mushaabb_can_direct_copy_area(
+	const mushaabb*, const mushaabb*, const mushaabb*);
 
 #endif

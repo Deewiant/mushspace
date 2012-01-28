@@ -5,8 +5,8 @@
 
 #include "aabb.98.h"
 
-#define mush_aabb_space_area MUSHSPACE_CAT(mush_aabb,_space_area)
+#define mushaabb_space_area MUSHSPACE_CAT(mushaabb,_space_area)
 
-void mush_aabb_space_area(mush_aabb*, const mush_aabb*);
+void mushaabb_space_area(mushaabb*, const mushaabb*);
 
 #endif

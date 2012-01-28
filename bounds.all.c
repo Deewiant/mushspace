@@ -4,7 +4,7 @@
 
 #include <assert.h>
 
-size_t mush_bounds_clamped_size(const mush_bounds* bounds) {
+size_t mushbounds_clamped_size(const mushbounds* bounds) {
 	size_t sz = 1;
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		sz = mush_size_t_mul_clamped(
@@ -12,7 +12,7 @@ size_t mush_bounds_clamped_size(const mush_bounds* bounds) {
 	return sz;
 }
 
-bool mush_bounds_contains(const mush_bounds* bounds, mushcoords pos) {
+bool mushbounds_contains(const mushbounds* bounds, mushcoords pos) {
 	if (pos.x < bounds->beg.x || pos.x > bounds->end.x) return false;
 #if MUSHSPACE_DIM >= 2
 	if (pos.y < bounds->beg.y || pos.y > bounds->end.y) return false;
@@ -22,7 +22,7 @@ bool mush_bounds_contains(const mush_bounds* bounds, mushcoords pos) {
 #endif
 	return true;
 }
-bool mush_bounds_safe_contains(const mush_bounds* bounds, mushcoords pos) {
+bool mushbounds_safe_contains(const mushbounds* bounds, mushcoords pos) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (bounds->beg.v[i] > bounds->end.v[i]) {
 			if (!(pos.v[i] >= bounds->beg.v[i] || pos.v[i] <= bounds->end.v[i]))
@@ -35,10 +35,10 @@ bool mush_bounds_safe_contains(const mush_bounds* bounds, mushcoords pos) {
 	return true;
 }
 
-bool mush_bounds_contains_bounds(const mush_bounds* a, const mush_bounds* b) {
-	return mush_bounds_contains(a, b->beg) && mush_bounds_contains(a, b->end);
+bool mushbounds_contains_bounds(const mushbounds* a, const mushbounds* b) {
+	return mushbounds_contains(a, b->beg) && mushbounds_contains(a, b->end);
 }
-bool mush_bounds_overlaps(const mush_bounds* a, const mush_bounds* b) {
+bool mushbounds_overlaps(const mushbounds* a, const mushbounds* b) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		if (a->beg.v[i] > b->end.v[i] || b->beg.v[i] > a->end.v[i])
 			return false;
@@ -46,37 +46,36 @@ bool mush_bounds_overlaps(const mush_bounds* a, const mush_bounds* b) {
 }
 
 #if !MUSHSPACE_93
-bool mush_bounds_get_overlap(
-	const mush_bounds* a, const mush_bounds* b, mush_bounds* overlap)
+bool mushbounds_get_overlap(
+	const mushbounds* a, const mushbounds* b, mushbounds* overlap)
 {
-	if (!mush_bounds_overlaps(a, b))
+	if (!mushbounds_overlaps(a, b))
 		return false;
 
 	overlap->beg = a->beg; mushcoords_max_into(&overlap->beg, b->beg);
 	overlap->end = a->end; mushcoords_min_into(&overlap->end, b->end);
 
-	assert (mush_bounds_contains_bounds(a, overlap));
-	assert (mush_bounds_contains_bounds(b, overlap));
+	assert (mushbounds_contains_bounds(a, overlap));
+	assert (mushbounds_contains_bounds(b, overlap));
 	return true;
 }
 
 #if MUSHSPACE_DIM > 1
-bool mush_bounds_on_same_axis(const mush_bounds* a, const mush_bounds* b) {
+bool mushbounds_on_same_axis(const mushbounds* a, const mushbounds* b) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		if (a->beg.v[i] == b->beg.v[i] && a->end.v[i] == b->end.v[i])
 			return true;
 	return false;
 }
-bool mush_bounds_on_same_primary_axis(
-	const mush_bounds* a, const mush_bounds* b)
+bool mushbounds_on_same_primary_axis(const mushbounds* a, const mushbounds* b)
 {
 	const mushdim I = MUSHSPACE_DIM-1;
 	return a->beg.v[I] == b->beg.v[I] && a->end.v[I] == b->end.v[I];
 }
 #endif
 
-bool mush_bounds_can_fuse(const mush_bounds* a, const mush_bounds* b) {
-	bool overlap = mush_bounds_overlaps(a, b);
+bool mushbounds_can_fuse(const mushbounds* a, const mushbounds* b) {
+	bool overlap = mushbounds_overlaps(a, b);
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (a->beg.v[i] == b->beg.v[i] && a->end.v[i] == b->end.v[i])
@@ -92,27 +91,27 @@ bool mush_bounds_can_fuse(const mush_bounds* a, const mush_bounds* b) {
 				return false;
 
 		#if MUSHSPACE_DIM > 1
-			assert (mush_bounds_on_same_axis(a, b));
+			assert (mushbounds_on_same_axis(a, b));
 		#endif
 		return true;
 	}
 	return false;
 }
 
-void mush_bounds_tessellate(
-	mush_bounds* bounds, mushcoords pos, mush_carr_mush_bounds bs)
+void mushbounds_tessellate(
+	mushbounds* bounds, mushcoords pos, mushcarr_mushbounds bs)
 {
-	assert (mush_bounds_contains(bounds, pos));
+	assert (mushbounds_contains(bounds, pos));
 
 	for (size_t i = 0; i < bs.len; ++i)
-		if (mush_bounds_overlaps(bounds, &bs.ptr[i]))
-			mush_bounds_tessellate1(bounds, pos, &bs.ptr[i]);
+		if (mushbounds_overlaps(bounds, &bs.ptr[i]))
+			mushbounds_tessellate1(bounds, pos, &bs.ptr[i]);
 }
-void mush_bounds_tessellate1(
-	mush_bounds* bounds, mushcoords pos, const mush_bounds* avoid)
+void mushbounds_tessellate1(
+	mushbounds* bounds, mushcoords pos, const mushbounds* avoid)
 {
-	assert (mush_bounds_contains(bounds, pos));
-	assert (mush_bounds_overlaps(bounds, avoid));
+	assert (mushbounds_contains(bounds, pos));
+	assert (mushbounds_overlaps(bounds, avoid));
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		// This could be improved, consider for instance the bottommost box in
@@ -150,6 +149,6 @@ void mush_bounds_tessellate1(
 		if (ae < p) bounds->beg.v[i] = mushcell_max(bounds->beg.v[i], ae+1);
 		if (ab > p) bounds->end.v[i] = mushcell_min(bounds->end.v[i], ab-1);
 	}
-	assert (!mush_bounds_overlaps(bounds, avoid));
+	assert (!mushbounds_overlaps(bounds, avoid));
 }
 #endif // !MUSHSPACE_93

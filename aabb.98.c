@@ -7,16 +7,16 @@
 
 #include "stdlib.any.h"
 
-void mush_aabb_make(mush_aabb* aabb, const mush_bounds* bounds) {
-	mush_aabb_make_unsafe(aabb, bounds);
-	mush_aabb_finalize(aabb);
+void mushaabb_make(mushaabb* aabb, const mushbounds* bounds) {
+	mushaabb_make_unsafe(aabb, bounds);
+	mushaabb_finalize(aabb);
 }
 
-void mush_aabb_make_unsafe(mush_aabb* aabb, const mush_bounds* bounds) {
-	*aabb = (mush_aabb){.bounds = *bounds};
+void mushaabb_make_unsafe(mushaabb* aabb, const mushbounds* bounds) {
+	*aabb = (mushaabb){.bounds = *bounds};
 }
 
-void mush_aabb_finalize(mush_aabb* aabb) {
+void mushaabb_finalize(mushaabb* aabb) {
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
 		assert (aabb->bounds.beg.v[i] <= aabb->bounds.end.v[i]);
 
@@ -32,7 +32,7 @@ void mush_aabb_finalize(mush_aabb* aabb) {
 #endif
 }
 
-bool mush_aabb_alloc(mush_aabb* aabb) {
+bool mushaabb_alloc(mushaabb* aabb) {
 	aabb->data = malloc(aabb->size);
 	if (!aabb->data)
 		return false;
@@ -40,7 +40,7 @@ bool mush_aabb_alloc(mush_aabb* aabb) {
 	return true;
 }
 
-size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
+size_t mushaabb_volume_on(const mushaabb* aabb, mushdim axis) {
 	assert (axis < MUSHSPACE_DIM);
 #if MUSHSPACE_DIM >= 2
 	if (axis == 1) return aabb->width;
@@ -52,35 +52,34 @@ size_t mush_aabb_volume_on(const mush_aabb* aabb, mushdim axis) {
 	return 1;
 }
 
-mushcell mush_aabb_get(const mush_aabb* aabb, mushcoords c) {
-	assert (mush_bounds_contains(&aabb->bounds, c));
-	return aabb->data[mush_aabb_get_idx(aabb, c)];
+mushcell mushaabb_get(const mushaabb* aabb, mushcoords c) {
+	assert (mushbounds_contains(&aabb->bounds, c));
+	return aabb->data[mushaabb_get_idx(aabb, c)];
 }
 
-void mush_aabb_put(mush_aabb* aabb, mushcoords p, mushcell c) {
-	assert (mush_bounds_contains(&aabb->bounds, p));
-	aabb->data[mush_aabb_get_idx(aabb, p)] = c;
+void mushaabb_put(mushaabb* aabb, mushcoords p, mushcell c) {
+	assert (mushbounds_contains(&aabb->bounds, p));
+	aabb->data[mushaabb_get_idx(aabb, p)] = c;
 }
 
-mushcell mush_aabb_get_no_offset(const mush_aabb* aabb, mushcoords c) {
+mushcell mushaabb_get_no_offset(const mushaabb* aabb, mushcoords c) {
 	// Can't assert contains(c + beg) since no_offset usage typically means that
 	// our beg/end don't match data.
-	return aabb->data[mush_aabb_get_idx_no_offset(aabb, c)];
+	return aabb->data[mushaabb_get_idx_no_offset(aabb, c)];
 }
 
-void mush_aabb_put_no_offset(mush_aabb* aabb, mushcoords p, mushcell c) {
-	aabb->data[mush_aabb_get_idx_no_offset(aabb, p)] = c;
+void mushaabb_put_no_offset(mushaabb* aabb, mushcoords p, mushcell c) {
+	aabb->data[mushaabb_get_idx_no_offset(aabb, p)] = c;
 }
 
-mushcell mush_aabb_getter_no_offset(const void* aabb, mushcoords c) {
-	return mush_aabb_get_no_offset(aabb, c);
+mushcell mushaabb_getter_no_offset(const void* aabb, mushcoords c) {
+	return mushaabb_get_no_offset(aabb, c);
 }
 
-size_t mush_aabb_get_idx(const mush_aabb* a, mushcoords c) {
-	return mush_aabb_get_idx_no_offset(a, mushcoords_sub(c, a->bounds.beg));
+size_t mushaabb_get_idx(const mushaabb* a, mushcoords c) {
+	return mushaabb_get_idx_no_offset(a, mushcoords_sub(c, a->bounds.beg));
 }
-size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
-{
+size_t mushaabb_get_idx_no_offset(const mushaabb* aabb, mushcoords c) {
 	size_t i = c.x;
 #if MUSHSPACE_DIM >= 2
 	i += aabb->width * c.y;
@@ -93,9 +92,7 @@ size_t mush_aabb_get_idx_no_offset(const mush_aabb* aabb, mushcoords c)
 	return i;
 }
 
-bool mush_aabb_can_direct_copy(
-	const mush_aabb* copier, const mush_aabb* copiee)
-{
+bool mushaabb_can_direct_copy(const mushaabb* copier, const mushaabb* copiee) {
 #if MUSHSPACE_DIM == 1
 	(void)copier; (void)copiee;
 	return true;
@@ -110,8 +107,8 @@ bool mush_aabb_can_direct_copy(
 	;
 #endif
 }
-bool mush_aabb_can_direct_copy_area(
-	const mush_aabb* copier, const mush_aabb* copiee, const mush_aabb* owner)
+bool mushaabb_can_direct_copy_area(
+	const mushaabb* copier, const mushaabb* copiee, const mushaabb* owner)
 {
 #if MUSHSPACE_DIM >= 2
 	if (copiee->width != owner->width) return false;
@@ -120,5 +117,5 @@ bool mush_aabb_can_direct_copy_area(
 #endif
 #endif
 	(void)owner;
-	return mush_aabb_can_direct_copy(copier, copiee);
+	return mushaabb_can_direct_copy(copier, copiee);
 }

@@ -10,32 +10,32 @@
 #include "coords.all.h"
 #include "typenames.any.h"
 
-#define mush_anamnesic_ring MUSHSPACE_NAME(mush_anamnesic_ring)
-#define mush_memory         MUSHSPACE_NAME(mush_memory)
+#define mushanamnesic_ring MUSHSPACE_NAME(mushanamnesic_ring)
+#define mushmemory         MUSHSPACE_NAME(mushmemory)
 
-#define MUSH_ANAMNESIC_RING_SIZE 3
+#define MUSHANAMNESIC_RING_SIZE 3
 
-typedef struct mush_memory {
-	mush_bounds placed;
+typedef struct mushmemory {
+	mushbounds placed;
 	mushcoords c;
-} mush_memory;
+} mushmemory;
 
-typedef struct mush_anamnesic_ring {
-	mush_memory ring[MUSH_ANAMNESIC_RING_SIZE];
+typedef struct mushanamnesic_ring {
+	mushmemory ring[MUSHANAMNESIC_RING_SIZE];
 	uint8_t pos;
 	bool full;
-} mush_anamnesic_ring;
+} mushanamnesic_ring;
 
-#define mush_anamnesic_ring_init MUSHSPACE_CAT(mush_anamnesic_ring,_init)
-#define mush_anamnesic_ring_push MUSHSPACE_CAT(mush_anamnesic_ring,_push)
-#define mush_anamnesic_ring_read MUSHSPACE_CAT(mush_anamnesic_ring,_read)
-#define mush_anamnesic_ring_last MUSHSPACE_CAT(mush_anamnesic_ring,_last)
+#define mushanamnesic_ring_init MUSHSPACE_CAT(mushanamnesic_ring,_init)
+#define mushanamnesic_ring_push MUSHSPACE_CAT(mushanamnesic_ring,_push)
+#define mushanamnesic_ring_read MUSHSPACE_CAT(mushanamnesic_ring,_read)
+#define mushanamnesic_ring_last MUSHSPACE_CAT(mushanamnesic_ring,_last)
 
-void mush_anamnesic_ring_init(mush_anamnesic_ring*);
+void mushanamnesic_ring_init(mushanamnesic_ring*);
 
-void mush_anamnesic_ring_push(mush_anamnesic_ring*, mush_memory);
+void mushanamnesic_ring_push(mushanamnesic_ring*, mushmemory);
 
-void mush_anamnesic_ring_read(const mush_anamnesic_ring*, mush_memory*);
-const mush_memory* mush_anamnesic_ring_last(const mush_anamnesic_ring*);
+void mushanamnesic_ring_read(const mushanamnesic_ring*, mushmemory*);
+const mushmemory* mushanamnesic_ring_last(const mushanamnesic_ring*);
 
 #endif

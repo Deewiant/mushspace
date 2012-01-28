@@ -9,51 +9,51 @@
 #include "bounds.all.h"
 #include "typenames.any.h"
 
-#define mush_bakaabb      MUSHSPACE_NAME(mush_bakaabb)
-#define mush_bakaabb_iter MUSHSPACE_NAME(mush_bakaabb_iter)
+#define mushbakaabb      MUSHSPACE_NAME(mushbakaabb)
+#define mushbakaabb_iter MUSHSPACE_NAME(mushbakaabb_iter)
 
-typedef struct mush_bakaabb {
-	mush_bounds bounds;
+typedef struct mushbakaabb {
+	mushbounds bounds;
 	void *data;
-} mush_bakaabb;
+} mushbakaabb;
 
-typedef struct mush_bakaabb_iter mush_bakaabb_iter;
+typedef struct mushbakaabb_iter mushbakaabb_iter;
 
-#define mush_bakaabb_iter_sizeof MUSHSPACE_CAT(mush_bakaabb_iter,_sizeof)
-#define mush_bakaabb_init        MUSHSPACE_CAT(mush_bakaabb,_init)
-#define mush_bakaabb_free        MUSHSPACE_CAT(mush_bakaabb,_free)
-#define mush_bakaabb_copy        MUSHSPACE_CAT(mush_bakaabb,_copy)
-#define mush_bakaabb_get         MUSHSPACE_CAT(mush_bakaabb,_get)
-#define mush_bakaabb_put         MUSHSPACE_CAT(mush_bakaabb,_put)
-#define mush_bakaabb_size        MUSHSPACE_CAT(mush_bakaabb,_size)
-#define mush_bakaabb_it_start    MUSHSPACE_CAT(mush_bakaabb,_it_start)
-#define mush_bakaabb_it_stop     MUSHSPACE_CAT(mush_bakaabb,_it_stop)
-#define mush_bakaabb_it_done     MUSHSPACE_CAT(mush_bakaabb,_it_done)
-#define mush_bakaabb_it_next     MUSHSPACE_CAT(mush_bakaabb,_it_next)
-#define mush_bakaabb_it_remove   MUSHSPACE_CAT(mush_bakaabb,_it_remove)
-#define mush_bakaabb_it_pos      MUSHSPACE_CAT(mush_bakaabb,_it_pos)
-#define mush_bakaabb_it_val      MUSHSPACE_CAT(mush_bakaabb,_it_val)
+#define mushbakaabb_iter_sizeof MUSHSPACE_CAT(mushbakaabb_iter,_sizeof)
+#define mushbakaabb_init        MUSHSPACE_CAT(mushbakaabb,_init)
+#define mushbakaabb_free        MUSHSPACE_CAT(mushbakaabb,_free)
+#define mushbakaabb_copy        MUSHSPACE_CAT(mushbakaabb,_copy)
+#define mushbakaabb_get         MUSHSPACE_CAT(mushbakaabb,_get)
+#define mushbakaabb_put         MUSHSPACE_CAT(mushbakaabb,_put)
+#define mushbakaabb_size        MUSHSPACE_CAT(mushbakaabb,_size)
+#define mushbakaabb_it_start    MUSHSPACE_CAT(mushbakaabb,_it_start)
+#define mushbakaabb_it_stop     MUSHSPACE_CAT(mushbakaabb,_it_stop)
+#define mushbakaabb_it_done     MUSHSPACE_CAT(mushbakaabb,_it_done)
+#define mushbakaabb_it_next     MUSHSPACE_CAT(mushbakaabb,_it_next)
+#define mushbakaabb_it_remove   MUSHSPACE_CAT(mushbakaabb,_it_remove)
+#define mushbakaabb_it_pos      MUSHSPACE_CAT(mushbakaabb,_it_pos)
+#define mushbakaabb_it_val      MUSHSPACE_CAT(mushbakaabb,_it_val)
 
-extern const size_t mush_bakaabb_iter_sizeof;
+extern const size_t mushbakaabb_iter_sizeof;
 
-bool mush_bakaabb_init(mush_bakaabb*, mushcoords);
-void mush_bakaabb_free(mush_bakaabb*);
-bool mush_bakaabb_copy(mush_bakaabb*, const mush_bakaabb*);
+bool mushbakaabb_init(mushbakaabb*, mushcoords);
+void mushbakaabb_free(mushbakaabb*);
+bool mushbakaabb_copy(mushbakaabb*, const mushbakaabb*);
 
-mushcell mush_bakaabb_get(const mush_bakaabb*, mushcoords);
-bool     mush_bakaabb_put(      mush_bakaabb*, mushcoords, mushcell);
+mushcell mushbakaabb_get(const mushbakaabb*, mushcoords);
+bool     mushbakaabb_put(      mushbakaabb*, mushcoords, mushcell);
 
-size_t mush_bakaabb_size(const mush_bakaabb*);
+size_t mushbakaabb_size(const mushbakaabb*);
 
-mush_bakaabb_iter* mush_bakaabb_it_start(const mush_bakaabb*, void*);
-void               mush_bakaabb_it_stop (mush_bakaabb_iter*);
+mushbakaabb_iter* mushbakaabb_it_start(const mushbakaabb*, void*);
+void              mushbakaabb_it_stop (mushbakaabb_iter*);
 
-bool mush_bakaabb_it_done(const mush_bakaabb_iter*, const mush_bakaabb*);
+bool mushbakaabb_it_done(const mushbakaabb_iter*, const mushbakaabb*);
 
-void mush_bakaabb_it_next  (mush_bakaabb_iter*, const mush_bakaabb*);
-void mush_bakaabb_it_remove(mush_bakaabb_iter*,       mush_bakaabb*);
+void mushbakaabb_it_next  (mushbakaabb_iter*, const mushbakaabb*);
+void mushbakaabb_it_remove(mushbakaabb_iter*,       mushbakaabb*);
 
-mushcoords mush_bakaabb_it_pos(const mush_bakaabb_iter*, const mush_bakaabb*);
-mushcell   mush_bakaabb_it_val(const mush_bakaabb_iter*, const mush_bakaabb*);
+mushcoords mushbakaabb_it_pos(const mushbakaabb_iter*, const mushbakaabb*);
+mushcell   mushbakaabb_it_val(const mushbakaabb_iter*, const mushbakaabb*);
 
 #endif

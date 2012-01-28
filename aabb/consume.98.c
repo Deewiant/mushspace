@@ -7,11 +7,11 @@
 
 #if MUSHSPACE_DIM > 1
 static void consume_2d(
-	const mush_aabb*, const mush_aabb*, size_t, size_t, size_t);
+	const mushaabb*, const mushaabb*, size_t, size_t, size_t);
 #endif
 
-bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
-	assert (mush_bounds_contains_bounds(&box->bounds, &old->bounds));
+bool mushaabb_consume(mushaabb* box, mushaabb* old) {
+	assert (mushbounds_contains_bounds(&box->bounds, &old->bounds));
 
 	static const size_t SIZE = sizeof *box->data;
 
@@ -20,9 +20,9 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
 
 	mushcell_space(box->data + old->size, box->size - old->size);
 
-	const size_t old_idx = mush_aabb_get_idx(box, old->bounds.beg);
+	const size_t old_idx = mushaabb_get_idx(box, old->bounds.beg);
 
-	if (mush_aabb_can_direct_copy(box, old)) {
+	if (mushaabb_can_direct_copy(box, old)) {
 		if (old_idx == 0)
 			return true;
 
@@ -65,7 +65,7 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
 }
 #if MUSHSPACE_DIM > 1
 static void consume_2d(
-	const mush_aabb* box, const mush_aabb* old,
+	const mushaabb* box, const mushaabb* old,
 	size_t old_idx, size_t old_end, size_t last_row_idx_summand)
 {
 	static const size_t SIZE = sizeof *box->data;

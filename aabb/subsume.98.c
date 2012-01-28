@@ -9,39 +9,39 @@ MUSH_DECL_CONST_DYN_ARRAY(mushcell)
 
 // Copies from data to aabb, given that it's an area contained in owner.
 static void subsume_owners_area(
-	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
-	mush_carr_mushcell data);
+	mushaabb* aabb, const mushaabb* owner, const mushaabb* area,
+	mushcarr_mushcell data);
 
-void mush_aabb_subsume(mush_aabb* a, const mush_aabb* b) {
-	assert (mush_bounds_contains_bounds(&a->bounds, &b->bounds));
+void mushaabb_subsume(mushaabb* a, const mushaabb* b) {
+	assert (mushbounds_contains_bounds(&a->bounds, &b->bounds));
 
-	subsume_owners_area(a, b, b, (mush_carr_mushcell){b->data, b->size});
+	subsume_owners_area(a, b, b, (mushcarr_mushcell){b->data, b->size});
 }
 
-void mush_aabb_subsume_area(
-	mush_aabb* a, const mush_aabb* b, const mush_aabb* area)
+void mushaabb_subsume_area(
+	mushaabb* a, const mushaabb* b, const mushaabb* area)
 {
-	assert (mush_bounds_contains_bounds(&a->bounds, &area->bounds));
-	assert (mush_bounds_contains_bounds(&b->bounds, &area->bounds));
+	assert (mushbounds_contains_bounds(&a->bounds, &area->bounds));
+	assert (mushbounds_contains_bounds(&b->bounds, &area->bounds));
 
-	const mush_bounds* ab = &area->bounds;
+	const mushbounds* ab = &area->bounds;
 
-	size_t beg_idx = mush_aabb_get_idx(b, ab->beg),
-	       end_idx = mush_aabb_get_idx(b, ab->end);
+	size_t beg_idx = mushaabb_get_idx(b, ab->beg),
+	       end_idx = mushaabb_get_idx(b, ab->end);
 
 	subsume_owners_area(
 		a, b, area,
-		(mush_carr_mushcell){b->data + beg_idx, end_idx - beg_idx + 1});
+		(mushcarr_mushcell){b->data + beg_idx, end_idx - beg_idx + 1});
 
-	assert (mush_aabb_get(a, ab->beg) == mush_aabb_get(b, ab->beg));
-	assert (mush_aabb_get(a, ab->end) == mush_aabb_get(b, ab->end));
+	assert (mushaabb_get(a, ab->beg) == mushaabb_get(b, ab->beg));
+	assert (mushaabb_get(a, ab->end) == mushaabb_get(b, ab->end));
 }
 static void subsume_owners_area(
-	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
-	mush_carr_mushcell arr)
+	mushaabb* aabb, const mushaabb* owner, const mushaabb* area,
+	mushcarr_mushcell arr)
 {
-	assert (mush_bounds_contains_bounds(&aabb->bounds,  &area->bounds));
-	assert (mush_bounds_contains_bounds(&owner->bounds, &area->bounds));
+	assert (mushbounds_contains_bounds(&aabb->bounds,  &area->bounds));
+	assert (mushbounds_contains_bounds(&owner->bounds, &area->bounds));
 
 	// We can't just use only area since the data is usually not continuous:
 	//
@@ -60,11 +60,11 @@ static void subsume_owners_area(
 
 	static const size_t SIZE = sizeof *arr.ptr;
 
-	const mush_bounds* ab = &area->bounds;
+	const mushbounds* ab = &area->bounds;
 
-	const size_t beg_idx = mush_aabb_get_idx(aabb, ab->beg);
+	const size_t beg_idx = mushaabb_get_idx(aabb, ab->beg);
 
-	if (mush_aabb_can_direct_copy_area(aabb, area, owner)) {
+	if (mushaabb_can_direct_copy_area(aabb, area, owner)) {
 		memcpy(aabb->data + beg_idx, arr.ptr, arr.len * SIZE);
 		goto end;
 	}
@@ -92,8 +92,8 @@ static void subsume_owners_area(
 	}
 #endif
 end:
-	assert (mush_aabb_get(aabb, ab->beg) == arr.ptr[0]);
-	assert (mush_aabb_get(aabb, ab->end) == arr.ptr[arr.len-1]);
-	assert (mush_aabb_get(aabb, ab->beg) == mush_aabb_get(owner, ab->beg));
-	assert (mush_aabb_get(aabb, ab->end) == mush_aabb_get(owner, ab->end));
+	assert (mushaabb_get(aabb, ab->beg) == arr.ptr[0]);
+	assert (mushaabb_get(aabb, ab->end) == arr.ptr[arr.len-1]);
+	assert (mushaabb_get(aabb, ab->beg) == mushaabb_get(owner, ab->beg));
+	assert (mushaabb_get(aabb, ab->end) == mushaabb_get(owner, ab->end));
 }

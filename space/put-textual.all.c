@@ -43,7 +43,7 @@ int mushspace_put_textual(
 	mushspace_get_loose_bounds(space, &lbeg, &lend);
 	mushcoords_min_into(&end, lend);
 
-	int ret = MUSH_ERR_OOM;
+	int ret = MUSHERR_OOM;
 
 	mushcoords c;
 	size_t i = 0, w = 0;
@@ -101,7 +101,7 @@ int mushspace_put_textual(
 	}
 #endif
 	put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat);
-	ret = MUSH_ERR_NONE;
+	ret = MUSHERR_NONE;
 
 end:
 	if (bufp) {

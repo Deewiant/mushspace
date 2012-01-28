@@ -7,39 +7,39 @@
 #include "space/heuristic-constants.98.h"
 #include "space/place-box.98.h"
 
-static void get_box_for(mushspace*, mushcoords, mush_aabb*);
+static void get_box_for(mushspace*, mushcoords, mushaabb*);
 
-static bool get_box_along_recent_line_for(mushspace*, mushcoords, mush_aabb*);
+static bool get_box_along_recent_line_for(mushspace*, mushcoords, mushaabb*);
 
 static bool get_box_along_recent_volume_for(
-	const mushspace*, mushcoords, mush_aabb*);
+	const mushspace*, mushcoords, mushaabb*);
 
 static bool extend_big_sequence_start_for(
-	const mushspace*, mushcoords, const mush_bounds*, mush_aabb*);
+	const mushspace*, mushcoords, const mushbounds*, mushaabb*);
 
 static bool extend_first_placed_big_for(
-	const mushspace*, mushcoords, const mush_bounds*, mush_aabb*);
+	const mushspace*, mushcoords, const mushbounds*, mushaabb*);
 
 bool mushspace_place_box_for(
-	mushspace* space, mushcoords c, mush_aabb** placed)
+	mushspace* space, mushcoords c, mushaabb** placed)
 {
 	if (space->box_count >= MAX_PLACED_BOXEN)
 		return false;
 
-	mush_aabb aabb;
+	mushaabb aabb;
 	get_box_for(space, c, &aabb);
 
 	if (!mushspace_place_box(space, &aabb, &c, placed))
 		return false;
 
-	mush_anamnesic_ring_push(
-		&space->recent_buf, (mush_memory){.placed = (*placed)->bounds, c});
+	mushanamnesic_ring_push(
+		&space->recent_buf, (mushmemory){.placed = (*placed)->bounds, c});
 
 	return true;
 }
-static void get_box_for(mushspace* space, mushcoords c, mush_aabb* aabb) {
+static void get_box_for(mushspace* space, mushcoords c, mushaabb* aabb) {
 	for (size_t b = 0; b < space->box_count; ++b)
-		assert (!mush_bounds_contains(&space->boxen[b].bounds, c));
+		assert (!mushbounds_contains(&space->boxen[b].bounds, c));
 
 	if (space->recent_buf.full) {
 		if (space->just_placed_big) {
@@ -52,15 +52,15 @@ static void get_box_for(mushspace* space, mushcoords c, mush_aabb* aabb) {
 
 	space->just_placed_big = false;
 
-	mush_bounds bounds = {mushcoords_subs_clamped(c, NEWBOX_PAD),
-	                      mushcoords_adds_clamped(c, NEWBOX_PAD)};
-	mush_aabb_make(aabb, &bounds);
+	mushbounds bounds = {mushcoords_subs_clamped(c, NEWBOX_PAD),
+	                     mushcoords_adds_clamped(c, NEWBOX_PAD)};
+	mushaabb_make(aabb, &bounds);
 
 end:
-	assert (mush_bounds_safe_contains(&aabb->bounds, c));
+	assert (mushbounds_safe_contains(&aabb->bounds, c));
 }
 static bool get_box_along_recent_line_for(
-	mushspace* space, mushcoords c, mush_aabb* aabb)
+	mushspace* space, mushcoords c, mushaabb* aabb)
 {
 	// Detect mushspace_put patterns where we seem to be moving in a straight
 	// line and allocate one long, narrow box. This is the first big box
@@ -75,8 +75,8 @@ static bool get_box_along_recent_line_for(
 
 	assert (space->recent_buf.full);
 
-	mush_memory recents[MUSH_ANAMNESIC_RING_SIZE];
-	mush_anamnesic_ring_read(&space->recent_buf, recents);
+	mushmemory recents[MUSHANAMNESIC_RING_SIZE];
+	mushanamnesic_ring_read(&space->recent_buf, recents);
 
 	// Find the axis along which the first two recent placements are aligned, if
 	// any, and note whether it was along the positive or negative direction.
@@ -128,21 +128,21 @@ static bool get_box_along_recent_line_for(
 	space->first_placed_big   = c;
 	space->big_sequence_start = recents[0].c;
 
-	mush_bounds bounds = {c,c};
+	mushbounds bounds = {c,c};
 	if (positive) mushcell_add_into(&bounds.end.v[axis], BIGBOX_PAD);
 	else          mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 
-	mush_aabb_make_unsafe(aabb, &bounds);
+	mushaabb_make_unsafe(aabb, &bounds);
 	return true;
 }
 static bool get_box_along_recent_volume_for(
-	const mushspace* space, mushcoords c, mush_aabb* aabb)
+	const mushspace* space, mushcoords c, mushaabb* aabb)
 {
 	assert (space->recent_buf.full);
 	assert (space->just_placed_big);
 
-	const mush_bounds *last =
-		&mush_anamnesic_ring_last(&space->recent_buf)->placed;
+	const mushbounds *last =
+		&mushanamnesic_ring_last(&space->recent_buf)->placed;
 
 	if (extend_big_sequence_start_for(space, c, last, aabb))
 		return true;
@@ -153,8 +153,8 @@ static bool get_box_along_recent_volume_for(
 	return false;
 }
 static bool extend_big_sequence_start_for(
-	const mushspace* space, mushcoords c, const mush_bounds* last,
-	mush_aabb* aabb)
+	const mushspace* space, mushcoords c, const mushbounds* last,
+	mushaabb* aabb)
 {
 	// See if c is at big_sequence_start except for one axis, along which it's
 	// just past last->end or last->beg. The typical case for this is the
@@ -191,17 +191,17 @@ static bool extend_big_sequence_start_for(
 		return false;
 
 	// Extend last along the axis where c was outside it.
-	mush_bounds bounds = *last;
+	mushbounds bounds = *last;
 	if (positive) mushcell_add_into(&bounds.end.v[axis], BIGBOX_PAD);
 	else          mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 
-	mush_aabb_make_unsafe(aabb, &bounds);
+	mushaabb_make_unsafe(aabb, &bounds);
 	return true;
 }
 
 static bool extend_first_placed_big_for(
-	const mushspace* space, mushcoords c, const mush_bounds* last,
-	mush_aabb* aabb)
+	const mushspace* space, mushcoords c, const mushbounds* last,
+	mushaabb* aabb)
 {
 	// Match against space->first_placed_big. This is for the case when we've
 	// made a few non-big boxes and then hit a new dimension for the first time
@@ -252,7 +252,7 @@ static bool extend_first_placed_big_for(
 	if (axis == MUSHSPACE_DIM)
 		return false;
 
-	mush_bounds bounds;
+	mushbounds bounds;
 	if (positive) {
 		bounds.beg = space->big_sequence_start;
 		bounds.end = last->end;
@@ -264,7 +264,7 @@ static bool extend_first_placed_big_for(
 
 		mushcell_sub_into(&bounds.beg.v[axis], BIGBOX_PAD);
 	}
-	mush_aabb_make_unsafe(aabb, &bounds);
+	mushaabb_make_unsafe(aabb, &bounds);
 	return true;
 #endif
 }

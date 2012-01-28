@@ -7,6 +7,6 @@
 
 #define mushspace_place_box MUSHSPACE_CAT(mushspace,_place_box)
 
-bool mushspace_place_box(mushspace*, mush_aabb*, mushcoords*, mush_aabb**);
+bool mushspace_place_box(mushspace*, mushaabb*, mushcoords*, mushaabb**);
 
 #endif

@@ -23,9 +23,9 @@
 
 typedef struct mushspace {
 #if MUSHSPACE_93
-	mush_staticaabb box;
+	mushstaticaabb box;
 #else
-	mush_anamnesic_ring recent_buf;
+	mushanamnesic_ring recent_buf;
 	bool just_placed_big;
 	mushcoords big_sequence_start, first_placed_big;
 
@@ -38,10 +38,10 @@ typedef struct mushspace {
 
 	size_t box_count;
 
-	mush_aabb    *boxen;
-	mush_bakaabb  bak;
+	mushaabb   *boxen;
+	mushbakaabb bak;
 
-	mush_staticaabb static_box;
+	mushstaticaabb static_box;
 #endif
 } mushspace;
 
@@ -72,7 +72,7 @@ typedef enum MushCursorMode {
 #define mushspace_get_caabb_idx    MUSHSPACE_CAT(mushspace,_get_caabb_idx)
 
 #if !MUSHSPACE_93
-typedef struct { const mush_aabb *aabb; size_t idx; } mush_caabb_idx;
+typedef struct { const mushaabb *aabb; size_t idx; } mushcaabb_idx;
 #endif
 
 extern const size_t mushspace_sizeof;
@@ -98,13 +98,13 @@ void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
 void mushspace_invalidate_all (mushspace*);
 
-mush_aabb* mushspace_find_box        (const mushspace*, mushcoords);
-mush_aabb* mushspace_find_box_and_idx(const mushspace*, mushcoords, size_t*);
+mushaabb* mushspace_find_box        (const mushspace*, mushcoords);
+mushaabb* mushspace_find_box_and_idx(const mushspace*, mushcoords, size_t*);
 
 // Removes the given range of boxes, inclusive.
 void mushspace_remove_boxes(mushspace*, size_t, size_t);
 
-mush_caabb_idx mushspace_get_caabb_idx(const mushspace*, size_t);
+mushcaabb_idx mushspace_get_caabb_idx(const mushspace*, size_t);
 #endif
 
 #endif

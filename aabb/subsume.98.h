@@ -5,10 +5,10 @@
 
 #include "aabb.98.h"
 
-#define mush_aabb_subsume      MUSHSPACE_CAT(mush_aabb,_subsume)
-#define mush_aabb_subsume_area MUSHSPACE_CAT(mush_aabb,_subsume_area)
+#define mushaabb_subsume      MUSHSPACE_CAT(mushaabb,_subsume)
+#define mushaabb_subsume_area MUSHSPACE_CAT(mushaabb,_subsume_area)
 
-void mush_aabb_subsume     (mush_aabb*, const mush_aabb*);
-void mush_aabb_subsume_area(mush_aabb*, const mush_aabb*, const mush_aabb*);
+void mushaabb_subsume     (mushaabb*, const mushaabb*);
+void mushaabb_subsume_area(mushaabb*, const mushaabb*, const mushaabb*);
 
 #endif

@@ -24,7 +24,7 @@ int mushspace_load_string(
 				goto end;
 
 			if (c != ' ')
-				mush_staticaabb_put(&space->box, pos, c);
+				mushstaticaabb_put(&space->box, pos, c);
 
 			if (++pos.x < 80)
 				break;
@@ -43,5 +43,5 @@ skipped:
 		}
 	}
 end:
-	return MUSH_ERR_NONE;
+	return MUSHERR_NONE;
 }

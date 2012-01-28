@@ -7,36 +7,36 @@
 
 #include "lib/khash.h"
 
-struct mush_bakaabb_iter { khiter_t k; };
+struct mushbakaabb_iter { khiter_t k; };
 
-const size_t mush_bakaabb_iter_sizeof = sizeof(mush_bakaabb_iter);
+const size_t mushbakaabb_iter_sizeof = sizeof(mushbakaabb_iter);
 
 static size_t hash(mushcoords);
 
 KHASH_INIT(mushcoords, mushcoords, mushcell, true, hash, mushcoords_equal)
 
-bool mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
+bool mushbakaabb_init(mushbakaabb* bak, mushcoords c) {
 	bak->data = kh_init(mushcoords);
-	bak->bounds = (mush_bounds){c,c};
+	bak->bounds = (mushbounds){c,c};
 	return bak->data != NULL;
 }
-void mush_bakaabb_free(mush_bakaabb* bak) {
+void mushbakaabb_free(mushbakaabb* bak) {
 	kh_destroy(mushcoords, bak->data);
 }
-bool mush_bakaabb_copy(mush_bakaabb* copy, const mush_bakaabb* bak) {
+bool mushbakaabb_copy(mushbakaabb* copy, const mushbakaabb* bak) {
 	if (!kh_copy(mushcoords, copy->data, bak->data))
 		return false;
 	copy->bounds = bak->bounds;
 	return true;
 }
 
-mushcell mush_bakaabb_get(const mush_bakaabb* bak, mushcoords c) {
+mushcell mushbakaabb_get(const mushbakaabb* bak, mushcoords c) {
 	const khash_t(mushcoords) *hash = bak->data;
 	khint_t i = kh_get(mushcoords, hash, c);
 	return i == kh_end(hash) ? ' ' : kh_value(hash, i);
 }
 
-bool mush_bakaabb_put(mush_bakaabb* bak, mushcoords p, mushcell c) {
+bool mushbakaabb_put(mushbakaabb* bak, mushcoords p, mushcell c) {
 	khash_t(mushcoords) *hash = bak->data;
 
 	if (c == ' ') {
@@ -54,44 +54,43 @@ bool mush_bakaabb_put(mush_bakaabb* bak, mushcoords p, mushcell c) {
 	return true;
 }
 
-size_t mush_bakaabb_size(const mush_bakaabb* bak) {
+size_t mushbakaabb_size(const mushbakaabb* bak) {
 	const khash_t(mushcoords) *hash = bak->data;
 	return kh_size(hash);
 }
 
-mush_bakaabb_iter* mush_bakaabb_it_start(const mush_bakaabb* bak, void* vp) {
-	mush_bakaabb_iter* it = vp ? vp : malloc(sizeof *it);
+mushbakaabb_iter* mushbakaabb_it_start(const mushbakaabb* bak, void* vp) {
+	mushbakaabb_iter* it = vp ? vp : malloc(sizeof *it);
 	if (it) {
 		const khash_t(mushcoords) *hash = bak->data;
-		*it = (mush_bakaabb_iter){ kh_begin(hash) };
+		*it = (mushbakaabb_iter){ kh_begin(hash) };
 	}
 	return it;
 }
-void mush_bakaabb_it_stop(mush_bakaabb_iter* it) { (void)it; }
+void mushbakaabb_it_stop(mushbakaabb_iter* it) { (void)it; }
 
-bool mush_bakaabb_it_done(const mush_bakaabb_iter* it, const mush_bakaabb* bak)
+bool mushbakaabb_it_done(const mushbakaabb_iter* it, const mushbakaabb* bak)
 {
 	const khash_t(mushcoords) *hash = bak->data;
 	return it->k != kh_end(hash);
 }
 
-void mush_bakaabb_it_next(mush_bakaabb_iter* it, const mush_bakaabb* bak) {
+void mushbakaabb_it_next(mushbakaabb_iter* it, const mushbakaabb* bak) {
 	(void)bak;
 	++it->k;
 }
-void mush_bakaabb_it_remove(mush_bakaabb_iter* it, mush_bakaabb* bak) {
+void mushbakaabb_it_remove(mushbakaabb_iter* it, mushbakaabb* bak) {
 	khash_t(mushcoords) *hash = bak->data;
 	kh_del(mushcoords, hash, it->k);
 }
 
-mushcoords mush_bakaabb_it_pos(
-	const mush_bakaabb_iter* it, const mush_bakaabb* bak)
+mushcoords mushbakaabb_it_pos(
+	const mushbakaabb_iter* it, const mushbakaabb* bak)
 {
 	const khash_t(mushcoords) *hash = bak->data;
 	return kh_key(hash, it->k);
 }
-mushcell mush_bakaabb_it_val(
-	const mush_bakaabb_iter* it, const mush_bakaabb* bak)
+mushcell mushbakaabb_it_val(const mushbakaabb_iter* it, const mushbakaabb* bak)
 {
 	const khash_t(mushcoords) *hash = bak->data;
 	return kh_value(hash, it->k);

@@ -28,20 +28,20 @@ mushspace* mushspace_copy(void* vp, const mushspace* space) {
 }
 
 mushcell mushspace_get(const mushspace* space, mushcoords c) {
-	return mush_staticaabb_contains(c) ? mush_staticaabb_get(&space->box, c)
-	                                   : ' ';
+	return mushstaticaabb_contains(c) ? mushstaticaabb_get(&space->box, c)
+	                                  : ' ';
 }
 
 int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
-	if (mush_staticaabb_contains(p))
-		mush_staticaabb_put(&space->box, p, c);
-	return MUSH_ERR_NONE;
+	if (mushstaticaabb_contains(p))
+		mushstaticaabb_put(&space->box, p, c);
+	return MUSHERR_NONE;
 }
 
 void mushspace_get_loose_bounds(
 	const mushspace* space, mushcoords* beg, mushcoords* end)
 {
 	(void)space;
-	*beg = MUSH_STATICAABB_BEG;
-	*end = MUSH_STATICAABB_END;
+	*beg = MUSHSTATICAABB_BEG;
+	*end = MUSHSTATICAABB_END;
 }

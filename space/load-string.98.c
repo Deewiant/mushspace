@@ -7,25 +7,25 @@
 #include "space/map-no-place.98.h"
 #include "space/place-box.98.h"
 
-MUSH_DECL_DYN_ARRAY(mush_aabb)
-MUSH_DECL_DYN_ARRAY(mush_bounds)
+MUSH_DECL_DYN_ARRAY(mushaabb)
+MUSH_DECL_DYN_ARRAY(mushbounds)
 
 static void get_aabbs(
 	const unsigned char*, size_t, mushcoords target, bool binary,
-	mush_arr_mush_aabb*);
+	musharr_mushaabb*);
 
 #if MUSHSPACE_DIM >= 2
 static bool newline(
-	bool*, mushcoords*, mushcoords, mush_arr_mush_bounds, size_t*, size_t*,
+	bool*, mushcoords*, mushcoords, musharr_mushbounds, size_t*, size_t*,
 	mushcoords, size_t*, uint8_t*);
 #endif
 
 static size_t get_aabbs_binary(
-	const unsigned char*, size_t len, mushcoords target, mush_bounds*);
+	const unsigned char*, size_t len, mushcoords target, mushbounds*);
 
-static void binary_load_arr(mush_arr_mushcell, void*);
+static void binary_load_arr(musharr_mushcell, void*);
 static void binary_load_blank(size_t, void*);
-static void load_arr(mush_arr_mushcell, void*,
+static void load_arr(musharr_mushcell, void*,
                      size_t, size_t, size_t, size_t, uint8_t*);
 static void load_blank(size_t, void*);
 
@@ -45,7 +45,7 @@ int mushspace_load_string(
 	mushspace* space, const unsigned char* str, size_t len,
 	mushcoords* end, mushcoords target, bool binary)
 {
-	mush_arr_mush_aabb aabbs;
+	musharr_mushaabb aabbs;
 	get_aabbs(str, len, target, binary, &aabbs);
 
 	if (!aabbs.ptr) {
@@ -61,13 +61,13 @@ int mushspace_load_string(
 			mushcoords_max_into(end, aabbs.ptr[i].bounds.end);
 
 		if (!mushspace_place_box(space, &aabbs.ptr[i], NULL, NULL))
-			return MUSH_ERR_OOM;
+			return MUSHERR_OOM;
 	}
 
 	// Build one to rule them all.
 	//
 	// Note that it may have beg > end along any number of axes!
-	mush_aabb aabb = aabbs.ptr[0];
+	mushaabb aabb = aabbs.ptr[0];
 	if (aabbs.len > 1) {
 		// If any box was placed past an axis, the end of that axis is the
 		// maximum of the ends of such boxes. Otherwise, it's the maximum of all
@@ -81,7 +81,7 @@ int mushspace_load_string(
 		// dropping space-filled lines and columns, but they haven't been
 		// subsumed into bigger boxes or anything.
 
-		mush_bounds *bounds = &aabb.bounds;
+		mushbounds *bounds = &aabb.bounds;
 
 		uint8_t found_past = 0, found_before = 0;
 
@@ -91,7 +91,7 @@ int mushspace_load_string(
 		}
 
 		for (size_t b = 1; b < aabbs.len; ++b) {
-			const mush_bounds *box = &aabbs.ptr[b].bounds;
+			const mushbounds *box = &aabbs.ptr[b].bounds;
 
 			for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 				const uint8_t axis = 1 << i;
@@ -127,7 +127,7 @@ int mushspace_load_string(
 				}
 			}
 		}
-		mush_aabb_finalize(&aabb);
+		mushaabb_finalize(&aabb);
 	}
 
 	const unsigned char *str_end = str + len;
@@ -153,7 +153,7 @@ int mushspace_load_string(
 	for (; str < str_end; ++str)
 		assert (*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f');
 	assert (!(str > str_end));
-	return MUSH_ERR_NONE;
+	return MUSHERR_NONE;
 }
 
 // Sets aabbs_out to an array of AABBs (a slice out of a static buffer) which
@@ -164,18 +164,18 @@ int mushspace_load_string(
 // (an int) is written into aabbs_out->len.
 static void get_aabbs(
 	const unsigned char* str, size_t len, mushcoords target, bool binary,
-	mush_arr_mush_aabb* aabbs_out)
+	musharr_mushaabb* aabbs_out)
 {
-	static mush_aabb aabbs[1 << MUSHSPACE_DIM];
+	static mushaabb aabbs[1 << MUSHSPACE_DIM];
 
-	mush_bounds *bounds = (mush_bounds*)aabbs;
+	mushbounds *bounds = (mushbounds*)aabbs;
 
 	aabbs_out->ptr = aabbs;
 
 	if (binary) {
 		size_t n = get_aabbs_binary(str, len, target, bounds);
 		if (n == SIZE_MAX) {
-			*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM};
+			*aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM};
 			return;
 		}
 		assert (n <= 2);
@@ -224,14 +224,14 @@ static void get_aabbs(
 	#if MUSHSPACE_DIM >= 2
 		bool got_cr = false;
 
-		const mush_arr_mush_bounds bounds_arr = {bounds, MUSH_ARRAY_LEN(aabbs)};
+		const musharr_mushbounds bounds_arr = {bounds, MUSH_ARRAY_LEN(aabbs)};
 
 		#define hit_newline do { \
 			if (!newline(&got_cr, &pos, target, \
 			             bounds_arr, &a, &max_a, \
 			             last_nonspace, &found_nonspace_for, &get_beg))\
 			{ \
-				*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM}; \
+				*aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM}; \
 				return; \
 			} \
 		} while (0)
@@ -267,7 +267,7 @@ static void get_aabbs(
 
 		} else if (pos.x == target.x) {
 			// Oops, came back to where we started. That's not good.
-			*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM};
+			*aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM};
 			return;
 		}
 		break;
@@ -305,7 +305,7 @@ static void get_aabbs(
 				max_a = mush_size_t_max(max_a, a |= 0x04);
 
 			} else if (pos.z == target.z) {
-				*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM};
+				*aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM};
 				return;
 			}
 			a &= ~0x03;
@@ -319,7 +319,7 @@ static void get_aabbs(
 
 	if (found_nonspace_for_anyone == MUSH_ARRAY_LEN(aabbs)) {
 		// Nothing to load. Not an error, but don't need to do anything so bail.
-		*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NONE};
+		*aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NONE};
 		return;
 	}
 
@@ -330,7 +330,7 @@ static void get_aabbs(
 	// Fix that.
 	size_t n = 0;
 	for (size_t i = 0; i <= max_a; ++i) {
-		const mush_bounds *box = &bounds[i];
+		const mushbounds *box = &bounds[i];
 
 		if (!(box->beg.x == MUSHCELL_MAX && box->end.x == MUSHCELL_MIN)) {
 			// The box has been initialized, so make sure it's valid and put it in
@@ -349,7 +349,7 @@ static void get_aabbs(
 #if MUSHSPACE_DIM >= 2
 static bool newline(
 	bool* got_cr, mushcoords* pos, mushcoords target,
-	mush_arr_mush_bounds bounds, size_t* a, size_t* max_a,
+	musharr_mushbounds bounds, size_t* a, size_t* max_a,
 	mushcoords last_nonspace, size_t* found_nonspace_for, uint8_t* get_beg)
 {
 	*got_cr = false;
@@ -376,7 +376,7 @@ static bool newline(
 
 static size_t get_aabbs_binary(
 	const unsigned char* str, size_t len,
-	mushcoords target, mush_bounds* bounds)
+	mushcoords target, mushbounds* bounds)
 {
 	size_t a = 0;
 	mushcoords beg = target, end = target;
@@ -403,16 +403,16 @@ static size_t get_aabbs_binary(
 
 	if (end.x > MUSHCELL_MAX - (mushcell)i) {
 		end.x = MUSHCELL_MAX;
-		bounds[a++] = (mush_bounds){beg, end};
+		bounds[a++] = (mushbounds){beg, end};
 		beg.x = MUSHCELL_MIN;
 	}
 	end.x += i;
 
-	bounds[a++] = (mush_bounds){beg, end};
+	bounds[a++] = (mushbounds){beg, end};
 	return a;
 }
 
-static void binary_load_arr(mush_arr_mushcell arr, void* p) {
+static void binary_load_arr(musharr_mushcell arr, void* p) {
 	const unsigned char **strp = p, *str = *strp;
 	for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
 		unsigned char c = *str++;
@@ -432,7 +432,7 @@ static void binary_load_blank(size_t blanks, void* p) {
 	*strp = str;
 }
 static void load_arr(
-	mush_arr_mushcell arr, void* p,
+	musharr_mushcell arr, void* p,
 	size_t width, size_t area, size_t line_start, size_t page_start,
 	uint8_t* hit)
 {

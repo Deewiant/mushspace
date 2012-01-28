@@ -25,17 +25,17 @@ typedef struct mushcursor {
 			mushcoords rel_pos;
 
 #if !MUSHSPACE_93
-			mush_bounds rel_bounds;
-			mushcoords  obeg;
-			mush_aabb  *box;
-			size_t      box_idx;
+			mushbounds rel_bounds;
+			mushcoords obeg;
+			mushaabb  *box;
+			size_t     box_idx;
 #endif
 		};
 #if !MUSHSPACE_93
 		// For bak mode.
 		struct {
-			mushcoords  actual_pos;
-			mush_bounds actual_bounds;
+			mushcoords actual_pos;
+			mushbounds actual_bounds;
 		};
 #endif
 	};

@@ -10,21 +10,21 @@
 #include "coords.all.h"
 #include "typenames.any.h"
 
-#define mush_staticaabb MUSHSPACE_NAME(mush_staticaabb)
+#define mushstaticaabb MUSHSPACE_NAME(mushstaticaabb)
 
 #ifdef MUSHSPACE_93
 	// These need to be separate instead of MUSHCOORDS so that
-	// MUSH_STATICAABB_BOUNDS can be defined as a global constant (BEG) and so
+	// MUSHSTATICAABB_BOUNDS can be defined as a global constant (BEG) and so
 	// that we can define the static array (SIZE).
 	//
 	// (Evidently (mushcoords){{.x = 1}}.x isn't a constant expression.)
 
-	#define MUSH_STATICAABB_SIZE_X 80
-	#define MUSH_STATICAABB_SIZE_Y 25
+	#define MUSHSTATICAABB_SIZE_X 80
+	#define MUSHSTATICAABB_SIZE_Y 25
 
-	#define MUSH_STATICAABB_BEG_X 0
-	#define MUSH_STATICAABB_BEG_Y 0
-	#define MUSH_STATICAABB_BEG_Z 0
+	#define MUSHSTATICAABB_BEG_X 0
+	#define MUSHSTATICAABB_BEG_Y 0
+	#define MUSHSTATICAABB_BEG_Z 0
 #else
 	// We want the static area to cover the size of a "typical" program
 	// (whatever that is) and have power-of-two width and height for fast
@@ -32,82 +32,82 @@
 	//
 	// We don't want it to be too big, not only for the sake of memory usage,
 	// but also due at least to get_*_bounds.
-	#define MUSH_STATICAABB_SIZE_X 128
-	#define MUSH_STATICAABB_SIZE_Y 512
-	#define MUSH_STATICAABB_SIZE_Z   3
+	#define MUSHSTATICAABB_SIZE_X 128
+	#define MUSHSTATICAABB_SIZE_Y 512
+	#define MUSHSTATICAABB_SIZE_Z   3
 
-	#define MUSH_STATICAABB_BEG_X -16
-	#define MUSH_STATICAABB_BEG_Y -16
-	#define MUSH_STATICAABB_BEG_Z -1
+	#define MUSHSTATICAABB_BEG_X -16
+	#define MUSHSTATICAABB_BEG_Y -16
+	#define MUSHSTATICAABB_BEG_Z -1
 #endif
 
-#define MUSH_STATICAABB_BEG_INIT MUSHCOORDS_INIT(MUSH_STATICAABB_BEG_X,\
-                                                 MUSH_STATICAABB_BEG_Y,\
-                                                 MUSH_STATICAABB_BEG_Z)
+#define MUSHSTATICAABB_BEG_INIT MUSHCOORDS_INIT(MUSHSTATICAABB_BEG_X,\
+                                                MUSHSTATICAABB_BEG_Y,\
+                                                MUSHSTATICAABB_BEG_Z)
 
-#define MUSH_STATICAABB_END_INIT \
-	MUSHCOORDS_INIT(MUSH_STATICAABB_BEG_X + MUSH_STATICAABB_SIZE_X - 1,\
-	                MUSH_STATICAABB_BEG_Y + MUSH_STATICAABB_SIZE_Y - 1,\
-	                MUSH_STATICAABB_BEG_Z + MUSH_STATICAABB_SIZE_Z - 1)
+#define MUSHSTATICAABB_END_INIT \
+	MUSHCOORDS_INIT(MUSHSTATICAABB_BEG_X + MUSHSTATICAABB_SIZE_X - 1,\
+	                MUSHSTATICAABB_BEG_Y + MUSHSTATICAABB_SIZE_Y - 1,\
+	                MUSHSTATICAABB_BEG_Z + MUSHSTATICAABB_SIZE_Z - 1)
 
 // size = end - beg + 1 = rel_end + 1
-#define MUSH_STATICAABB_REL_END_INIT \
-	MUSHCOORDS_INIT(MUSH_STATICAABB_SIZE_X - 1,\
-	                MUSH_STATICAABB_SIZE_Y - 1,\
-	                MUSH_STATICAABB_SIZE_Z - 1)
+#define MUSHSTATICAABB_REL_END_INIT \
+	MUSHCOORDS_INIT(MUSHSTATICAABB_SIZE_X - 1,\
+	                MUSHSTATICAABB_SIZE_Y - 1,\
+	                MUSHSTATICAABB_SIZE_Z - 1)
 
-#define MUSH_STATICAABB_SIZE MUSHCOORDS(MUSH_STATICAABB_SIZE_X,\
-                                        MUSH_STATICAABB_SIZE_Y,\
-                                        MUSH_STATICAABB_SIZE_Z)
+#define MUSHSTATICAABB_SIZE MUSHCOORDS(MUSHSTATICAABB_SIZE_X,\
+                                        MUSHSTATICAABB_SIZE_Y,\
+                                        MUSHSTATICAABB_SIZE_Z)
 
-#define MUSH_STATICAABB_BEG (mushcoords)MUSH_STATICAABB_BEG_INIT
-#define MUSH_STATICAABB_END (mushcoords)MUSH_STATICAABB_END_INIT
+#define MUSHSTATICAABB_BEG (mushcoords)MUSHSTATICAABB_BEG_INIT
+#define MUSHSTATICAABB_END (mushcoords)MUSHSTATICAABB_END_INIT
 
-typedef struct mush_staticaabb {
+typedef struct mushstaticaabb {
 
 		mushcell array[
-			  MUSH_STATICAABB_SIZE_X
+			  MUSHSTATICAABB_SIZE_X
 #if MUSHSPACE_DIM == 2
-			* MUSH_STATICAABB_SIZE_Y
+			* MUSHSTATICAABB_SIZE_Y
 #if MUSHSPACE_DIM == 3
-			* MUSH_STATICAABB_SIZE_Z
+			* MUSHSTATICAABB_SIZE_Z
 #endif
 #endif
 		];
 
-} mush_staticaabb;
+} mushstaticaabb;
 
-#define MUSH_STATICAABB_BOUNDS \
-	MUSHSPACE_CAT(MUSHSPACE_NAME(MUSH_STATICAABB),_BOUNDS)
-#define MUSH_STATICAABB_REL_BOUNDS \
-	MUSHSPACE_CAT(MUSHSPACE_NAME(MUSH_STATICAABB),_REL_BOUNDS)
+#define MUSHSTATICAABB_BOUNDS \
+	MUSHSPACE_CAT(MUSHSPACE_NAME(MUSHSTATICAABB),_BOUNDS)
+#define MUSHSTATICAABB_REL_BOUNDS \
+	MUSHSPACE_CAT(MUSHSPACE_NAME(MUSHSTATICAABB),_REL_BOUNDS)
 
-#define mush_staticaabb_contains MUSHSPACE_CAT(mush_staticaabb,_contains)
-#define mush_staticaabb_get      MUSHSPACE_CAT(mush_staticaabb,_get)
-#define mush_staticaabb_put      MUSHSPACE_CAT(mush_staticaabb,_put)
-#define mush_staticaabb_get_idx  MUSHSPACE_CAT(mush_staticaabb,_get_idx)
-#define mush_staticaabb_get_no_offset \
-	MUSHSPACE_CAT(mush_staticaabb,_get_no_offset)
-#define mush_staticaabb_put_no_offset \
-	MUSHSPACE_CAT(mush_staticaabb,_put_no_offset)
-#define mush_staticaabb_getter_no_offset \
-	MUSHSPACE_CAT(mush_staticaabb,_getter_no_offset)
-#define mush_staticaabb_get_idx_no_offset \
-	MUSHSPACE_CAT(mush_staticaabb,_get_idx_no_offset)
+#define mushstaticaabb_contains MUSHSPACE_CAT(mushstaticaabb,_contains)
+#define mushstaticaabb_get      MUSHSPACE_CAT(mushstaticaabb,_get)
+#define mushstaticaabb_put      MUSHSPACE_CAT(mushstaticaabb,_put)
+#define mushstaticaabb_get_idx  MUSHSPACE_CAT(mushstaticaabb,_get_idx)
+#define mushstaticaabb_get_no_offset \
+	MUSHSPACE_CAT(mushstaticaabb,_get_no_offset)
+#define mushstaticaabb_put_no_offset \
+	MUSHSPACE_CAT(mushstaticaabb,_put_no_offset)
+#define mushstaticaabb_getter_no_offset \
+	MUSHSPACE_CAT(mushstaticaabb,_getter_no_offset)
+#define mushstaticaabb_get_idx_no_offset \
+	MUSHSPACE_CAT(mushstaticaabb,_get_idx_no_offset)
 
-extern const mush_bounds MUSH_STATICAABB_BOUNDS, MUSH_STATICAABB_REL_BOUNDS;
+extern const mushbounds MUSHSTATICAABB_BOUNDS, MUSHSTATICAABB_REL_BOUNDS;
 
-bool mush_staticaabb_contains(mushcoords);
+bool mushstaticaabb_contains(mushcoords);
 
-mushcell mush_staticaabb_get(const mush_staticaabb*, mushcoords);
-void     mush_staticaabb_put(      mush_staticaabb*, mushcoords, mushcell);
+mushcell mushstaticaabb_get(const mushstaticaabb*, mushcoords);
+void     mushstaticaabb_put(      mushstaticaabb*, mushcoords, mushcell);
 
-mushcell mush_staticaabb_get_no_offset(const mush_staticaabb*, mushcoords);
-void     mush_staticaabb_put_no_offset(mush_staticaabb*, mushcoords, mushcell);
+mushcell mushstaticaabb_get_no_offset(const mushstaticaabb*, mushcoords);
+void     mushstaticaabb_put_no_offset(mushstaticaabb*, mushcoords, mushcell);
 
-mushcell mush_staticaabb_getter_no_offset(const void*, mushcoords);
+mushcell mushstaticaabb_getter_no_offset(const void*, mushcoords);
 
-size_t mush_staticaabb_get_idx          (mushcoords);
-size_t mush_staticaabb_get_idx_no_offset(mushcoords);
+size_t mushstaticaabb_get_idx          (mushcoords);
+size_t mushstaticaabb_get_idx_no_offset(mushcoords);
 
 #endif

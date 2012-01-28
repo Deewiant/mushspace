@@ -4,14 +4,14 @@
 
 #include <assert.h>
 
-void mush_aabb_space_area(mush_aabb* aabb, const mush_aabb* area) {
-	assert (mush_bounds_contains_bounds(&aabb->bounds, &area->bounds));
+void mushaabb_space_area(mushaabb* aabb, const mushaabb* area) {
+	assert (mushbounds_contains_bounds(&aabb->bounds, &area->bounds));
 
-	const mush_bounds* ab = &area->bounds;
+	const mushbounds* ab = &area->bounds;
 
-	const size_t beg_idx = mush_aabb_get_idx(aabb, ab->beg);
+	const size_t beg_idx = mushaabb_get_idx(aabb, ab->beg);
 
-	if (mush_aabb_can_direct_copy(aabb, area)) {
+	if (mushaabb_can_direct_copy(aabb, area)) {
 		mushcell_space(aabb->data + beg_idx, area->size);
 		goto end;
 	}
@@ -31,6 +31,6 @@ void mush_aabb_space_area(mush_aabb* aabb, const mush_aabb* area) {
 			mushcell_space(aabb->data + i, area->width);
 #endif
 end:
-	assert (mush_aabb_get(aabb, ab->beg) == ' ');
-	assert (mush_aabb_get(aabb, ab->end) == ' ');
+	assert (mushaabb_get(aabb, ab->beg) == ' ');
+	assert (mushaabb_get(aabb, ab->end) == ' ');
 }

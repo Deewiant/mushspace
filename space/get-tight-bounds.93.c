@@ -25,7 +25,7 @@ bool mushspace_get_tight_bounds(
 		} else {
 			found_on_row = false;
 			for (c.x = 0; c.x < 80; ++c.x) {
-				if (mush_staticaabb_get(&space->box, c) != ' ') {
+				if (mushstaticaabb_get(&space->box, c) != ' ') {
 					mushcell_min_into(&beg->x, c.x);
 					found_on_row = true;
 					break;
@@ -42,7 +42,7 @@ bool mushspace_get_tight_bounds(
 		}
 
 		for (c.x = 80; c.x-- > 0;) {
-			if (mush_staticaabb_get(&space->box, c) != ' ') {
+			if (mushstaticaabb_get(&space->box, c) != ' ') {
 				mushcell_max_into(&end->x, c.x);
 				break;
 			}
@@ -60,7 +60,7 @@ bool mushspace_get_tight_bounds(
 
 	for (c.y = 25; c.y-- > beg->y;) {
 		for (c.x = 0; c.x < 80; ++c.x) {
-			if (mush_staticaabb_get(&space->box, c) != ' ') {
+			if (mushstaticaabb_get(&space->box, c) != ' ') {
 				end->y = c.y;
 				return true;
 			}
@@ -68,3 +68,4 @@ bool mushspace_get_tight_bounds(
 	}
 	assert (false);
 }
+

@@ -12,9 +12,9 @@ static mushucell get_move_count(mushcell, mushcell, mushcell,
 static mushucell get_move_count_expensive(mushcell, mushcell, mushucell*,
                                           mushucell*, const mushucell*);
 
-bool mush_bounds_ray_intersects(
+bool mushbounds_ray_intersects(
 	mushcoords o, mushcoords delta,
-	const mush_bounds* bounds, mushucell* pmove_count, mushcoords* phit_pos)
+	const mushbounds* bounds, mushucell* pmove_count, mushcoords* phit_pos)
 {
 	const mushcoords *beg = &bounds->beg, *end = &bounds->end;
 
@@ -273,7 +273,7 @@ next_move_count_2:;
 
 	*pmove_count = best_move_count;
 	*phit_pos    = mushcoords_add(o, mushcoords_muls(delta, best_move_count));
-	assert (mush_bounds_contains(bounds, *phit_pos));
+	assert (mushbounds_contains(bounds, *phit_pos));
 	return true;
 }
 static bool matches(
