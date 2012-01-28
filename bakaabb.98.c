@@ -35,6 +35,10 @@ mushcell mushbakaabb_get(const mushbakaabb* bak, mushcoords c) {
 	khint_t i = kh_get(mushcoords, hash, c);
 	return i == kh_end(hash) ? ' ' : kh_value(hash, i);
 }
+mushcell* mushbakaabb_get_ptr_unsafe(mushbakaabb* bak, mushcoords c) {
+	const khash_t(mushcoords) *hash = bak->data;
+	return &kh_value(hash, kh_get(mushcoords, hash, c));
+}
 
 bool mushbakaabb_put(mushbakaabb* bak, mushcoords p, mushcell c) {
 	khash_t(mushcoords) *hash = bak->data;
