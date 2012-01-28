@@ -145,6 +145,14 @@ int mushspace_map(mushspace* space, mushbounds bounds,
 	mushspace_map_no_place(space, &aabb, data, f, NULL);
 	return MUSHERR_NONE;
 }
+void mushspace_map_existing(
+	mushspace* space, mushbounds bounds,
+	void(*f)(musharr_mushcell, void*), void(*g)(size_t, void*), void* data)
+{
+	mushaabb aabb;
+	mushaabb_make(&aabb, &bounds);
+	mushspace_map_no_place(space, &aabb, data, f, g);
+}
 
 void mushspace_invalidate_all(mushspace* space) {
 	void (**i)(void*) = space->invalidatees;

@@ -66,6 +66,7 @@ MUSH_DECL_DYN_ARRAY(mushcell)
 #define mushspace_put              MUSHSPACE_CAT(mushspace,_put)
 #define mushspace_put_nostats      MUSHSPACE_CAT(mushspace,_put_nostats)
 #define mushspace_get_loose_bounds MUSHSPACE_CAT(mushspace,_get_loose_bounds)
+#define mushspace_map_existing     MUSHSPACE_CAT(mushspace,_map_existing)
 #define mushspace_map              MUSHSPACE_CAT(mushspace,_map)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
@@ -96,6 +97,10 @@ mushcell mushspace_get(const mushspace*, mushcoords);
 int      mushspace_put(      mushspace*, mushcoords, mushcell);
 
 void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
+
+void mushspace_map_existing(
+	mushspace*, mushbounds,
+	void(*)(musharr_mushcell, void*), void(*)(size_t, void*), void*);
 
 #if !MUSHSPACE_93
 int mushspace_map(mushspace*, mushbounds,
