@@ -5,6 +5,4 @@
 
 #include "stdlib.any.h"
 
-MUSH_DECL_DYN_ARRAY(mushcell)
-
 #endif

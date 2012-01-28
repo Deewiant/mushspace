@@ -8,6 +8,8 @@
 
 #include "stdlib.any.h"
 #include "types.h"
+#include "space/map-no-place.98.h"
+#include "space/place-box.98.h"
 #include "space/place-box-for.98.h"
 
 mushspace* mushspace_init(void* vp, mushstats* stats) {
@@ -131,6 +133,18 @@ void mushspace_get_loose_bounds(
 		mushcoords_min_into(beg, space->bak.bounds.beg);
 		mushcoords_max_into(end, space->bak.bounds.end);
 	}
+}
+
+int mushspace_map(mushspace* space, mushbounds bounds,
+                   void(*f)(musharr_mushcell, void*), void* data)
+{
+	mushaabb aabb;
+	mushaabb_make(&aabb, &bounds);
+	if (!mushspace_place_box(space, &aabb, NULL, NULL))
+		return MUSHERR_OOM;
+
+	mushspace_map_no_place(space, &aabb, data, f, NULL);
+	return MUSHERR_NONE;
 }
 
 void mushspace_invalidate_all(mushspace* space) {

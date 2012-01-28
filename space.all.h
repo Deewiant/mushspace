@@ -55,6 +55,8 @@ typedef enum MushCursorMode {
 #endif
 } MushCursorMode;
 
+MUSH_DECL_DYN_ARRAY(mushcell)
+
 #define mushspace_sizeof           MUSHSPACE_CAT(mushspace,_sizeof)
 #define mushspace_init             MUSHSPACE_CAT(mushspace,_init)
 #define mushspace_free             MUSHSPACE_CAT(mushspace,_free)
@@ -64,6 +66,7 @@ typedef enum MushCursorMode {
 #define mushspace_put              MUSHSPACE_CAT(mushspace,_put)
 #define mushspace_put_nostats      MUSHSPACE_CAT(mushspace,_put_nostats)
 #define mushspace_get_loose_bounds MUSHSPACE_CAT(mushspace,_get_loose_bounds)
+#define mushspace_map              MUSHSPACE_CAT(mushspace,_map)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
 #define mushspace_find_box         MUSHSPACE_CAT(mushspace,_find_box)
@@ -95,6 +98,9 @@ int      mushspace_put(      mushspace*, mushcoords, mushcell);
 void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
 
 #if !MUSHSPACE_93
+int mushspace_map(mushspace*, mushbounds,
+                  void(*)(musharr_mushcell, void*), void*);
+
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
 void mushspace_invalidate_all (mushspace*);
 
