@@ -10,14 +10,6 @@
 MUSH_DECL_DYN_ARRAY(mush_aabb)
 MUSH_DECL_DYN_ARRAY(mush_bounds)
 
-#define mushspace_get_aabbs         MUSHSPACE_CAT(mushspace,_get_aabbs)
-#define mushspace_newline           MUSHSPACE_CAT(mushspace,_newline)
-#define mushspace_get_aabbs_binary  MUSHSPACE_CAT(mushspace,_get_aabbs_binary)
-#define mushspace_binary_load_arr   MUSHSPACE_CAT(mushspace,_binary_load_arr)
-#define mushspace_binary_load_blank MUSHSPACE_CAT(mushspace,_binary_load_blank)
-#define mushspace_load_arr          MUSHSPACE_CAT(mushspace,_load_arr)
-#define mushspace_load_blank        MUSHSPACE_CAT(mushspace,_load_blank)
-
 static void mushspace_get_aabbs(
 	const unsigned char*, size_t, mushcoords target, bool binary,
 	mush_arr_mush_aabb*);

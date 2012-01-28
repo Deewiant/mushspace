@@ -11,8 +11,6 @@ struct mush_bakaabb_iter { khiter_t k; };
 
 const size_t mush_bakaabb_iter_sizeof = sizeof(mush_bakaabb_iter);
 
-#define mush_bakaabb_hash MUSHSPACE_CAT(mush_bakaabb,_hash)
-
 static size_t mush_bakaabb_hash(mushcoords);
 
 KHASH_INIT(mushcoords, mushcoords, mushcell, true,

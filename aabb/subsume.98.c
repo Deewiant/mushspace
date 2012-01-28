@@ -7,9 +7,6 @@
 
 MUSH_DECL_CONST_DYN_ARRAY(mushcell)
 
-#define mush_aabb_subsume_owners_area \
-	MUSHSPACE_CAT(mush_aabb,_subsume_owners_area)
-
 // Copies from data to aabb, given that it's an area contained in owner.
 static void mush_aabb_subsume_owners_area(
 	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,

@@ -7,13 +7,6 @@
 
 typedef struct { mushcell cell; size_t idx; } mush_cell_idx;
 
-#define mushspace_map_in_static   MUSHSPACE_CAT(mushspace,_map_in_static)
-#define mushspace_map_in_box      MUSHSPACE_CAT(mushspace,_map_in_box)
-#define mushspace_mapex_in_static MUSHSPACE_CAT(mushspace,_mapex_in_static)
-#define mushspace_mapex_in_box    MUSHSPACE_CAT(mushspace,_mapex_in_box)
-#define mushspace_get_next_in     MUSHSPACE_CAT(mushspace,_get_next_in)
-#define mushspace_get_next_in1    MUSHSPACE_CAT(mushspace,_get_next_in1)
-
 static bool mushspace_map_in_box(
 	mushspace*, mush_bounded_pos, mush_caabb_idx,
 	void*, void(*f)(mush_arr_mushcell, void*));

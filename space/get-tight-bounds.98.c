@@ -4,9 +4,6 @@
 
 #include <assert.h>
 
-#define mushspace_find_beg_in MUSHSPACE_CAT(mushspace,_find_beg_in)
-#define mushspace_find_end_in MUSHSPACE_CAT(mushspace,_find_end_in)
-
 static bool mushspace_find_beg_in(
 	mushcoords*, mushdim, const mush_bounds*,
 	mushcell(*)(const void*, mushcoords), const void*);

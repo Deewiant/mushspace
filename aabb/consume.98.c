@@ -6,7 +6,6 @@
 #include <string.h>
 
 #if MUSHSPACE_DIM > 1
-#define mush_aabb_consume_2d MUSHSPACE_CAT(mush_aabb,_consume_2d)
 static void mush_aabb_consume_2d(
 	const mush_aabb*, const mush_aabb*, size_t, size_t, size_t);
 #endif

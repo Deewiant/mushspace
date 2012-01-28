@@ -22,7 +22,6 @@
 #endif
 
 #if !MUSHSPACE_93
-#define mushcursor_recalibrate_void MUSHSPACE_CAT(mushcursor,_recalibrate_void)
 static void mushcursor_recalibrate_void(void*);
 #endif
 

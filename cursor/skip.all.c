@@ -62,10 +62,6 @@
 
 #endif
 
-#define mushcursor_skip_spaces_here MUSHSPACE_CAT(mushcursor,_skip_spaces_here)
-#define mushcursor_skip_semicolons_here \
-	MUSHSPACE_CAT(mushcursor,_skip_semicolons_here)
-
 static bool mushcursor_skip_spaces_here    (mushcursor*, mushcoords);
 static bool mushcursor_skip_semicolons_here(mushcursor*, mushcoords, bool*);
 

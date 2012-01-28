@@ -7,16 +7,6 @@
 #include "space/heuristic-constants.98.h"
 #include "space/place-box.98.h"
 
-#define mushspace_get_box_for MUSHSPACE_CAT(mushspace,_get_box_for)
-#define mushspace_get_box_along_recent_volume_for \
-	MUSHSPACE_CAT(mushspace,_get_box_along_recent_volume_for)
-#define mushspace_get_box_along_recent_line_for \
-	MUSHSPACE_CAT(mushspace,_get_box_along_recent_line_for)
-#define mushspace_extend_big_sequence_start_for \
-	MUSHSPACE_CAT(mushspace,_extend_big_sequence_start_for)
-#define mushspace_extend_first_placed_big_for \
-	MUSHSPACE_CAT(mushspace,_extend_first_placed_big_for)
-
 static void mushspace_get_box_for(mushspace*, mushcoords, mush_aabb*);
 
 static bool mushspace_get_box_along_recent_line_for(

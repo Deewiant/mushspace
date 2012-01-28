@@ -2,11 +2,6 @@
 
 #include "space/put-textual.all.h"
 
-#define mushspace_put_textual_row    MUSHSPACE_CAT(mushspace,_put_textual_row)
-#define mushspace_put_textual_page   MUSHSPACE_CAT(mushspace,_put_textual_page)
-#define mushspace_put_textual_add_ws \
-	MUSHSPACE_CAT(mushspace,_put_textual_add_ws)
-
 static bool mushspace_put_textual_row(
 	const mushcell*, size_t*, const unsigned char*, size_t*,
 	void(*)(const mushcell*, size_t, void*), void(*)(unsigned char, void*),

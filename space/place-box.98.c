@@ -16,24 +16,6 @@ typedef struct mushspace_consumee {
 
 MUSH_DECL_DYN_ARRAY(size_t)
 
-#define mushspace_really_place_box MUSHSPACE_CAT(mushspace,_really_place_box)
-#define mushspace_subsume_contains MUSHSPACE_CAT(mushspace,_subsume_contains)
-#define mushspace_subsume_fusables MUSHSPACE_CAT(mushspace,_subsume_fusables)
-#define mushspace_subsume_disjoint MUSHSPACE_CAT(mushspace,_subsume_disjoint)
-#define mushspace_subsume_overlaps MUSHSPACE_CAT(mushspace,_subsume_overlaps)
-#define mushspace_min_max_size     MUSHSPACE_CAT(mushspace,_min_max_size)
-#define mushspace_cheaper_to_alloc MUSHSPACE_CAT(mushspace,_cheaper_to_alloc)
-#define mushspace_disjoint_mms_validator \
-	MUSHSPACE_CAT(mushspace,_disjoint_mms_validator)
-#define mushspace_overlaps_mms_validator \
-	MUSHSPACE_CAT(mushspace,_overlaps_mms_validator)
-#define mushspace_valid_min_max_size \
-	MUSHSPACE_CAT(mushspace,_valid_min_max_size)
-#define mushspace_consume_and_subsume \
-	MUSHSPACE_CAT(mushspace,_consume_and_subsume)
-#define mushspace_irrelevize_subsumption_order \
-	MUSHSPACE_CAT(mushspace,_irrelevize_subsumption_order)
-
 static mush_aabb* mushspace_really_place_box(mushspace*, mush_aabb*);
 
 static void mushspace_subsume_contains(
