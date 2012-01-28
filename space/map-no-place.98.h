@@ -4,7 +4,6 @@
 #define MUSHSPACE_SPACE_MAP_NO_PLACE_H
 
 #include "space.all.h"
-#include "types.h"
 
 #define mushspace_map_no_place   MUSHSPACE_CAT(mushspace,_map_no_place)
 #define mushspace_mapex_no_place MUSHSPACE_CAT(mushspace,_mapex_no_place)
