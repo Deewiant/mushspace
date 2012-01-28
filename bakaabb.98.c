@@ -11,10 +11,9 @@ struct mush_bakaabb_iter { khiter_t k; };
 
 const size_t mush_bakaabb_iter_sizeof = sizeof(mush_bakaabb_iter);
 
-static size_t mush_bakaabb_hash(mushcoords);
+static size_t hash(mushcoords);
 
-KHASH_INIT(mushcoords, mushcoords, mushcell, true,
-           mush_bakaabb_hash, mushcoords_equal)
+KHASH_INIT(mushcoords, mushcoords, mushcell, true, hash, mushcoords_equal)
 
 bool mush_bakaabb_init(mush_bakaabb* bak, mushcoords c) {
 	bak->data = kh_init(mushcoords);
@@ -98,7 +97,7 @@ mushcell mush_bakaabb_it_val(
 	return kh_value(hash, it->k);
 }
 
-static size_t mush_bakaabb_hash(mushcoords c) {
+static size_t hash(mushcoords c) {
 #if SIZE_MAX == 0xffffffff
 	// MurmurHash3_x86_32
 	uint32_t h = 0;

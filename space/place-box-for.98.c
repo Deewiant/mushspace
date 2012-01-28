@@ -7,18 +7,17 @@
 #include "space/heuristic-constants.98.h"
 #include "space/place-box.98.h"
 
-static void mushspace_get_box_for(mushspace*, mushcoords, mush_aabb*);
+static void get_box_for(mushspace*, mushcoords, mush_aabb*);
 
-static bool mushspace_get_box_along_recent_line_for(
-	mushspace*, mushcoords, mush_aabb*);
+static bool get_box_along_recent_line_for(mushspace*, mushcoords, mush_aabb*);
 
-static bool mushspace_get_box_along_recent_volume_for(
+static bool get_box_along_recent_volume_for(
 	const mushspace*, mushcoords, mush_aabb*);
 
-static bool mushspace_extend_big_sequence_start_for(
+static bool extend_big_sequence_start_for(
 	const mushspace*, mushcoords, const mush_bounds*, mush_aabb*);
 
-static bool mushspace_extend_first_placed_big_for(
+static bool extend_first_placed_big_for(
 	const mushspace*, mushcoords, const mush_bounds*, mush_aabb*);
 
 bool mushspace_place_box_for(
@@ -28,7 +27,7 @@ bool mushspace_place_box_for(
 		return false;
 
 	mush_aabb aabb;
-	mushspace_get_box_for(space, c, &aabb);
+	get_box_for(space, c, &aabb);
 
 	if (!mushspace_place_box(space, &aabb, &c, placed))
 		return false;
@@ -38,18 +37,16 @@ bool mushspace_place_box_for(
 
 	return true;
 }
-static void mushspace_get_box_for(
-	mushspace* space, mushcoords c, mush_aabb* aabb)
-{
+static void get_box_for(mushspace* space, mushcoords c, mush_aabb* aabb) {
 	for (size_t b = 0; b < space->box_count; ++b)
 		assert (!mush_bounds_contains(&space->boxen[b].bounds, c));
 
 	if (space->recent_buf.full) {
 		if (space->just_placed_big) {
-			if (mushspace_get_box_along_recent_volume_for(space, c, aabb))
+			if (get_box_along_recent_volume_for(space, c, aabb))
 				goto end;
 		} else
-			if (mushspace_get_box_along_recent_line_for(space, c, aabb))
+			if (get_box_along_recent_line_for(space, c, aabb))
 				goto end;
 	}
 
@@ -62,7 +59,7 @@ static void mushspace_get_box_for(
 end:
 	assert (mush_bounds_safe_contains(&aabb->bounds, c));
 }
-static bool mushspace_get_box_along_recent_line_for(
+static bool get_box_along_recent_line_for(
 	mushspace* space, mushcoords c, mush_aabb* aabb)
 {
 	// Detect mushspace_put patterns where we seem to be moving in a straight
@@ -138,7 +135,7 @@ static bool mushspace_get_box_along_recent_line_for(
 	mush_aabb_make_unsafe(aabb, &bounds);
 	return true;
 }
-static bool mushspace_get_box_along_recent_volume_for(
+static bool get_box_along_recent_volume_for(
 	const mushspace* space, mushcoords c, mush_aabb* aabb)
 {
 	assert (space->recent_buf.full);
@@ -147,15 +144,15 @@ static bool mushspace_get_box_along_recent_volume_for(
 	const mush_bounds *last =
 		&mush_anamnesic_ring_last(&space->recent_buf)->placed;
 
-	if (mushspace_extend_big_sequence_start_for(space, c, last, aabb))
+	if (extend_big_sequence_start_for(space, c, last, aabb))
 		return true;
 
-	if (mushspace_extend_first_placed_big_for(space, c, last, aabb))
+	if (extend_first_placed_big_for(space, c, last, aabb))
 		return true;
 
 	return false;
 }
-static bool mushspace_extend_big_sequence_start_for(
+static bool extend_big_sequence_start_for(
 	const mushspace* space, mushcoords c, const mush_bounds* last,
 	mush_aabb* aabb)
 {
@@ -202,7 +199,7 @@ static bool mushspace_extend_big_sequence_start_for(
 	return true;
 }
 
-static bool mushspace_extend_first_placed_big_for(
+static bool extend_first_placed_big_for(
 	const mushspace* space, mushcoords c, const mush_bounds* last,
 	mush_aabb* aabb)
 {

@@ -4,11 +4,11 @@
 
 #include <assert.h>
 
-static bool mushspace_find_beg_in(
+static bool find_beg_in(
 	mushcoords*, mushdim, const mush_bounds*,
 	mushcell(*)(const void*, mushcoords), const void*);
 
-static void mushspace_find_end_in(
+static void find_end_in(
 	mushcoords*, mushdim, const mush_bounds*,
 	mushcell(*)(const void*, mushcoords), const void*);
 
@@ -39,19 +39,15 @@ bool mushspace_get_tight_bounds(
 
 	for (mushdim axis = 0; axis < MUSHSPACE_DIM; ++axis) {
 		found_nonspace |=
-			!mushspace_find_beg_in(
-				beg, axis, &MUSH_STATICAABB_BOUNDS,
-				mush_staticaabb_getter_no_offset, &space->static_box);
+			!find_beg_in(beg, axis, &MUSH_STATICAABB_BOUNDS,
+			             mush_staticaabb_getter_no_offset, &space->static_box);
 
-		mushspace_find_end_in(
-			end, axis, &MUSH_STATICAABB_BOUNDS,
-			mush_staticaabb_getter_no_offset, &space->static_box);
+		find_end_in(end, axis, &MUSH_STATICAABB_BOUNDS,
+		            mush_staticaabb_getter_no_offset, &space->static_box);
 
 		for (size_t i = 0; i < space->box_count; ++i) {
-			if (
-				mushspace_find_beg_in(
-					beg, axis, &space->boxen[i].bounds,
-					mush_aabb_getter_no_offset, &space->boxen[i]))
+			if (find_beg_in(beg, axis, &space->boxen[i].bounds,
+			                mush_aabb_getter_no_offset, &space->boxen[i]))
 			{
 				mushspace_remove_boxes(space, i, i);
 				mushstats_add(space->stats, MushStat_empty_boxes_dropped, 1);
@@ -59,8 +55,8 @@ bool mushspace_get_tight_bounds(
 				continue;
 			}
 			found_nonspace = true;
-			mushspace_find_end_in(end, axis, &space->boxen[i].bounds,
-										 mush_aabb_getter_no_offset, &space->boxen[i]);
+			find_end_in(end, axis, &space->boxen[i].bounds,
+			            mush_aabb_getter_no_offset, &space->boxen[i]);
 		}
 	}
 
@@ -97,7 +93,7 @@ bool mushspace_get_tight_bounds(
 	space->last_end = *end;
 	return found_nonspace;
 }
-static bool mushspace_find_beg_in(
+static bool find_beg_in(
 	mushcoords* beg, mushdim axis, const mush_bounds* bounds,
 	mushcell(*getter_no_offset)(const void*, mushcoords), const void* box)
 {
@@ -182,7 +178,7 @@ static bool mushspace_find_beg_in(
 	}
 	return empty_box;
 }
-static void mushspace_find_end_in(
+static void find_end_in(
 	mushcoords* end, mushdim axis, const mush_bounds* bounds,
 	mushcell(*getter_no_offset)(const void*, mushcoords), const void* box)
 {

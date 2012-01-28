@@ -8,15 +8,14 @@
 MUSH_DECL_CONST_DYN_ARRAY(mushcell)
 
 // Copies from data to aabb, given that it's an area contained in owner.
-static void mush_aabb_subsume_owners_area(
+static void subsume_owners_area(
 	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
 	mush_carr_mushcell data);
 
 void mush_aabb_subsume(mush_aabb* a, const mush_aabb* b) {
 	assert (mush_bounds_contains_bounds(&a->bounds, &b->bounds));
 
-	mush_aabb_subsume_owners_area(
-		a, b, b, (mush_carr_mushcell){b->data, b->size});
+	subsume_owners_area(a, b, b, (mush_carr_mushcell){b->data, b->size});
 }
 
 void mush_aabb_subsume_area(
@@ -30,14 +29,14 @@ void mush_aabb_subsume_area(
 	size_t beg_idx = mush_aabb_get_idx(b, ab->beg),
 	       end_idx = mush_aabb_get_idx(b, ab->end);
 
-	mush_aabb_subsume_owners_area(
+	subsume_owners_area(
 		a, b, area,
 		(mush_carr_mushcell){b->data + beg_idx, end_idx - beg_idx + 1});
 
 	assert (mush_aabb_get(a, ab->beg) == mush_aabb_get(b, ab->beg));
 	assert (mush_aabb_get(a, ab->end) == mush_aabb_get(b, ab->end));
 }
-static void mush_aabb_subsume_owners_area(
+static void subsume_owners_area(
 	mush_aabb* aabb, const mush_aabb* owner, const mush_aabb* area,
 	mush_carr_mushcell arr)
 {

@@ -6,7 +6,7 @@
 #include <string.h>
 
 #if MUSHSPACE_DIM > 1
-static void mush_aabb_consume_2d(
+static void consume_2d(
 	const mush_aabb*, const mush_aabb*, size_t, size_t, size_t);
 #endif
 
@@ -47,7 +47,7 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
 #endif
 
 #if MUSHSPACE_DIM == 2
-	mush_aabb_consume_2d(box, old, old_idx, old->size, last_row_idx_summand);
+	consume_2d(box, old, old_idx, old->size, last_row_idx_summand);
 #elif MUSHSPACE_DIM == 3
 	const size_t
 		last_area_idx =
@@ -57,14 +57,14 @@ bool mush_aabb_consume(mush_aabb* box, mush_aabb* old) {
 
 	for (size_t b = new_old_end, o = old->size; b > last_area_idx;) {
 		b -= box->area;
-		mush_aabb_consume_2d(box, old, b, o, last_row_idx_summand);
+		consume_2d(box, old, b, o, last_row_idx_summand);
 		o -= old->area;
 	}
 #endif
 	return true;
 }
 #if MUSHSPACE_DIM > 1
-static void mush_aabb_consume_2d(
+static void consume_2d(
 	const mush_aabb* box, const mush_aabb* old,
 	size_t old_idx, size_t old_end, size_t last_row_idx_summand)
 {

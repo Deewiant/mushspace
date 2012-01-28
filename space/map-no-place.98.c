@@ -7,26 +7,26 @@
 
 typedef struct { mushcell cell; size_t idx; } mush_cell_idx;
 
-static bool mushspace_map_in_box(
+static bool map_in_box(
 	mushspace*, mush_bounded_pos, mush_caabb_idx,
 	void*, void(*f)(mush_arr_mushcell, void*));
 
-static bool mushspace_map_in_static(
+static bool map_in_static(
 	mushspace*, mush_bounded_pos,
 	void*, void(*f)(mush_arr_mushcell, void*));
 
-static bool mushspace_mapex_in_box(
+static bool mapex_in_box(
 	mushspace*, mush_bounded_pos, mush_caabb_idx, void*,
 	void(*)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*));
 
-static bool mushspace_mapex_in_static(
+static bool mapex_in_static(
 	mushspace*, mush_bounded_pos, void*,
 	void(*)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*));
 
-static bool mushspace_get_next_in(
+static bool get_next_in(
 	const mushspace*, const mush_aabb*, mushcoords*, size_t*);
 
-static void mushspace_get_next_in1(
+static void get_next_in1(
 	mushucell, const mush_bounds*, mushcell, size_t, mushcoords, size_t,
 	mush_cell_idx*, mush_cell_idx*);
 
@@ -39,7 +39,7 @@ void mushspace_map_no_place(
 
 	for (;;) next_pos: {
 		if (mush_staticaabb_contains(pos)) {
-			if (mushspace_map_in_static(space, bpos, fg, f))
+			if (map_in_static(space, bpos, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -51,7 +51,7 @@ void mushspace_map_no_place(
 			if (!mush_bounds_contains(&box.aabb->bounds, pos))
 				continue;
 
-			if (mushspace_map_in_box(space, bpos, box, fg, f))
+			if (map_in_box(space, bpos, box, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -60,14 +60,14 @@ void mushspace_map_no_place(
 		// No hits for pos: find the next pos we can hit, or stop if there's
 		// nothing left.
 		size_t skipped = 0;
-		bool found = mushspace_get_next_in(space, aabb, &pos, &skipped);
+		bool found = get_next_in(space, aabb, &pos, &skipped);
 		if (g)
 			g(skipped, fg);
 		if (!found)
 			return;
 	}
 }
-bool mushspace_map_in_box(
+static bool map_in_box(
 	mushspace* space, mush_bounded_pos bpos, mush_caabb_idx cai,
 	void* caller_data, void(*f)(mush_arr_mushcell, void*))
 {
@@ -104,7 +104,7 @@ bool mushspace_map_in_box(
 	f((mush_arr_mushcell){box->data, end_idx - beg_idx + 1}, caller_data);
 	return hit_end;
 }
-bool mushspace_map_in_static(
+static bool map_in_static(
 	mushspace* space, mush_bounded_pos bpos,
 	void* caller_data, void(*f)(mush_arr_mushcell, void*))
 {
@@ -144,7 +144,7 @@ void mushspace_mapex_no_place(
 
 	for (;;) next_pos: {
 		if (mush_staticaabb_contains(pos)) {
-			if (mushspace_mapex_in_static(space, bpos, fg, f))
+			if (mapex_in_static(space, bpos, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -156,7 +156,7 @@ void mushspace_mapex_no_place(
 			if (!mush_bounds_contains(&box.aabb->bounds, pos))
 				continue;
 
-			if (mushspace_mapex_in_box(space, bpos, box, fg, f))
+			if (mapex_in_box(space, bpos, box, fg, f))
 				return;
 			else
 				goto next_pos;
@@ -165,14 +165,14 @@ void mushspace_mapex_no_place(
 		// No hits for pos: find the next pos we can hit, or stop if there's
 		// nothing left.
 		size_t skipped = 0;
-		bool found = mushspace_get_next_in(space, aabb, &pos, &skipped);
+		bool found = get_next_in(space, aabb, &pos, &skipped);
 		if (g)
 			g(skipped, fg);
 		if (!found)
 			return;
 	}
 }
-bool mushspace_mapex_in_box(
+static bool mapex_in_box(
 	mushspace* space, mush_bounded_pos bpos,
 	mush_caabb_idx cai,
 	void* caller_data,
@@ -267,7 +267,7 @@ bump_z:
 #endif
 	return hit_end;
 }
-bool mushspace_mapex_in_static(
+static bool mapex_in_static(
 	mushspace* space, mush_bounded_pos bpos,
 	void* caller_data,
 	void(*f)(mush_arr_mushcell, void*, size_t,size_t, size_t,size_t, uint8_t*))
@@ -349,7 +349,7 @@ bump_z:
 //
 // Assumes that the point, if it exists, was allocated within some box: doesn't
 // look at bakaabb at all.
-static bool mushspace_get_next_in(
+static bool get_next_in(
 	const mushspace* space, const mush_aabb* aabb,
 	mushcoords* pos, size_t* skipped)
 {
@@ -374,14 +374,14 @@ restart:
 
 		// Go through every box, starting from the static one.
 
-		mushspace_get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
-		                       MUSH_STATICAABB_BEG, box_count,
-		                       &best_coord, &best_wrapped);
+		get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
+		             MUSH_STATICAABB_BEG, box_count,
+		             &best_coord, &best_wrapped);
 
 		for (mushucell b = 0; b < box_count; ++b)
-			mushspace_get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
-			                       space->boxen[b].bounds.beg, b,
-			                       &best_coord, &best_wrapped);
+			get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
+			             space->boxen[b].bounds.beg, b,
+			             &best_coord, &best_wrapped);
 
 		if (best_coord.idx > box_count) {
 			if (best_wrapped.idx > box_count) {
@@ -438,7 +438,7 @@ restart:
 	}
 	return false;
 }
-static void mushspace_get_next_in1(
+static void get_next_in1(
 	mushucell x, const mush_bounds* bounds, mushcell posx, size_t box_count,
 	mushcoords box_beg, size_t box_idx,
 	mush_cell_idx* best_coord, mush_cell_idx* best_wrapped)

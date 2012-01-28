@@ -10,26 +10,26 @@
 MUSH_DECL_DYN_ARRAY(mush_aabb)
 MUSH_DECL_DYN_ARRAY(mush_bounds)
 
-static void mushspace_get_aabbs(
+static void get_aabbs(
 	const unsigned char*, size_t, mushcoords target, bool binary,
 	mush_arr_mush_aabb*);
 
 #if MUSHSPACE_DIM >= 2
-static bool mushspace_newline(
+static bool newline(
 	bool*, mushcoords*, mushcoords, mush_arr_mush_bounds, size_t*, size_t*,
 	mushcoords, size_t*, uint8_t*);
 #endif
 
-static size_t mushspace_get_aabbs_binary(
+static size_t get_aabbs_binary(
 	const unsigned char*, size_t len, mushcoords target, mush_bounds*);
 
-static void mushspace_binary_load_arr(mush_arr_mushcell, void*);
-static void mushspace_binary_load_blank(size_t, void*);
-static void mushspace_load_arr(mush_arr_mushcell, void*,
-                               size_t, size_t, size_t, size_t, uint8_t*);
-static void mushspace_load_blank(size_t, void*);
+static void binary_load_arr(mush_arr_mushcell, void*);
+static void binary_load_blank(size_t, void*);
+static void load_arr(mush_arr_mushcell, void*,
+                     size_t, size_t, size_t, size_t, uint8_t*);
+static void load_blank(size_t, void*);
 
-#define mushspace_load_arr_auxdata MUSHSPACE_CAT(mushspace,_load_arr_auxdata)
+#define load_arr_auxdata MUSHSPACE_CAT(mushspace,_load_arr_auxdata)
 typedef struct {
 	const unsigned char *str, *str_end;
 
@@ -39,14 +39,14 @@ typedef struct {
 		mushcell y, target_y, aabb_beg_y;
 	#endif
 	#endif
-} mushspace_load_arr_auxdata;
+} load_arr_auxdata;
 
 int mushspace_load_string(
 	mushspace* space, const unsigned char* str, size_t len,
 	mushcoords* end, mushcoords target, bool binary)
 {
 	mush_arr_mush_aabb aabbs;
-	mushspace_get_aabbs(str, len, target, binary, &aabbs);
+	get_aabbs(str, len, target, binary, &aabbs);
 
 	if (!aabbs.ptr) {
 		// The error code was placed in aabbs.len.
@@ -76,10 +76,10 @@ int mushspace_load_string(
 		// Similarly, if any box was placed before an axis, the beg is the
 		// minimum of such boxes' begs.
 		//
-		// Note that these boxes, from mushspace_get_aabbs, don't cover any
-		// excess area! They may be smaller than the range from target to the end
-		// point due to dropping space-filled lines and columns, but they haven't
-		// been subsumed into bigger boxes or anything.
+		// Note that these boxes, from get_aabbs, don't cover any excess area!
+		// They may be smaller than the range from target to the end point due to
+		// dropping space-filled lines and columns, but they haven't been
+		// subsumed into bigger boxes or anything.
 
 		mush_bounds *bounds = &aabb.bounds;
 
@@ -133,11 +133,10 @@ int mushspace_load_string(
 	const unsigned char *str_end = str + len;
 
 	if (binary)
-		mushspace_map_no_place(
-			space, &aabb, &str,
-			mushspace_binary_load_arr, mushspace_binary_load_blank);
+		mushspace_map_no_place(space, &aabb, &str,
+		                       binary_load_arr, binary_load_blank);
 	else {
-		mushspace_load_arr_auxdata aux =
+		load_arr_auxdata aux =
 			{ str, str_end
 		#if MUSHSPACE_DIM >= 2
 			, target.x, target.x, aabb.bounds.beg.x
@@ -147,9 +146,7 @@ int mushspace_load_string(
 		#endif
 		};
 
-		mushspace_mapex_no_place(
-			space, &aabb, &aux, mushspace_load_arr, mushspace_load_blank);
-
+		mushspace_mapex_no_place(space, &aabb, &aux, load_arr, load_blank);
 		str = aux.str;
 	}
 
@@ -165,7 +162,7 @@ int mushspace_load_string(
 //
 // If nothing would be loaded, aabbs_out->ptr is set to NULL and an error code
 // (an int) is written into aabbs_out->len.
-static void mushspace_get_aabbs(
+static void get_aabbs(
 	const unsigned char* str, size_t len, mushcoords target, bool binary,
 	mush_arr_mush_aabb* aabbs_out)
 {
@@ -176,7 +173,7 @@ static void mushspace_get_aabbs(
 	aabbs_out->ptr = aabbs;
 
 	if (binary) {
-		size_t n = mushspace_get_aabbs_binary(str, len, target, bounds);
+		size_t n = get_aabbs_binary(str, len, target, bounds);
 		if (n == SIZE_MAX) {
 			*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM};
 			return;
@@ -229,10 +226,10 @@ static void mushspace_get_aabbs(
 
 		const mush_arr_mush_bounds bounds_arr = {bounds, MUSH_ARRAY_LEN(aabbs)};
 
-		#define mush_hit_newline do { \
-			if (!mushspace_newline(&got_cr, &pos, target, \
-			                       bounds_arr, &a, &max_a, \
-			                       last_nonspace, &found_nonspace_for, &get_beg))\
+		#define hit_newline do { \
+			if (!newline(&got_cr, &pos, target, \
+			             bounds_arr, &a, &max_a, \
+			             last_nonspace, &found_nonspace_for, &get_beg))\
 			{ \
 				*aabbs_out = (mush_arr_mush_aabb){NULL, MUSH_ERR_NO_ROOM}; \
 				return; \
@@ -245,7 +242,7 @@ static void mushspace_get_aabbs(
 	default:
 		#if MUSHSPACE_DIM >= 2
 			if (got_cr)
-				mush_hit_newline;
+				hit_newline;
 		#endif
 
 		if (*str != ' ') {
@@ -283,14 +280,14 @@ static void mushspace_get_aabbs(
 
 	case '\n':
 		#if MUSHSPACE_DIM >= 2
-			mush_hit_newline;
+			hit_newline;
 		#endif
 		break;
 
 	case '\f':
 		#if MUSHSPACE_DIM >= 2
 			if (got_cr)
-				mush_hit_newline;
+				hit_newline;
 		#endif
 		#if MUSHSPACE_DIM >= 3
 			mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
@@ -317,7 +314,7 @@ static void mushspace_get_aabbs(
 		break;
 	}
 	#if MUSHSPACE_DIM >= 2
-	#undef mush_hit_newline
+	#undef hit_newline
 	#endif
 
 	if (found_nonspace_for_anyone == MUSH_ARRAY_LEN(aabbs)) {
@@ -350,7 +347,7 @@ static void mushspace_get_aabbs(
 	aabbs_out->len = n;
 }
 #if MUSHSPACE_DIM >= 2
-static bool mushspace_newline(
+static bool newline(
 	bool* got_cr, mushcoords* pos, mushcoords target,
 	mush_arr_mush_bounds bounds, size_t* a, size_t* max_a,
 	mushcoords last_nonspace, size_t* found_nonspace_for, uint8_t* get_beg)
@@ -377,7 +374,7 @@ static bool mushspace_newline(
 }
 #endif
 
-static size_t mushspace_get_aabbs_binary(
+static size_t get_aabbs_binary(
 	const unsigned char* str, size_t len,
 	mushcoords target, mush_bounds* bounds)
 {
@@ -415,7 +412,7 @@ static size_t mushspace_get_aabbs_binary(
 	return a;
 }
 
-static void mushspace_binary_load_arr(mush_arr_mushcell arr, void* p) {
+static void binary_load_arr(mush_arr_mushcell arr, void* p) {
 	const unsigned char **strp = p, *str = *strp;
 	for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
 		unsigned char c = *str++;
@@ -424,7 +421,7 @@ static void mushspace_binary_load_arr(mush_arr_mushcell arr, void* p) {
 	}
 	*strp = str;
 }
-static void mushspace_binary_load_blank(size_t blanks, void* p) {
+static void binary_load_blank(size_t blanks, void* p) {
 	const unsigned char **strp = p, *str = *strp;
 	while (blanks) {
 		if (*str != ' ')
@@ -434,7 +431,7 @@ static void mushspace_binary_load_blank(size_t blanks, void* p) {
 	}
 	*strp = str;
 }
-static void mushspace_load_arr(
+static void load_arr(
 	mush_arr_mushcell arr, void* p,
 	size_t width, size_t area, size_t line_start, size_t page_start,
 	uint8_t* hit)
@@ -445,7 +442,7 @@ static void mushspace_load_arr(
 	(void)area;
 	#endif
 
-	mushspace_load_arr_auxdata *aux = p;
+	load_arr_auxdata *aux = p;
 	const unsigned char *str = aux->str, *str_end = aux->str_end;
 
 	// x and y are used only for skipping leading spaces/newlines and thus
@@ -600,8 +597,8 @@ end:
 	aux->str = str;
 	return;
 }
-static void mushspace_load_blank(size_t blanks, void* p) {
-	mushspace_load_arr_auxdata *aux = p;
+static void load_blank(size_t blanks, void* p) {
+	load_arr_auxdata *aux = p;
 	const unsigned char *str = aux->str;
 	while (blanks) {
 		if (!(*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f'))

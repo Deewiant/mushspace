@@ -2,17 +2,17 @@
 
 #include "space/put-textual.all.h"
 
-static bool mushspace_put_textual_row(
+static bool put_textual_row(
 	const mushcell*, size_t*, const unsigned char*, size_t*,
 	void(*)(const mushcell*, size_t, void*), void(*)(unsigned char, void*),
 	void*);
 
-static void mushspace_put_textual_page(
+static void put_textual_page(
 	const mushcell*, size_t*, const unsigned char*, size_t*,
 	void(*)(const mushcell*, size_t, void*), void(*)(unsigned char, void*),
 	void*);
 
-static bool mushspace_put_textual_add_ws(
+static bool put_textual_add_ws(
 	unsigned char**, size_t*, size_t*, unsigned char);
 
 int mushspace_put_textual(
@@ -71,39 +71,36 @@ int mushspace_put_textual(
 							--c.x;
 					}
 				case '\n':
-					if (!mushspace_put_textual_row(buf, &i, wsbuf, &w,
-					                               putrow, put, pdat)
-					 &&  mushspace_put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\n'))
+					if (!put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat)
+					 &&  put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\n'))
 						goto end;
 					break;
 
 				case '\f': {
-					mushspace_put_textual_page(buf, &i, wsbuf, &w,
-					                           putrow, put, pdat);
+					put_textual_page(buf, &i, wsbuf, &w, putrow, put, pdat);
 
 					// Always buffer this instead of outputting it: form feeds go
 					// between pages, not after each one.
-					if (!mushspace_put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
+					if (!put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
 						goto end;
 				}}
 			}
 #if MUSHSPACE_DIM >= 2
-			if (!mushspace_put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat))
-				if (!mushspace_put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\n'))
+			if (!put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat))
+				if (!put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\n'))
 					goto end;
 		}
 #endif
 #if MUSHSPACE_DIM >= 3
-		mushspace_put_textual_page(buf, &i, wsbuf, &w, putrow, put, pdat);
+		put_textual_page(buf, &i, wsbuf, &w, putrow, put, pdat);
 
 		// Don't possibly force a reallocation for something that we know we
 		// won't use: don't add a form feed at end.z.
-		if (c.z < end.z
-		 && !mushspace_put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
+		if (c.z < end.z && !put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
 			goto end;
 	}
 #endif
-	mushspace_put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat);
+	put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat);
 	ret = MUSH_ERR_NONE;
 
 end:
@@ -122,7 +119,7 @@ end:
 	return ret;
 }
 
-static bool mushspace_put_textual_row(
+static bool put_textual_row(
 	const mushcell     *   buf, size_t* i,
 	const unsigned char* wsbuf, size_t* w,
 	void(*putrow)(const mushcell*, size_t, void*),
@@ -147,7 +144,7 @@ static bool mushspace_put_textual_row(
 	return true;
 }
 
-static void mushspace_put_textual_page(
+static void put_textual_page(
 	const mushcell     *   buf, size_t* i,
 	const unsigned char* wsbuf, size_t* w,
 	void(*putrow)(const mushcell*, size_t, void*),
@@ -159,10 +156,10 @@ static void mushspace_put_textual_page(
 	for (j = *w; j-- > 0 && wsbuf[j] == '\n';);
 	*w = j + 1;
 
-	mushspace_put_textual_row(buf, i, wsbuf, w, putrow, put, pdat);
+	put_textual_row(buf, i, wsbuf, w, putrow, put, pdat);
 }
 
-static bool mushspace_put_textual_add_ws(
+static bool put_textual_add_ws(
 	unsigned char** wsbuf, size_t* wsbuflen, size_t* w, unsigned char ws)
 {
 	if (*w == *wsbuflen) {
