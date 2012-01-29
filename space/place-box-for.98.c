@@ -168,15 +168,15 @@ static bool extend_big_sequence_start_for(
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (axis == MUSHSPACE_DIM) {
-			if (   c.v[i] >  last->end.v[i]
-			    && c.v[i] <= last->end.v[i] + BIG_SEQ_MAX_SPACING)
+			if (c.v[i] >  last->end.v[i]
+			 && c.v[i] <= last->end.v[i] + BIG_SEQ_MAX_SPACING)
 			{
 				positive = true;
 				axis = i;
 				continue;
 			}
-			if (   c.v[i] <  last->beg.v[i]
-			    && c.v[i] >= last->beg.v[i] - BIG_SEQ_MAX_SPACING)
+			if (c.v[i] <  last->beg.v[i]
+			 && c.v[i] >= last->beg.v[i] - BIG_SEQ_MAX_SPACING)
 			{
 				positive = false;
 				axis = i;
@@ -230,15 +230,15 @@ static bool extend_first_placed_big_for(
 
 	for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 		if (axis == MUSHSPACE_DIM) {
-			if (   c.v[i] >  space->first_placed_big.v[i]
-			    && c.v[i] <= space->first_placed_big.v[i] + BIG_SEQ_MAX_SPACING)
+			if (c.v[i] >  space->first_placed_big.v[i]
+			 && c.v[i] <= space->first_placed_big.v[i] + BIG_SEQ_MAX_SPACING)
 			{
 				positive = true;
 				axis = i;
 				continue;
 			}
-			if (   c.v[i] <  space->first_placed_big.v[i]
-			    && c.v[i] >= space->first_placed_big.v[i] - BIG_SEQ_MAX_SPACING)
+			if (c.v[i] <  space->first_placed_big.v[i]
+			 && c.v[i] >= space->first_placed_big.v[i] - BIG_SEQ_MAX_SPACING)
 			{
 				positive = false;
 				axis = i;

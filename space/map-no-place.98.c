@@ -438,8 +438,8 @@ restart:
 			return true;
 
 		// If we ended up in the box, that's fine too.
-		if (   best_coord.idx < box_count
-		    && mushbounds_contains(&space->boxen[best_coord.idx].bounds, *pos))
+		if (best_coord.idx < box_count
+		 && mushbounds_contains(&space->boxen[best_coord.idx].bounds, *pos))
 			return true;
 
 		// If we ended up in some other box, that's also fine.
@@ -481,9 +481,8 @@ static void get_next_in1(
 	//
 	// Note that best_wrapped->cell <= best_coord->cell so we can safely test
 	// this after the first best_coord->cell check.
-	if (   posx > bounds->end.v[x]
-	    && (   box_beg.v[x] < best_wrapped->cell
-	        || best_wrapped->idx == box_count+1))
+	if (posx > bounds->end.v[x]
+	 && (box_beg.v[x] < best_wrapped->cell || best_wrapped->idx == box_count+1))
 	{
 		best_wrapped->cell = box_beg.v[x];
 		best_wrapped->idx  = box_idx;

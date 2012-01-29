@@ -102,8 +102,8 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	}
 
 	mushaabb* box;
-	if (    (box = mushspace_find_box(space, p))
-	     || mushspace_place_box_for  (space, p, &box))
+	if ((box = mushspace_find_box(space, p))
+	 || mushspace_place_box_for  (space, p, &box))
 	{
 		mushaabb_put(box, p, c);
 		return MUSHERR_NONE;
