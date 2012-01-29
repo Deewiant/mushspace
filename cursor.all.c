@@ -35,7 +35,8 @@ int mushcursor_init(
 		return MUSHERR_OOM;
 
 #if !MUSHSPACE_93
-	mushspace_add_invalidatee(space, mushcursor_recalibrate_void, cursor);
+	if (!mushspace_add_invalidatee(space, mushcursor_recalibrate_void, cursor))
+		return MUSHERR_OOM;
 #endif
 
 	cursor->space = space;
