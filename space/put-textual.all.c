@@ -16,7 +16,7 @@ static bool put_textual_add_ws(
 	unsigned char**, size_t*, size_t*, unsigned char);
 
 int mushspace_put_textual(
-	const mushspace* space, mushcoords beg, mushcoords end,
+	const mushspace* space, mushbounds bounds,
 	mushcell     **   bufp, size_t*   buflenp,
 	unsigned char** wsbufp, size_t* wsbuflenp,
 	void(*putrow)(const mushcell*, size_t, void*),
@@ -41,7 +41,7 @@ int mushspace_put_textual(
 	// beginning: leading whitespace is not invisible.
 	mushcoords lbeg, lend;
 	mushspace_get_loose_bounds(space, &lbeg, &lend);
-	mushcoords_min_into(&end, lend);
+	mushcoords_min_into(&bounds.end, lend);
 
 	int ret = MUSHERR_OOM;
 
@@ -49,12 +49,12 @@ int mushspace_put_textual(
 	size_t i = 0, w = 0;
 
 #if MUSHSPACE_DIM >= 3
-	for (c.z = beg.z; c.z <= end.z; ++c.z) {
+	for (c.z = bounds.beg.z; c.z <= bounds.end.z; ++c.z) {
 #endif
 #if MUSHSPACE_DIM >= 2
-		for (c.y = beg.y; c.y <= end.y; ++c.y) {
+		for (c.y = bounds.beg.y; c.y <= bounds.end.y; ++c.y) {
 #endif
-			for (c.x = beg.x; c.x <= end.x; ++c.x) {
+			for (c.x = bounds.beg.x; c.x <= bounds.end.x; ++c.x) {
 				if (i == buflen) {
 					mushcell *p = realloc(buf,
 						(buflen ? (buflen *= 2) : (buflen += 1024)) * sizeof *buf);
@@ -65,7 +65,7 @@ int mushspace_put_textual(
 
 				switch (buf[i++] = mushspace_get(space, c)) {
 				case '\r':
-					if (c.x < end.x) {
+					if (c.x < bounds.end.x) {
 						++c.x;
 						if (mushspace_get(space, c) != '\n')
 							--c.x;
@@ -96,7 +96,8 @@ int mushspace_put_textual(
 
 		// Don't possibly force a reallocation for something that we know we
 		// won't use: don't add a form feed at end.z.
-		if (c.z < end.z && !put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
+		if (c.z < bounds.end.z
+		 && !put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
 			goto end;
 	}
 #endif

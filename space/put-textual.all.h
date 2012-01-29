@@ -7,7 +7,7 @@
 
 #define mushspace_put_textual MUSHSPACE_CAT(mushspace,_put_textual)
 
-int mushspace_put_textual(const mushspace*, mushcoords, mushcoords,
+int mushspace_put_textual(const mushspace*, mushbounds,
                           mushcell**, size_t*, unsigned char**, size_t*,
                           void(*)(const mushcell*, size_t, void*),
                           void(*)(unsigned char, void*), void*);
