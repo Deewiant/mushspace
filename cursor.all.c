@@ -48,18 +48,10 @@ int mushcursor_init(
 
 #if MUSHSPACE_93
 	cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
-#else
-	if (!mushcursor_get_box(cursor, pos)) {
-		if (!mushspace_jump_to_box(space, &pos, delta, &cursor->mode,
-		                           &cursor->box, &cursor->box_idx))
-		{
-			mushcursor_set_infloop_pos(cursor, pos);
-			return MUSHERR_INFINITE_LOOP_SPACES;
-		}
-		mushcursor_tessellate(cursor, pos);
-	}
-#endif
 	return MUSHERR_NONE;
+#else
+	return initial_position_fixup(cursor, pos, delta);
+#endif
 }
 
 int mushcursor_free(mushcursor* cursor) {
@@ -91,19 +83,11 @@ int mushcursor_copy(
 
 	copy->space = space;
 
-#if !MUSHSPACE_93
-	mushcoords pos = mushcursor_get_pos(copy);
-	if (!mushcursor_get_box(copy, pos)) {
-		if (!mushspace_jump_to_box(space, &pos, *delta, &copy->mode,
-		                           &copy->box, &copy->box_idx))
-		{
-			mushcursor_set_infloop_pos(copy, pos);
-			return MUSHERR_INFINITE_LOOP_SPACES;
-		}
-		mushcursor_tessellate(copy, pos);
-	}
-#endif
+#if MUSHSPACE_93
 	return MUSHERR_NONE;
+#else
+	return initial_position_fixup(copy, mushcursor_get_pos(copy), *delta);
+#endif
 }
 
 #if !MUSHSPACE_93
