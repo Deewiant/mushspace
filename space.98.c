@@ -43,6 +43,10 @@ void mushspace_free(mushspace* space) {
 		free(space->boxen[i].data);
 	free(space->boxen);
 	mushbakaabb_free(&space->bak);
+	if (space->invalidatees) {
+		free(space->invalidatees);
+		free(space->invalidatees_data);
+	}
 }
 
 mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
