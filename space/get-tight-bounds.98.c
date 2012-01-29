@@ -62,8 +62,8 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
 	if (space->bak.data && mushbakaabb_size(&space->bak) > 0) {
 		found_nonspace = true;
 
-		// Might as well tighten the approximate space->bak.bounds while we're at
-		// it.
+		// We might as well tighten the approximate space->bak.bounds while we're
+		// at it.
 		mushbounds bak_bounds = {space->bak.bounds.end, space->bak.bounds.beg};
 
 		unsigned char buf[mushbakaabb_iter_sizeof];
