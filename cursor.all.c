@@ -28,7 +28,7 @@ static void mushcursor_recalibrate_void(void*);
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
 int mushcursor_init(
-	mushspace* space, mushcoords pos, mushcoords delta, void** vp)
+	void** vp, mushspace* space, mushcoords pos, mushcoords delta)
 {
 	mushcursor *cursor = *vp ? *vp : (*vp = malloc(sizeof *cursor));
 	if (!cursor)
