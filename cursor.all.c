@@ -29,8 +29,11 @@ static void mushcursor_recalibrate_void(void*);
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
 int mushcursor_init(
-	void** vp, mushspace* space, mushcoords pos, mushcoords delta)
-{
+	void** vp, mushspace* space, mushcoords pos
+#if !MUSHSPACE_93
+	, mushcoords delta
+#endif
+) {
 	mushcursor *cursor = *vp ? *vp : (*vp = malloc(sizeof *cursor));
 	if (!cursor)
 		return MUSHERR_OOM;
@@ -43,7 +46,6 @@ int mushcursor_init(
 	cursor->space = space;
 
 #if MUSHSPACE_93
-	(void)delta;
 	cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
 #else
 	if (!mushcursor_get_box(cursor, pos)) {
@@ -70,9 +72,11 @@ int mushcursor_free(mushcursor* cursor) {
 }
 
 int mushcursor_copy(
-	void** vp, const mushcursor* cursor, mushspace* space,
-	const mushcoords* delta)
-{
+	void** vp, const mushcursor* cursor, mushspace* space
+#if !MUSHSPACE_93
+	, const mushcoords* delta
+#endif
+) {
 	mushcursor *copy = *vp ? *vp : (*vp = malloc(sizeof *copy));
 	if (!copy)
 		return MUSHERR_OOM;
@@ -86,9 +90,7 @@ int mushcursor_copy(
 
 	copy->space = space;
 
-#if MUSHSPACE_93
-	(void)delta;
-#else
+#if !MUSHSPACE_93
 	mushcoords pos = mushcursor_get_pos(copy);
 	if (!mushcursor_get_box(copy, pos)) {
 		if (!mushspace_jump_to_box(space, &pos, *delta, &copy->mode,
