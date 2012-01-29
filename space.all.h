@@ -96,7 +96,7 @@ mushspace *mushspace_copy(void*, const mushspace*
 mushcell mushspace_get(const mushspace*, mushcoords);
 int      mushspace_put(      mushspace*, mushcoords, mushcell);
 
-void mushspace_get_loose_bounds(const mushspace*, mushcoords*, mushcoords*);
+void mushspace_get_loose_bounds(const mushspace*, mushbounds*);
 
 void mushspace_map_existing(
 	mushspace*, mushbounds,

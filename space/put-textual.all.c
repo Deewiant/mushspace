@@ -39,9 +39,9 @@ int mushspace_put_textual(
 
 	// Clamp end to loose bounds: no point in going beyond them. Don't clamp the
 	// beginning: leading whitespace is not invisible.
-	mushcoords lbeg, lend;
-	mushspace_get_loose_bounds(space, &lbeg, &lend);
-	mushcoords_min_into(&bounds.end, lend);
+	mushbounds lbounds;
+	mushspace_get_loose_bounds(space, &lbounds);
+	mushcoords_min_into(&bounds.end, lbounds.end);
 
 	int ret = MUSHERR_OOM;
 

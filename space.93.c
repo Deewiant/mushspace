@@ -38,10 +38,8 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	return MUSHERR_NONE;
 }
 
-void mushspace_get_loose_bounds(
-	const mushspace* space, mushcoords* beg, mushcoords* end)
-{
+void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
 	(void)space;
-	*beg = MUSHSTATICAABB_BEG;
-	*end = MUSHSTATICAABB_END;
+	bounds->beg = MUSHSTATICAABB_BEG;
+	bounds->end = MUSHSTATICAABB_END;
 }

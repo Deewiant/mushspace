@@ -118,19 +118,17 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 	return MUSHERR_NONE;
 }
 
-void mushspace_get_loose_bounds(
-	const mushspace* space, mushcoords* beg, mushcoords* end)
-{
-	*beg = MUSHSTATICAABB_BEG;
-	*end = MUSHSTATICAABB_END;
+void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
+	bounds->beg = MUSHSTATICAABB_BEG;
+	bounds->end = MUSHSTATICAABB_END;
 
 	for (size_t i = 0; i < space->box_count; ++i) {
-		mushcoords_min_into(beg, space->boxen[i].bounds.beg);
-		mushcoords_max_into(end, space->boxen[i].bounds.end);
+		mushcoords_min_into(&bounds->beg, space->boxen[i].bounds.beg);
+		mushcoords_max_into(&bounds->end, space->boxen[i].bounds.end);
 	}
 	if (space->bak.data) {
-		mushcoords_min_into(beg, space->bak.bounds.beg);
-		mushcoords_max_into(end, space->bak.bounds.end);
+		mushcoords_min_into(&bounds->beg, space->bak.bounds.beg);
+		mushcoords_max_into(&bounds->end, space->bak.bounds.end);
 	}
 }
 
