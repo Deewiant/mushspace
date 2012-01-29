@@ -23,6 +23,7 @@
 #endif
 
 #if !MUSHSPACE_93
+static int  initial_position_fixup(mushcursor*, mushcoords, mushcoords);
 static void mushcursor_recalibrate_void(void*);
 #endif
 
@@ -104,6 +105,23 @@ int mushcursor_copy(
 #endif
 	return MUSHERR_NONE;
 }
+
+#if !MUSHSPACE_93
+static int initial_position_fixup(
+	mushcursor* cursor, mushcoords pos, mushcoords delta)
+{
+	if (!mushcursor_get_box(cursor, pos)) {
+		if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
+		                           &cursor->box, &cursor->box_idx))
+		{
+			mushcursor_set_infloop_pos(cursor, pos);
+			return MUSHERR_INFINITE_LOOP_SPACES;
+		}
+		mushcursor_tessellate(cursor, pos);
+	}
+	return MUSHERR_NONE;
+}
+#endif
 
 mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 	switch (MUSHCURSOR_MODE(cursor)) {
