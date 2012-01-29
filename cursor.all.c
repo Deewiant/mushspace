@@ -58,6 +58,16 @@ int mushcursor_init(
 	return MUSHERR_NONE;
 }
 
+int mushcursor_free(mushcursor* cursor) {
+#if MUSHSPACE_93
+	(void)cursor;
+	return MUSHERR_NONE;
+#else
+	return mushspace_del_invalidatee(cursor->space, cursor) ? MUSHERR_NONE
+	                                                        : MUSHERR_OOM;
+#endif
+}
+
 mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 	switch (MUSHCURSOR_MODE(cursor)) {
 	case MushCursorMode_static:
