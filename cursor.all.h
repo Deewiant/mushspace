@@ -44,6 +44,7 @@ typedef struct mushcursor {
 #define mushcursor_sizeof          MUSHSPACE_CAT(mushcursor,_sizeof)
 #define mushcursor_init            MUSHSPACE_CAT(mushcursor,_init)
 #define mushcursor_free            MUSHSPACE_CAT(mushcursor,_free)
+#define mushcursor_copy            MUSHSPACE_CAT(mushcursor,_copy)
 #define mushcursor_get_pos         MUSHSPACE_CAT(mushcursor,_get_pos)
 #define mushcursor_set_pos         MUSHSPACE_CAT(mushcursor,_set_pos)
 #define mushcursor_get             MUSHSPACE_CAT(mushcursor,_get)
@@ -66,6 +67,7 @@ extern const size_t mushcursor_sizeof;
 
 int mushcursor_init(void**, mushspace*, mushcoords, mushcoords);
 int mushcursor_free(mushcursor*);
+int mushcursor_copy(void**, const mushcursor*, mushspace*, const mushcoords*);
 
 mushcoords mushcursor_get_pos(const mushcursor*);
 void       mushcursor_set_pos(      mushcursor*, mushcoords);

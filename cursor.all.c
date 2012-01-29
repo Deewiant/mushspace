@@ -3,6 +3,7 @@
 #include "cursor.all.h"
 
 #include <assert.h>
+#include <string.h>
 
 #if !MUSHSPACE_93
 #include "space/jump-to-box.98.h"
@@ -66,6 +67,40 @@ int mushcursor_free(mushcursor* cursor) {
 	return mushspace_del_invalidatee(cursor->space, cursor) ? MUSHERR_NONE
 	                                                        : MUSHERR_OOM;
 #endif
+}
+
+int mushcursor_copy(
+	void** vp, const mushcursor* cursor, mushspace* space,
+	const mushcoords* delta)
+{
+	mushcursor *copy = *vp ? *vp : (*vp = malloc(sizeof *copy));
+	if (!copy)
+		return MUSHERR_OOM;
+
+	memcpy(copy, cursor, sizeof *copy);
+
+	// We assume that cursor was already in a valid state, so we don't need to
+	// fix the position if the space doesn't change.
+	if (!space || space == cursor->space)
+		return MUSHERR_NONE;
+
+	copy->space = space;
+
+#if MUSHSPACE_93
+	(void)delta;
+#else
+	mushcoords pos = mushcursor_get_pos(copy);
+	if (!mushcursor_get_box(copy, pos)) {
+		if (!mushspace_jump_to_box(space, &pos, *delta, &copy->mode,
+		                           &copy->box, &copy->box_idx))
+		{
+			mushcursor_set_infloop_pos(copy, pos);
+			return MUSHERR_INFINITE_LOOP_SPACES;
+		}
+		mushcursor_tessellate(copy, pos);
+	}
+#endif
+	return MUSHERR_NONE;
 }
 
 mushcoords mushcursor_get_pos(const mushcursor* cursor) {
