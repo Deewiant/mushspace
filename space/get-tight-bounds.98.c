@@ -10,41 +10,39 @@ static bool find_beg_in(mushcoords*, mushdim, const mushbounds*,
 static void find_end_in(mushcoords*, mushdim, const mushbounds*,
                         mushcell(*)(const void*, mushcoords), const void*);
 
-bool mushspace_get_tight_bounds(
-	mushspace* space, mushcoords* beg, mushcoords* end)
-{
+bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
 	bool last_beg_space = mushspace_get(space, space->last_beg) == ' ',
 	     last_end_space = mushspace_get(space, space->last_end) == ' ',
 	     found_nonspace = true;
 
 	if (last_beg_space == last_end_space) {
 		if (last_beg_space) {
-			*beg = MUSHCOORDS(MUSHCELL_MAX, MUSHCELL_MAX, MUSHCELL_MAX);
-			*end = MUSHCOORDS(MUSHCELL_MIN, MUSHCELL_MIN, MUSHCELL_MIN);
+			bounds->beg = MUSHCOORDS(MUSHCELL_MAX, MUSHCELL_MAX, MUSHCELL_MAX);
+			bounds->end = MUSHCOORDS(MUSHCELL_MIN, MUSHCELL_MIN, MUSHCELL_MIN);
 			found_nonspace = false;
 		} else {
-			*beg = space->last_beg;
-			*end = space->last_end;
+			bounds->beg = space->last_beg;
+			bounds->end = space->last_end;
 		}
 	} else {
 		if (last_beg_space)
-			*beg = *end = space->last_end;
+			bounds->beg = bounds->end = space->last_end;
 		else
-			*beg = *end = space->last_beg;
+			bounds->beg = bounds->end = space->last_beg;
 	}
 
 	bool changed = false;
 
 	for (mushdim axis = 0; axis < MUSHSPACE_DIM; ++axis) {
 		found_nonspace |=
-			!find_beg_in(beg, axis, &MUSHSTATICAABB_BOUNDS,
+			!find_beg_in(&bounds->beg, axis, &MUSHSTATICAABB_BOUNDS,
 			             mushstaticaabb_getter_no_offset, &space->static_box);
 
-		find_end_in(end, axis, &MUSHSTATICAABB_BOUNDS,
+		find_end_in(&bounds->end, axis, &MUSHSTATICAABB_BOUNDS,
 		            mushstaticaabb_getter_no_offset, &space->static_box);
 
 		for (size_t i = 0; i < space->box_count; ++i) {
-			if (find_beg_in(beg, axis, &space->boxen[i].bounds,
+			if (find_beg_in(&bounds->beg, axis, &space->boxen[i].bounds,
 			                mushaabb_getter_no_offset, &space->boxen[i]))
 			{
 				mushspace_remove_boxes(space, i, i);
@@ -53,7 +51,7 @@ bool mushspace_get_tight_bounds(
 				continue;
 			}
 			found_nonspace = true;
-			find_end_in(end, axis, &space->boxen[i].bounds,
+			find_end_in(&bounds->end, axis, &space->boxen[i].bounds,
 			            mushaabb_getter_no_offset, &space->boxen[i]);
 		}
 	}
@@ -84,11 +82,11 @@ bool mushspace_get_tight_bounds(
 
 		space->bak.bounds = bak_bounds;
 
-		mushcoords_min_into(beg, bak_bounds.beg);
-		mushcoords_max_into(end, bak_bounds.end);
+		mushcoords_min_into(&bounds->beg, bak_bounds.beg);
+		mushcoords_max_into(&bounds->end, bak_bounds.end);
 	}
-	space->last_beg = *beg;
-	space->last_end = *end;
+	space->last_beg = bounds->beg;
+	space->last_end = bounds->end;
 	return found_nonspace;
 }
 static bool find_beg_in(

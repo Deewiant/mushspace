@@ -4,11 +4,9 @@
 
 #include <assert.h>
 
-bool mushspace_get_tight_bounds(
-	const mushspace* space, mushcoords* beg, mushcoords* end)
-{
-	beg->x = 79;
-	end->x =  0;
+bool mushspace_get_tight_bounds(const mushspace* space, mushbounds* bounds) {
+	bounds->beg.x = 79;
+	bounds->end.x =  0;
 
 	mushcoords c;
 
@@ -16,17 +14,17 @@ bool mushspace_get_tight_bounds(
 	     found_anywhere = false;
 	for (c.y = 0; c.y < 25; ++c.y) {
 
-		if (beg->x == 0) {
+		if (bounds->beg.x == 0) {
 			assert (found_anywhere);
-			assert (beg->y < c.y);
+			assert (bounds->beg.y < c.y);
 
-			if (end->x == 79)
+			if (bounds->end.x == 79)
 				break;
 		} else {
 			found_on_row = false;
 			for (c.x = 0; c.x < 80; ++c.x) {
 				if (mushstaticaabb_get(&space->box, c) != ' ') {
-					mushcell_min_into(&beg->x, c.x);
+					mushcell_min_into(&bounds->beg.x, c.x);
 					found_on_row = true;
 					break;
 				}
@@ -36,14 +34,14 @@ bool mushspace_get_tight_bounds(
 
 			if (!found_anywhere) {
 				found_anywhere = true;
-				beg->y = c.y;
-			} else if (end->x == 79)
+				bounds->beg.y = c.y;
+			} else if (bounds->end.x == 79)
 				continue;
 		}
 
 		for (c.x = 80; c.x-- > 0;) {
 			if (mushstaticaabb_get(&space->box, c) != ' ') {
-				mushcell_max_into(&end->x, c.x);
+				mushcell_max_into(&bounds->end.x, c.x);
 				break;
 			}
 		}
@@ -51,21 +49,20 @@ bool mushspace_get_tight_bounds(
 	if (!found_anywhere)
 		return false;
 
-	// Still need end->y.
+	// Still need bounds->end.y.
 
-	if (beg->y == 24 || (c.y == 24 && found_on_row)) {
-		end->y = 24;
+	if (bounds->beg.y == 24 || (c.y == 24 && found_on_row)) {
+		bounds->end.y = 24;
 		return true;
 	}
 
-	for (c.y = 25; c.y-- > beg->y;) {
+	for (c.y = 25; c.y-- > bounds->beg.y;) {
 		for (c.x = 0; c.x < 80; ++c.x) {
 			if (mushstaticaabb_get(&space->box, c) != ' ') {
-				end->y = c.y;
+				bounds->end.y = c.y;
 				return true;
 			}
 		}
 	}
 	assert (false);
 }
-

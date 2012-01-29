@@ -7,12 +7,12 @@
 
 #define mushspace_get_tight_bounds MUSHSPACE_CAT(mushspace,_get_tight_bounds)
 
-// Returns false if the space is completely empty. In that case, the values of
-// *beg and *end are undefined.
+// Returns false if the space is completely empty. In that case, the bounds are
+// undefined.
 bool mushspace_get_tight_bounds(
 #if MUSHSPACE_93
 	const
 #endif
-	mushspace*, mushcoords* beg, mushcoords* end);
+	mushspace*, mushbounds*);
 
 #endif
