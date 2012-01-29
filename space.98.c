@@ -220,3 +220,34 @@ bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
 	id[n] = d;
 	return true;
 }
+bool mushspace_del_invalidatee(mushspace* space, void* d) {
+	size_t i = 0;
+	void  **id         = space->invalidatees_data;
+	void (**is)(void*) = space->invalidatees;
+
+	while (id[i] != d) {
+		assert (is[i]);
+		++i;
+	}
+
+	if (is[i+1]) {
+		size_t rest_len = i+1;
+		while (is[rest_len])
+			++rest_len;
+
+		memmove(id + i, id + i + 1, rest_len * sizeof *id);
+		memmove(is + i, is + i + 1, rest_len * sizeof *is);
+	}
+
+	id = realloc(id, i * sizeof *id);
+	if (i && !id)
+		return false;
+
+	is = realloc(is, i * sizeof *is);
+	if (i && !is)
+		return false;
+
+	space->invalidatees      = is;
+	space->invalidatees_data = id;
+	return true;
+}

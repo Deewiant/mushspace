@@ -69,6 +69,7 @@ MUSH_DECL_DYN_ARRAY(mushcell)
 #define mushspace_map_existing     MUSHSPACE_CAT(mushspace,_map_existing)
 #define mushspace_map              MUSHSPACE_CAT(mushspace,_map)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
+#define mushspace_del_invalidatee  MUSHSPACE_CAT(mushspace,_del_invalidatee)
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
 #define mushspace_find_box         MUSHSPACE_CAT(mushspace,_find_box)
 #define mushspace_find_box_and_idx MUSHSPACE_CAT(mushspace,_find_box_and_idx)
@@ -107,6 +108,7 @@ int mushspace_map(mushspace*, mushbounds,
                   void(*)(musharr_mushcell, void*), void*);
 
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
+bool mushspace_del_invalidatee(mushspace*, void*);
 void mushspace_invalidate_all (mushspace*);
 
 mushaabb* mushspace_find_box        (const mushspace*, mushcoords);
