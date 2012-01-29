@@ -2,8 +2,7 @@
 
 #include "space/put-binary.all.h"
 
-void mushspace_put_binary(const mushspace* space,
-                          mushcoords beg, mushcoords end,
+void mushspace_put_binary(const mushspace* space, mushbounds bounds,
                           void(*putcell)(mushcell, void*),
 #if MUSHSPACE_DIM > 1
                           void(*put)(unsigned char, void*),
@@ -12,22 +11,22 @@ void mushspace_put_binary(const mushspace* space,
 ) {
 	mushcoords c;
 #if MUSHSPACE_DIM >= 3
-	for (c.z = beg.z;;) {
+	for (c.z = bounds.beg.z;;) {
 #endif
 #if MUSHSPACE_DIM >= 2
-		for (c.y = beg.y;;) {
+		for (c.y = bounds.beg.y;;) {
 #endif
-			for (c.x = beg.x; c.x <= end.x; ++c.x)
+			for (c.x = bounds.beg.x; c.x <= bounds.end.x; ++c.x)
 				putcell(mushspace_get(space, c), putdata);
 
 #if MUSHSPACE_DIM >= 2
-			if (c.y++ == end.y)
+			if (c.y++ == bounds.end.y)
 				break;
 			put('\n', putdata);
 		}
 #endif
 #if MUSHSPACE_DIM >= 3
-		if (c.z++ == end.z)
+		if (c.z++ == bounds.end.z)
 			break;
 		put('\f', putdata);
 	}

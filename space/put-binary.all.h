@@ -7,7 +7,7 @@
 
 #define mushspace_put_binary MUSHSPACE_CAT(mushspace,_put_binary)
 
-void mushspace_put_binary(const mushspace*, mushcoords, mushcoords,
+void mushspace_put_binary(const mushspace*, mushbounds,
                           void(*)(mushcell, void*),
 #if MUSHSPACE_DIM > 1
                           void(*)(unsigned char, void*),
