@@ -12,15 +12,15 @@
 #define mushaabb MUSHSPACE_NAME(mushaabb)
 
 typedef struct mushaabb {
-	mushbounds bounds;
-	mushcell *data;
-	size_t size;
+   mushbounds bounds;
+   mushcell *data;
+   size_t size;
 
 #if MUSHSPACE_DIM >= 2
-	size_t width;
+   size_t width;
 #endif
 #if MUSHSPACE_DIM >= 3
-	size_t area;
+   size_t area;
 #endif
 } mushaabb;
 
@@ -38,7 +38,7 @@ typedef struct mushaabb {
 #define mushaabb_get_idx_no_offset MUSHSPACE_CAT(mushaabb,_get_idx_no_offset)
 #define mushaabb_can_direct_copy   MUSHSPACE_CAT(mushaabb,_can_direct_copy)
 #define mushaabb_can_direct_copy_area \
-	MUSHSPACE_CAT(mushaabb,_can_direct_copy_area)
+   MUSHSPACE_CAT(mushaabb,_can_direct_copy_area)
 
 void mushaabb_make       (mushaabb*, const mushbounds*);
 void mushaabb_make_unsafe(mushaabb*, const mushbounds*);
@@ -60,6 +60,6 @@ size_t mushaabb_get_idx_no_offset(const mushaabb*, mushcoords);
 
 bool mushaabb_can_direct_copy(const mushaabb*, const mushaabb*);
 bool mushaabb_can_direct_copy_area(
-	const mushaabb*, const mushaabb*, const mushaabb*);
+   const mushaabb*, const mushaabb*, const mushaabb*);
 
 #endif

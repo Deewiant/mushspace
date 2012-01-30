@@ -16,14 +16,14 @@
 #define MUSHMEMORYBUF_SIZE 3
 
 typedef struct mushmemory {
-	mushbounds placed;
-	mushcoords c;
+   mushbounds placed;
+   mushcoords c;
 } mushmemory;
 
 typedef struct mushmemorybuf {
-	mushmemory ring[MUSHMEMORYBUF_SIZE];
-	uint8_t pos;
-	bool full;
+   mushmemory ring[MUSHMEMORYBUF_SIZE];
+   uint8_t pos;
+   bool full;
 } mushmemorybuf;
 
 #define mushmemorybuf_init MUSHSPACE_CAT(mushmemorybuf,_init)

@@ -11,8 +11,8 @@
 // undefined.
 bool mushspace_get_tight_bounds(
 #if MUSHSPACE_93
-	const
+   const
 #endif
-	mushspace*, mushbounds*);
+   mushspace*, mushbounds*);
 
 #endif

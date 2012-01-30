@@ -13,8 +13,8 @@
 #define mushbakaabb_iter MUSHSPACE_NAME(mushbakaabb_iter)
 
 typedef struct mushbakaabb {
-	mushbounds bounds;
-	void *data;
+   mushbounds bounds;
+   void *data;
 } mushbakaabb;
 
 typedef struct mushbakaabb_iter mushbakaabb_iter;

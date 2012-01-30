@@ -10,7 +10,7 @@
 #define mushbounds MUSHSPACE_NAME(mushbounds)
 
 typedef struct mushbounds {
-	mushcoords beg, end;
+   mushcoords beg, end;
 } mushbounds;
 
 MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
@@ -26,7 +26,7 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 #define mushbounds_tessellate      MUSHSPACE_CAT(mushbounds,_tessellate)
 #define mushbounds_tessellate1     MUSHSPACE_CAT(mushbounds,_tessellate1)
 #define mushbounds_on_same_primary_axis \
-	MUSHSPACE_CAT(mushbounds,_on_same_primary_axis)
+   MUSHSPACE_CAT(mushbounds,_on_same_primary_axis)
 
 size_t mushbounds_clamped_size(const mushbounds*);
 

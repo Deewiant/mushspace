@@ -8,10 +8,10 @@
 #define MUSH_ARRAY_LEN(X) (sizeof(X) / sizeof((X)[0]))
 
 #define MUSH_DECL_DYN_ARRAY(T) \
-	typedef struct musharr_##T { T *ptr; size_t len; } musharr_##T;
+   typedef struct musharr_##T { T *ptr; size_t len; } musharr_##T;
 
 #define MUSH_DECL_CONST_DYN_ARRAY(T) \
-	typedef struct mushcarr_##T { const T *ptr; size_t len; } mushcarr_##T;
+   typedef struct mushcarr_##T { const T *ptr; size_t len; } mushcarr_##T;
 
 size_t mush_size_t_max(size_t, size_t);
 

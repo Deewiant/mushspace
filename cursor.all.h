@@ -15,30 +15,30 @@
 
 typedef struct mushcursor {
 #if !MUSHSPACE_93
-	MushCursorMode mode;
+   MushCursorMode mode;
 #endif
-	mushspace *space;
-	union {
-		// For dynamic mode.
-		struct {
-			// For static mode (only rel_pos).
-			mushcoords rel_pos;
+   mushspace *space;
+   union {
+      // For dynamic mode.
+      struct {
+         // For static mode (only rel_pos).
+         mushcoords rel_pos;
 
 #if !MUSHSPACE_93
-			mushbounds rel_bounds;
-			mushcoords obeg;
-			mushaabb  *box;
-			size_t     box_idx;
+         mushbounds rel_bounds;
+         mushcoords obeg;
+         mushaabb  *box;
+         size_t     box_idx;
 #endif
-		};
+      };
 #if !MUSHSPACE_93
-		// For bak mode.
-		struct {
-			mushcoords actual_pos;
-			mushbounds actual_bounds;
-		};
+      // For bak mode.
+      struct {
+         mushcoords actual_pos;
+         mushbounds actual_bounds;
+      };
 #endif
-	};
+   };
 } mushcursor;
 
 #define mushcursor_sizeof          MUSHSPACE_CAT(mushcursor,_sizeof)

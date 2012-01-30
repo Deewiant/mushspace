@@ -9,26 +9,26 @@ void mushspace_put_binary(const mushspace* space, mushbounds bounds,
 #endif
                           void* putdata
 ) {
-	mushcoords c;
+   mushcoords c;
 #if MUSHSPACE_DIM >= 3
-	for (c.z = bounds.beg.z;;) {
+   for (c.z = bounds.beg.z;;) {
 #endif
 #if MUSHSPACE_DIM >= 2
-		for (c.y = bounds.beg.y;;) {
+      for (c.y = bounds.beg.y;;) {
 #endif
-			for (c.x = bounds.beg.x; c.x <= bounds.end.x; ++c.x)
-				putcell(mushspace_get(space, c), putdata);
+         for (c.x = bounds.beg.x; c.x <= bounds.end.x; ++c.x)
+            putcell(mushspace_get(space, c), putdata);
 
 #if MUSHSPACE_DIM >= 2
-			if (c.y++ == bounds.end.y)
-				break;
-			put('\n', putdata);
-		}
+         if (c.y++ == bounds.end.y)
+            break;
+         put('\n', putdata);
+      }
 #endif
 #if MUSHSPACE_DIM >= 3
-		if (c.z++ == bounds.end.z)
-			break;
-		put('\f', putdata);
-	}
+      if (c.z++ == bounds.end.z)
+         break;
+      put('\f', putdata);
+   }
 #endif
 }

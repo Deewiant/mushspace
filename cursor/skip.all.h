@@ -8,7 +8,7 @@
 #define mushcursor_skip_spaces     MUSHSPACE_CAT(mushcursor,_skip_spaces)
 #define mushcursor_skip_semicolons MUSHSPACE_CAT(mushcursor,_skip_semicolons)
 #define mushcursor_skip_to_last_space \
-	MUSHSPACE_CAT(mushcursor,_skip_to_last_space)
+   MUSHSPACE_CAT(mushcursor,_skip_to_last_space)
 
 #if MUSHSPACE_93
 #define mushcursor_skip_markers mushcursor2_93_skip_markers_98

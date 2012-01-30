@@ -13,17 +13,17 @@
 typedef union mushcoords {
 #pragma pack(push)
 #pragma pack(1)
-	struct {
-		mushcell x;
+   struct {
+      mushcell x;
 #if MUSHSPACE_DIM >= 2
-		mushcell y;
+      mushcell y;
 #endif
 #if MUSHSPACE_DIM >= 3
-		mushcell z;
+      mushcell z;
 #endif
-	};
+   };
 #pragma pack(pop)
-	mushcell v[MUSHSPACE_DIM];
+   mushcell v[MUSHSPACE_DIM];
 } mushcoords;
 
 #define MUSHCOORDS_INIT MUSHSPACE_CAT(MUSHCOORDS_INIT,MUSHSPACE_DIM)
@@ -48,7 +48,7 @@ typedef union mushcoords {
 #define mushcoords_max_into     MUSHSPACE_CAT(mushcoords,_max_into)
 #define mushcoords_min_into     MUSHSPACE_CAT(mushcoords,_min_into)
 #define mushcoords_get_end_of_contiguous_range \
-	MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
+   MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
 
 mushcoords mushcoords_add(mushcoords, mushcoords);
 mushcoords mushcoords_sub(mushcoords, mushcoords);
@@ -69,13 +69,13 @@ mushcoords mushcoords_adds_clamped(mushcoords, mushcell);
 mushcoords mushcoords_subs_clamped(mushcoords, mushcell);
 
 mushcoords mushcoords_get_end_of_contiguous_range(
-	mushcoords  end_pt,
-	mushcoords* from,
-	mushcoords  to,
-	mushcoords  orig_beg,
-	bool*       reached_to,
-	mushcoords  tessell_beg,
-	mushcoords  area_beg);
+   mushcoords  end_pt,
+   mushcoords* from,
+   mushcoords  to,
+   mushcoords  orig_beg,
+   bool*       reached_to,
+   mushcoords  tessell_beg,
+   mushcoords  area_beg);
 #endif
 
 #endif

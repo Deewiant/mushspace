@@ -23,35 +23,35 @@
 
 typedef struct mushspace {
 #if MUSHSPACE_93
-	mushstaticaabb box;
+   mushstaticaabb box;
 #else
-	mushmemorybuf recent_buf;
-	bool just_placed_big;
-	mushcoords big_sequence_start, first_placed_big;
+   mushmemorybuf recent_buf;
+   bool just_placed_big;
+   mushcoords big_sequence_start, first_placed_big;
 
-	void (**invalidatees)(void*);
-	void  **invalidatees_data;
+   void (**invalidatees)(void*);
+   void  **invalidatees_data;
 
-	mushcoords last_beg, last_end;
+   mushcoords last_beg, last_end;
 
-	mushstats *stats;
+   mushstats *stats;
 
-	size_t box_count;
+   size_t box_count;
 
-	mushaabb   *boxen;
-	mushbakaabb bak;
+   mushaabb   *boxen;
+   mushbakaabb bak;
 
-	mushstaticaabb static_box;
+   mushstaticaabb static_box;
 #endif
 } mushspace;
 
 // What kind of an area is the cursor in? Defined here because
 // mushspace_jump_to_box uses it.
 typedef enum MushCursorMode {
-	MushCursorMode_static,
+   MushCursorMode_static,
 #if !MUSHSPACE_93
-	MushCursorMode_dynamic,
-	MushCursorMode_bak,
+   MushCursorMode_dynamic,
+   MushCursorMode_bak,
 #endif
 } MushCursorMode;
 
@@ -100,8 +100,8 @@ int      mushspace_put(      mushspace*, mushcoords, mushcell);
 void mushspace_get_loose_bounds(const mushspace*, mushbounds*);
 
 void mushspace_map_existing(
-	mushspace*, mushbounds,
-	void(*)(musharr_mushcell, void*), void(*)(size_t, void*), void*);
+   mushspace*, mushbounds,
+   void(*)(musharr_mushcell, void*), void(*)(size_t, void*), void*);
 
 #if !MUSHSPACE_93
 int mushspace_map(mushspace*, mushbounds,
