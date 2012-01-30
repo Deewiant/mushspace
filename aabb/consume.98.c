@@ -63,6 +63,7 @@ bool mushaabb_consume(mushaabb* box, mushaabb* old) {
 #endif
    return true;
 }
+
 #if MUSHSPACE_DIM > 1
 static void consume_2d(
    const mushaabb* box, const mushaabb* old,

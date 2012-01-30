@@ -36,6 +36,7 @@ void mushaabb_subsume_area(
    assert (mushaabb_get(a, ab->beg) == mushaabb_get(b, ab->beg));
    assert (mushaabb_get(a, ab->end) == mushaabb_get(b, ab->end));
 }
+
 static void subsume_owners_area(
    mushaabb* aabb, const mushaabb* owner, const mushaabb* area,
    mushcarr_mushcell arr)

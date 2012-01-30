@@ -79,6 +79,7 @@ void mushspace_map_no_place(
          return;
    }
 }
+
 static bool map_in_box(
    mushspace* space, mushbounded_pos bpos, mushcaabb_idx cai,
    void* caller_data, void(*f)(musharr_mushcell, void*))
@@ -116,6 +117,7 @@ static bool map_in_box(
    f((musharr_mushcell){box->data, end_idx - beg_idx + 1}, caller_data);
    return hit_end;
 }
+
 static bool map_in_static(
    mushspace* space, mushbounded_pos bpos,
    void* caller_data, void(*f)(musharr_mushcell, void*))
@@ -187,6 +189,7 @@ void mushspace_mapex_no_place(
          return;
    }
 }
+
 static bool mapex_in_box(
    mushspace* space, mushbounded_pos bpos,
    mushcaabb_idx cai,
@@ -282,6 +285,7 @@ bump_z:
 #endif
    return hit_end;
 }
+
 static bool mapex_in_static(
    mushspace* space, mushbounded_pos bpos,
    void* caller_data,
@@ -453,6 +457,7 @@ restart:
    }
    return false;
 }
+
 static void get_next_in1(
    mushucell x, const mushbounds* bounds, mushcell posx, size_t box_count,
    mushcoords box_beg, size_t box_idx,

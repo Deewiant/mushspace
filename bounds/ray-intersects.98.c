@@ -274,6 +274,7 @@ next_move_count_2:;
    assert (mushbounds_contains(bounds, *phit_pos));
    return true;
 }
+
 static bool matches(
    mushucell move_count, mushcell a, mushcell b, mushcell from, mushcell delta)
 {
@@ -284,6 +285,7 @@ static bool matches(
    mushcell pos = mushcell_add(from, move_count * (mushucell)delta);
    return pos >= a && pos <= b;
 }
+
 static void get_hittable_range(
    mushcell a, mushcell b, mushcell delta, mushcell* hit_a, mushcell* hit_b)
 {
@@ -296,6 +298,7 @@ static void get_hittable_range(
       *hit_a = mushcell_max(a, mushcell_dec(mushcell_add(b, delta)));
    }
 }
+
 // The number of moves it takes to get from "from" to "to" with delta "delta".
 // Returns the number of such solutions.
 //
@@ -330,6 +333,7 @@ static mushucell get_move_count(
    }
    return count;
 }
+
 static mushucell get_move_count_expensive(
    mushcell to, mushcell delta,
    mushucell* move_count, mushucell* increment,

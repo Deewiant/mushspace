@@ -346,6 +346,7 @@ static void get_aabbs(
    }
    aabbs_out->len = n;
 }
+
 #if MUSHSPACE_DIM >= 2
 static bool newline(
    bool* got_cr, mushcoords* pos, mushcoords target,
@@ -421,6 +422,7 @@ static void binary_load_arr(musharr_mushcell arr, void* p) {
    }
    *strp = str;
 }
+
 static void binary_load_blank(size_t blanks, void* p) {
    const unsigned char **strp = p, *str = *strp;
    while (blanks) {
@@ -431,6 +433,7 @@ static void binary_load_blank(size_t blanks, void* p) {
    }
    *strp = str;
 }
+
 static void load_arr(
    musharr_mushcell arr, void* p,
    size_t width, size_t area, size_t line_start, size_t page_start,
@@ -597,6 +600,7 @@ end:
    aux->str = str;
    return;
 }
+
 static void load_blank(size_t blanks, void* p) {
    load_arr_auxdata *aux = p;
    const unsigned char *str = aux->str;

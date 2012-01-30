@@ -275,6 +275,7 @@ static void subsume_contains(
       mushstats_add(space->stats, MushStat_subsumed_contains, 1);
    }
 }
+
 static bool subsume_fusables(
    mushspace* space,
    size_t* candidates, musharr_size_t* subsumees, mushbounds* consumer,
@@ -362,6 +363,7 @@ static bool subsume_fusables(
    }
    return true;
 }
+
 static bool subsume_disjoint(
    mushspace* space,
    size_t* candidates, musharr_size_t* subsumees, mushbounds* consumer,
@@ -392,6 +394,7 @@ static bool subsume_disjoint(
    assert (subsumees->len >= s0);
    return subsumees->len > s0;
 }
+
 static bool disjoint_mms_validator(
    const mushbounds* b, const mushaabb* fodder, size_t used_cells, void* nil)
 {
@@ -399,6 +402,7 @@ static bool disjoint_mms_validator(
    return cheaper_to_alloc(
       mushbounds_clamped_size(b), used_cells + fodder->size);
 }
+
 static bool subsume_overlaps(
    mushspace* space,
    size_t* candidates, musharr_size_t* subsumees, mushbounds* consumer,
@@ -427,6 +431,7 @@ static bool subsume_overlaps(
    assert (subsumees->len >= s0);
    return subsumees->len > s0;
 }
+
 static bool overlaps_mms_validator(
    const mushbounds* b, const mushaabb* fodder, size_t used_cells, void* cp)
 {
@@ -439,6 +444,7 @@ static bool overlaps_mms_validator(
    return cheaper_to_alloc(
       mushbounds_clamped_size(b), used_cells + fodder->size - overlap.size);
 }
+
 static void min_max_size(
    mushbounds* bounds,
    consumee* max, size_t* total_size, mushcaabb_idx box)
@@ -453,6 +459,7 @@ static void min_max_size(
       mushcoords_max_into(&bounds->end, box.aabb->bounds.end);
    }
 }
+
 // Fills in the input values with the min_max_size data, returning what the
 // given validator function returns.
 //
@@ -483,11 +490,13 @@ static bool valid_min_max_size(
    *total_size = try_total_size;
    return true;
 }
+
 static bool cheaper_to_alloc(size_t together, size_t separate) {
    return together <= ACCEPTABLE_WASTE
        ||   sizeof(mushcell) * (together - ACCEPTABLE_WASTE)
           < sizeof(mushcell) * separate + sizeof(mushaabb);
 }
+
 static bool consume_and_subsume(
    mushspace* space,
    musharr_size_t subsumees, size_t consumee, mushaabb* consumer)
@@ -564,6 +573,7 @@ static bool consume_and_subsume(
    mushspace_remove_boxes(space, range_beg, range_end);
    return true;
 }
+
 // Consider the following:
 //
 // +-----++---+

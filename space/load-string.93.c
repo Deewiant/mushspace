@@ -7,6 +7,7 @@ static bool newline(bool* got_cr, mushcoords* pos) {
    pos->x = 0;
    return ++pos->y >= 25;
 }
+
 int mushspace_load_string(
    mushspace* space, const unsigned char* str, size_t len)
 {

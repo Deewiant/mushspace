@@ -37,6 +37,7 @@ bool mushspace_place_box_for(
 
    return true;
 }
+
 static void get_box_for(mushspace* space, mushcoords c, mushaabb* aabb) {
    for (size_t b = 0; b < space->box_count; ++b)
       assert (!mushbounds_contains(&space->boxen[b].bounds, c));
@@ -59,6 +60,7 @@ static void get_box_for(mushspace* space, mushcoords c, mushaabb* aabb) {
 end:
    assert (mushbounds_safe_contains(&aabb->bounds, c));
 }
+
 static bool get_box_along_recent_line_for(
    mushspace* space, mushcoords c, mushaabb* aabb)
 {
@@ -135,6 +137,7 @@ static bool get_box_along_recent_line_for(
    mushaabb_make_unsafe(aabb, &bounds);
    return true;
 }
+
 static bool get_box_along_recent_volume_for(
    const mushspace* space, mushcoords c, mushaabb* aabb)
 {
@@ -151,6 +154,7 @@ static bool get_box_along_recent_volume_for(
 
    return false;
 }
+
 static bool extend_big_sequence_start_for(
    const mushspace* space, mushcoords c, const mushbounds* last,
    mushaabb* aabb)

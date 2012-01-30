@@ -89,6 +89,7 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
    space->last_end = bounds->end;
    return found_nonspace;
 }
+
 static bool find_beg_in(
    mushcoords* beg, mushdim axis, const mushbounds* bounds,
    mushcell(*getter_no_offset)(const void*, mushcoords), const void* box)
@@ -174,6 +175,7 @@ static bool find_beg_in(
    }
    return empty_box;
 }
+
 static void find_end_in(
    mushcoords* end, mushdim axis, const mushbounds* bounds,
    mushcell(*getter_no_offset)(const void*, mushcoords), const void* box)
