@@ -10,6 +10,16 @@
 #define load_arr          MUSHSPACE_CAT(load_arr,UTF)
 #define load_blank        MUSHSPACE_CAT(load_blank,UTF)
 
+// These operate under the assumption that s points or should point to an ASCII
+// character. They work for all UTF and constant-width formats, because an
+// ASCII character is always encoded as exactly one code unit and that code
+// unit can never be a part of a different code point's encoding.
+#ifndef ASCII_NEXT
+#define ASCII_READ(s) (*(s))
+#define ASCII_NEXT(s) (*(s)++)
+#define ASCII_PREV(s) (*--(s))
+#endif
+
 static void get_aabbs(
    const void*, size_t, mushcoords target, bool binary, musharr_mushaabb*);
 
