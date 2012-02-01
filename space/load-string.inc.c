@@ -142,15 +142,16 @@ static void get_aabbs(
       } while (0)
    #endif
 
-   for (const C *str_end = str + len; str < str_end; ++str)
-   switch (*str) {
+   C c;
+   for (const C *str_end = str + len; str < str_end;)
+   switch (c = NEXT(str)) {
    default:
       #if MUSHSPACE_DIM >= 2
          if (got_cr)
             hit_newline;
       #endif
 
-      if (*str != ' ') {
+      if (c != ' ') {
          found_nonspace_for = found_nonspace_for_anyone = a;
          last_nonspace = pos;
 
@@ -328,7 +329,7 @@ static size_t get_aabbs_binary(
 static void binary_load_arr(musharr_mushcell arr, void* p) {
    const C **strp = p, *str = *strp;
    for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
-      C c = *str++;
+      C c = NEXT(str);
       if (c != ' ')
          *arr.ptr = c;
    }
@@ -374,7 +375,7 @@ static void load_arr(
    for (size_t i = 0; i < arr.len;) {
       assert (str < str_end);
 
-      const C c = *str++;
+      const C c = NEXT(str);
       switch (c) {
       default:
          arr.ptr[i++] = c;
@@ -544,3 +545,4 @@ static void load_blank(size_t blanks, void* p) {
 
 #undef UTF
 #undef C
+#undef NEXT
