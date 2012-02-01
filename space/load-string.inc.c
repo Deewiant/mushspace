@@ -51,8 +51,10 @@ int MUSHSPACE_CAT(mushspace_load_string,UTF)(
 
    if (ret == MUSHERR_NONE) {
       str = p;
-      for (; str < str_end; ++str)
-         assert (*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f');
+      while (str < str_end) {
+         C c = ASCII_NEXT(str);
+         assert (c == ' ' || c == '\r' || c == '\n' || c == '\f');
+      }
       assert (!(str > str_end));
    }
    return ret;
@@ -284,32 +286,40 @@ static size_t get_aabbs_binary(
    size_t a = 0;
    mushcoords beg = target, end = target;
 
-   size_t i = 0;
-   while (i < len && str[i++] == ' ');
+   const C *str_end = str + len;
 
-   if (i == len) {
+   size_t leading_spaces = 0;
+
+   for (; str < str_end && ASCII_READ(str) == ' '; (void)ASCII_NEXT(str))
+      ++leading_spaces;
+
+   if (str == str_end) {
       // All spaces: nothing to load.
       return 0;
    }
 
-   beg.x += i-1;
+   beg.x += leading_spaces;
 
    // No need to check bounds here since we've already established that it's
    // not all spaces.
-   i = len;
-   while (str[--i] == ' ');
+   str = str_end;
+   while (ASCII_PREV(str) == ' ');
 
-   if (i > (size_t)MUSHCELL_MAX) {
+   const size_t trailing_spaces = str_end - str,
+                loadee_len      = len - (leading_spaces + trailing_spaces),
+                loadee_end      = leading_spaces + loadee_len;
+
+   if (loadee_len > (size_t)MUSHCELL_MAX) {
       // Oops, that's not going to fit! Bail.
       return SIZE_MAX;
    }
 
-   if (end.x > MUSHCELL_MAX - (mushcell)i) {
+   if (end.x > MUSHCELL_MAX - (mushcell)loadee_end) {
       end.x = MUSHCELL_MAX;
       bounds[a++] = (mushbounds){beg, end};
       beg.x = MUSHCELL_MIN;
    }
-   end.x += i;
+   end.x += loadee_end;
 
    bounds[a++] = (mushbounds){beg, end};
    return a;
@@ -328,10 +338,10 @@ static void binary_load_arr(musharr_mushcell arr, void* p) {
 static void binary_load_blank(size_t blanks, void* p) {
    const C **strp = p, *str = *strp;
    while (blanks) {
-      if (*str != ' ')
+      if (ASCII_READ(str) != ' ')
          break;
       --blanks;
-      ++str;
+      (void)ASCII_NEXT(str);
    }
    *strp = str;
 }
@@ -390,8 +400,8 @@ static void load_arr(
 
    #if MUSHSPACE_DIM >= 2
       case '\r':
-         if (str < str_end && *str == '\n')
-            ++str;
+         if (str < str_end && ASCII_READ(str) == '\n')
+            (void)ASCII_NEXT(str);
       case '\n': {
          // Ignore leading newlines (north of aabb.beg.y)
          bool leading_newline = i == page_start;
@@ -448,25 +458,33 @@ static void load_arr(
    // trailing whitespace until we hit it in the file as well.
    #if MUSHSPACE_DIM == 3
       if (*hit & 1 << 1) {
-         while (*str == '\r' || *str == '\n' || *str == ' ')
-            ++str;
+         C c;
+         while ((c = ASCII_READ(str)) == '\r' || c == '\n' || c == ' ')
+            (void)ASCII_NEXT(str);
 
          if (str < str_end) {
-            assert (*str == '\f');
-            ++str;
+            assert (c == '\f');
+            (void)ASCII_NEXT(str);
          }
          goto end;
       }
    #endif
    #if MUSHSPACE_DIM >= 2
       if (*hit & 1 << 0) {
-         while (*str == ' ' || (MUSHSPACE_DIM < 3 && *str == '\f'))
-            ++str;
+         C c;
+         while ((c = ASCII_READ(str)) == ' '
+             || (MUSHSPACE_DIM < 3 && c == '\f'))
+         {
+            (void)ASCII_NEXT(str);
+         }
 
          if (str < str_end) {
-            assert (*str == '\r' || *str == '\n');
-            if (*str++ == '\r' && str < str_end && *str == '\n')
-               ++str;
+            assert (c == '\r' || c == '\n');
+            if (ASCII_NEXT(str) == '\r' && str < str_end
+             && ASCII_READ(str) == '\n')
+            {
+               (void)ASCII_NEXT(str);
+            }
          }
          goto end;
       }
@@ -476,19 +494,19 @@ static void load_arr(
    // an optimization, we'd catch it and handle it appropriately come next call
    // anyway.
    #if MUSHSPACE_DIM >= 3
-      if (*str == '\f') {
-         ++str;
+      if (ASCII_READ(str) == '\f') {
+         (void)ASCII_NEXT(str);
          *hit = 1 << 1;
          goto end;
       }
    #endif
    #if MUSHSPACE_DIM >= 2
-      if (*str == '\r') {
-         ++str;
+      if (ASCII_READ(str) == '\r') {
+         (void)ASCII_NEXT(str);
          *hit = 1 << 0;
       }
-      if (str < str_end && *str == '\n') {
-         ++str;
+      if (str < str_end && ASCII_READ(str) == '\n') {
+         (void)ASCII_NEXT(str);
          *hit = 1 << 0;
       }
    #endif
@@ -507,10 +525,11 @@ static void load_blank(size_t blanks, void* p) {
    load_arr_auxdata *aux = p;
    const C *str = aux->str;
    while (blanks) {
-      if (!(*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f'))
+      C c = ASCII_READ(str);
+      if (!(c == ' ' || c == '\r' || c == '\n' || c == '\f'))
          break;
       --blanks;
-      ++str;
+      (void)ASCII_NEXT(str);
    }
    aux->str = str;
 }
