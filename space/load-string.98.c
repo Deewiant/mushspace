@@ -11,8 +11,7 @@ MUSH_DECL_DYN_ARRAY(mushaabb)
 MUSH_DECL_DYN_ARRAY(mushbounds)
 
 static void get_aabbs(
-   const unsigned char*, size_t, mushcoords target, bool binary,
-   musharr_mushaabb*);
+   const void*, size_t, mushcoords target, bool binary, musharr_mushaabb*);
 
 #if MUSHSPACE_DIM >= 2
 static bool newline(
@@ -31,7 +30,7 @@ static void load_blank(size_t, void*);
 
 #define load_arr_auxdata MUSHSPACE_CAT(mushspace,_load_arr_auxdata)
 typedef struct {
-   const unsigned char *str;
+   const void *str;
    size_t len;
 
    #if MUSHSPACE_DIM >= 2
@@ -164,12 +163,13 @@ int mushspace_load_string(
 // If nothing would be loaded, aabbs_out->ptr is set to NULL and an error code
 // (an int) is written into aabbs_out->len.
 static void get_aabbs(
-   const unsigned char* str, size_t len, mushcoords target, bool binary,
+   const void* vstr, size_t len, mushcoords target, bool binary,
    musharr_mushaabb* aabbs_out)
 {
    static mushaabb aabbs[1 << MUSHSPACE_DIM];
 
    mushbounds *bounds = (mushbounds*)aabbs;
+   const unsigned char *str = vstr;
 
    aabbs_out->ptr = aabbs;
 
