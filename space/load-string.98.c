@@ -41,12 +41,18 @@ typedef struct {
    #endif
 } load_arr_auxdata;
 
-int mushspace_load_string(
-   mushspace* space, const unsigned char* str, size_t len,
-   mushcoords* end, mushcoords target, bool binary)
+static int load_string_generic(
+   mushspace* space, const void** str, size_t len,
+   mushcoords* end, mushcoords target, bool binary,
+   void (*get_aabbs)(const void*, size_t, mushcoords, bool, musharr_mushaabb*),
+   void (*load_arr)         (musharr_mushcell, void*,
+                             size_t, size_t, size_t, size_t, uint8_t*),
+   void (*load_blank)       (size_t, void*),
+   void (*binary_load_arr)  (musharr_mushcell, void*),
+   void (*binary_load_blank)(size_t, void*))
 {
    musharr_mushaabb aabbs;
-   get_aabbs(str, len, target, binary, &aabbs);
+   get_aabbs(*str, len, target, binary, &aabbs);
 
    if (!aabbs.ptr) {
       // The error code was placed in aabbs.len.
@@ -130,14 +136,12 @@ int mushspace_load_string(
       mushaabb_finalize(&aabb);
    }
 
-   const unsigned char *str_end = str + len;
-
    if (binary)
-      mushspace_map_no_place(space, &aabb, &str,
+      mushspace_map_no_place(space, &aabb, str,
                              binary_load_arr, binary_load_blank);
    else {
       load_arr_auxdata aux =
-         { str, len
+         { *str, len
       #if MUSHSPACE_DIM >= 2
          , target.x, target.x, aabb.bounds.beg.x
       #if MUSHSPACE_DIM >= 3
@@ -147,13 +151,29 @@ int mushspace_load_string(
       };
 
       mushspace_mapex_no_place(space, &aabb, &aux, load_arr, load_blank);
-      str = aux.str;
+      *str = aux.str;
    }
-
-   for (; str < str_end; ++str)
-      assert (*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f');
-   assert (!(str > str_end));
    return MUSHERR_NONE;
+}
+
+int mushspace_load_string(
+   mushspace* space, const unsigned char* str, size_t len,
+   mushcoords* end, mushcoords target, bool binary)
+{
+   const unsigned char *str_end = str + len;
+
+   const void *p = str;
+   int ret = load_string_generic(
+      space, &p, len, end, target, binary,
+      get_aabbs, load_arr, load_blank, binary_load_arr, binary_load_blank);
+
+   if (ret == MUSHERR_NONE) {
+      str = p;
+      for (; str < str_end; ++str)
+         assert (*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f');
+      assert (!(str > str_end));
+   }
+   return ret;
 }
 
 // Sets aabbs_out to an array of AABBs (a slice out of a static buffer) which
