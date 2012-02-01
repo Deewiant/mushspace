@@ -31,7 +31,8 @@ static void load_blank(size_t, void*);
 
 #define load_arr_auxdata MUSHSPACE_CAT(mushspace,_load_arr_auxdata)
 typedef struct {
-   const unsigned char *str, *str_end;
+   const unsigned char *str;
+   size_t len;
 
    #if MUSHSPACE_DIM >= 2
       mushcell x, target_x, aabb_beg_x;
@@ -137,7 +138,7 @@ int mushspace_load_string(
                              binary_load_arr, binary_load_blank);
    else {
       load_arr_auxdata aux =
-         { str, str_end
+         { str, len
       #if MUSHSPACE_DIM >= 2
          , target.x, target.x, aabb.bounds.beg.x
       #if MUSHSPACE_DIM >= 3
@@ -446,7 +447,7 @@ static void load_arr(
    #endif
 
    load_arr_auxdata *aux = p;
-   const unsigned char *str = aux->str, *str_end = aux->str_end;
+   const unsigned char *str = aux->str, *str_end = str + aux->len;
 
    // x and y are used only for skipping leading spaces/newlines and thus
    // aren't really representative of the cursor position at any point.
