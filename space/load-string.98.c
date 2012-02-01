@@ -138,4 +138,5 @@ static int load_string_generic(
    return MUSHERR_NONE;
 }
 
+#define UTF
 #include "space/load-string.inc.c"

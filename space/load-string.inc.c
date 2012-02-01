@@ -2,6 +2,14 @@
 
 // Not built by itself, only #included into load-string.98.c.
 
+#define get_aabbs         MUSHSPACE_CAT(get_aabbs,UTF)
+#define newline           MUSHSPACE_CAT(newline,UTF)
+#define get_aabbs_binary  MUSHSPACE_CAT(get_aabbs_binary,UTF)
+#define binary_load_arr   MUSHSPACE_CAT(binary_load_arr,UTF)
+#define binary_load_blank MUSHSPACE_CAT(binary_load_blank,UTF)
+#define load_arr          MUSHSPACE_CAT(load_arr,UTF)
+#define load_blank        MUSHSPACE_CAT(load_blank,UTF)
+
 static void get_aabbs(
    const void*, size_t, mushcoords target, bool binary, musharr_mushaabb*);
 
@@ -20,7 +28,7 @@ static void load_arr(musharr_mushcell, void*,
                      size_t, size_t, size_t, size_t, uint8_t*);
 static void load_blank(size_t, void*);
 
-int mushspace_load_string(
+int MUSHSPACE_CAT(mushspace_load_string,UTF)(
    mushspace* space, const unsigned char* str, size_t len,
    mushcoords* end, mushcoords target, bool binary)
 {
@@ -497,3 +505,13 @@ static void load_blank(size_t blanks, void* p) {
    }
    aux->str = str;
 }
+
+#undef get_aabbs
+#undef newline
+#undef get_aabbs_binary
+#undef binary_load_arr
+#undef binary_load_blank
+#undef load_arr
+#undef load_blank
+
+#undef UTF
