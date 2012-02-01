@@ -20,7 +20,7 @@ static bool newline(
 #endif
 
 static size_t get_aabbs_binary(
-   const unsigned char*, size_t len, mushcoords target, mushbounds*);
+   const C*, size_t len, mushcoords target, mushbounds*);
 
 static void binary_load_arr(musharr_mushcell, void*);
 static void binary_load_blank(size_t, void*);
@@ -29,10 +29,10 @@ static void load_arr(musharr_mushcell, void*,
 static void load_blank(size_t, void*);
 
 int MUSHSPACE_CAT(mushspace_load_string,UTF)(
-   mushspace* space, const unsigned char* str, size_t len,
+   mushspace* space, const C* str, size_t len,
    mushcoords* end, mushcoords target, bool binary)
 {
-   const unsigned char *str_end = str + len;
+   const C *str_end = str + len;
 
    const void *p = str;
    int ret = load_string_generic(
@@ -61,7 +61,7 @@ static void get_aabbs(
    static mushaabb aabbs[1 << MUSHSPACE_DIM];
 
    mushbounds *bounds = (mushbounds*)aabbs;
-   const unsigned char *str = vstr;
+   const C *str = vstr;
 
    aabbs_out->ptr = aabbs;
 
@@ -130,7 +130,7 @@ static void get_aabbs(
       } while (0)
    #endif
 
-   for (const unsigned char* str_end = str + len; str < str_end; ++str)
+   for (const C *str_end = str + len; str < str_end; ++str)
    switch (*str) {
    default:
       #if MUSHSPACE_DIM >= 2
@@ -269,8 +269,7 @@ static bool newline(
 #endif
 
 static size_t get_aabbs_binary(
-   const unsigned char* str, size_t len,
-   mushcoords target, mushbounds* bounds)
+   const C* str, size_t len, mushcoords target, mushbounds* bounds)
 {
    size_t a = 0;
    mushcoords beg = target, end = target;
@@ -307,9 +306,9 @@ static size_t get_aabbs_binary(
 }
 
 static void binary_load_arr(musharr_mushcell arr, void* p) {
-   const unsigned char **strp = p, *str = *strp;
+   const C **strp = p, *str = *strp;
    for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
-      unsigned char c = *str++;
+      C c = *str++;
       if (c != ' ')
          *arr.ptr = c;
    }
@@ -317,7 +316,7 @@ static void binary_load_arr(musharr_mushcell arr, void* p) {
 }
 
 static void binary_load_blank(size_t blanks, void* p) {
-   const unsigned char **strp = p, *str = *strp;
+   const C **strp = p, *str = *strp;
    while (blanks) {
       if (*str != ' ')
          break;
@@ -339,7 +338,7 @@ static void load_arr(
    #endif
 
    load_arr_auxdata *aux = p;
-   const unsigned char *str = aux->str, *str_end = str + aux->len;
+   const C *str = aux->str, *str_end = str + aux->len;
 
    // x and y are used only for skipping leading spaces/newlines and thus
    // aren't really representative of the cursor position at any point.
@@ -355,7 +354,7 @@ static void load_arr(
    for (size_t i = 0; i < arr.len;) {
       assert (str < str_end);
 
-      const unsigned char c = *str++;
+      const C c = *str++;
       switch (c) {
       default:
          arr.ptr[i++] = c;
@@ -496,7 +495,7 @@ end:
 
 static void load_blank(size_t blanks, void* p) {
    load_arr_auxdata *aux = p;
-   const unsigned char *str = aux->str;
+   const C *str = aux->str;
    while (blanks) {
       if (!(*str == ' ' || *str == '\r' || *str == '\n' || *str == '\f'))
          break;
@@ -515,3 +514,4 @@ static void load_blank(size_t blanks, void* p) {
 #undef load_blank
 
 #undef UTF
+#undef C
