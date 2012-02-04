@@ -1,0 +1,9 @@
+# File created: 2012-02-04 21:06:52
+
+include_rules
+
+INCLUDES += $(INCLUDE)$(TUP_CWD)
+
+: foreach *.c |> !cc |> %B.o
+
+.gitignore
