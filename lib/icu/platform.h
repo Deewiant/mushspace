@@ -23,15 +23,6 @@
 #ifndef _PLATFORM_H
 #define _PLATFORM_H
 
-/**
- * \file
- * \brief Basic types for the platform
- */
-
-/*===========================================================================*/
-/** @{ Symbol import-export control                                              */
-/*===========================================================================*/
-
 #ifdef U_STATIC_IMPLEMENTATION
 #define U_EXPORT
 #elif defined(__GNUC__)
@@ -43,9 +34,6 @@
 #define U_EXPORT
 #endif
 
-/* U_CALLCONV is releated to U_EXPORT2 */
 #define U_EXPORT2
-
-/* @} */
 
 #endif

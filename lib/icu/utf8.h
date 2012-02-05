@@ -14,47 +14,17 @@
 *   created by: Markus W. Scherer
 */
 
-/**
- * \file
- * \brief C API: 8-bit Unicode handling macros
- *
- * This file defines macros to deal with 8-bit Unicode (UTF-8) code units (bytes) and strings.
- * utf8.h is included by utf.h after unicode/umachine.h
- * and some common definitions.
- *
- * For more information see utf.h and the ICU User Guide Strings chapter
- * (http://icu-project.org/userguide/strings.html).
- *
- * <em>Usage:</em>
- * ICU coding guidelines for if() statements should be followed when using these macros.
- * Compound statements (curly braces {}) must be used  for if-else-while...
- * bodies and all macro statements should be terminated with semicolon.
- */
-
 #ifndef __UTF8_H__
 #define __UTF8_H__
 
-/* utf.h must be included first. */
 #ifndef __UTF_H__
 #   include "lib/icu/utf.h"
 #endif
 
-/* internal definitions ----------------------------------------------------- */
-
 U_CAPI UChar32 U_EXPORT2
 utf8_nextCharPtrSafeBody(const uint8_t **s, const uint8_t *s_end, UChar32 c);
 
-/* single-code point definitions -------------------------------------------- */
-
-/**
- * Is this code unit (byte) a UTF-8 lead byte?
- * @param c 8-bit code unit (byte)
- * @return TRUE or FALSE
- * @stable ICU 2.4
- */
 #define U8_IS_LEAD(c) ((uint8_t)((c)-0xc0)<0x3e)
-
-/* definitions with forward iteration --------------------------------------- */
 
 #define U8_NEXT_PTR(s, s_end, c) do { \
     (c)=(uint8_t)*(s)++; \
