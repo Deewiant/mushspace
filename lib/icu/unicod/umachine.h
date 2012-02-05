@@ -41,6 +41,7 @@
 /* which are contained in the platform-specific file platform.h             */
 /*==========================================================================*/
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #if !defined(__MINGW32__) && (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64))
@@ -79,15 +80,15 @@
 /*==========================================================================*/
 
 /** The ICU boolean type @stable ICU 2.0 */
-typedef int8_t UBool;
+typedef bool UBool;
 
 #ifndef TRUE
 /** The TRUE value of a UBool @stable ICU 2.0 */
-#   define TRUE  1
+#   define TRUE  true
 #endif
 #ifndef FALSE
 /** The FALSE value of a UBool @stable ICU 2.0 */
-#   define FALSE 0
+#   define FALSE false
 #endif
 
 
