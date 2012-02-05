@@ -95,44 +95,9 @@ typedef int8_t UBool;
 /* Unicode data types                                                       */
 /*==========================================================================*/
 
-/* wchar_t-related definitions -------------------------------------------- */
-
-/**
- * \def U_SIZEOF_WCHAR_T
- * U_SIZEOF_WCHAR_T==sizeof(wchar_t) (0 means it is not defined or autoconf could not set it)
- *
- * @stable ICU 2.0
- */
-#if U_SIZEOF_WCHAR_T==0
-#   undef U_SIZEOF_WCHAR_T
-#   define U_SIZEOF_WCHAR_T 4
-#endif
-
 /* UChar and UChar32 definitions -------------------------------------------- */
 
-/**
- * \var UChar
- * Define UChar to be wchar_t if that is 16 bits wide; always assumed to be unsigned.
- * If wchar_t is not 16 bits wide, then define UChar to be uint16_t or char16_t because GCC >=4.4
- * can handle UTF16 string literals.
- * This makes the definition of UChar platform-dependent
- * but allows direct string type compatibility with platforms with
- * 16-bit wchar_t types.
- *
- * @draft ICU 4.4
- */
-
-/* Define UChar to be compatible with wchar_t if possible. */
-#if U_SIZEOF_WCHAR_T==2
-    typedef wchar_t UChar;
-#elif U_GNUC_UTF16_STRING
-#if defined _GCC_
-    typedef __CHAR16_TYPE__ char16_t;
-#endif
-    typedef char16_t UChar;
-#else
-    typedef uint16_t UChar;
-#endif
+typedef uint16_t UChar;
 
 /**
  * Define UChar32 as a type for single Unicode code points.
