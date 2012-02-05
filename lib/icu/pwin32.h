@@ -31,5 +31,4 @@
 #define U_EXPORT __declspec(dllexport)
 #endif
 #define U_EXPORT2 __cdecl
-#define U_IMPORT __declspec(dllimport)
 /** @} */

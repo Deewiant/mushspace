@@ -46,13 +46,6 @@
 /* U_CALLCONV is releated to U_EXPORT2 */
 #define U_EXPORT2
 
-/* cygwin needs to export/import data */
-#if defined(U_CYGWIN) && !defined(__GNUC__)
-#define U_IMPORT __declspec(dllimport)
-#else
-#define U_IMPORT
-#endif
-
 /* @} */
 
 #endif

@@ -17,11 +17,6 @@
 *   that would otherwise be too long as macros.
 */
 
-/* set import/export definitions */
-#ifndef U_UTF8_IMPL
-#   define U_UTF8_IMPL
-#endif
-
 #include "lib/icu/umachine.h"
 #include "lib/icu/utf.h"
 

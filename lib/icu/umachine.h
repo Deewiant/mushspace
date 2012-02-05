@@ -62,18 +62,8 @@
 /* Functions are declared   U_STABLE return-type U_EXPORT2 function-name()... */
 /*==========================================================================*/
 
-/**
- * \def U_CFUNC
- * This is used in a declaration of a library private ICU C function.
- * @stable ICU 2.4
- */
-
-#define U_CFUNC extern
-
 /** This is used to declare a function as a public ICU C API @stable ICU 2.0*/
 #define U_CAPI extern U_EXPORT
-/** This is used to declare a function as a stable public ICU C API*/
-#define U_STABLE U_CAPI
 
 /*==========================================================================*/
 /* Unicode data types                                                       */
