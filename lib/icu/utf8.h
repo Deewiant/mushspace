@@ -41,7 +41,7 @@
 
 /* internal definitions ----------------------------------------------------- */
 
-U_STABLE UChar32 U_EXPORT2
+U_CAPI UChar32 U_EXPORT2
 utf8_nextCharPtrSafeBody(const uint8_t **s, const uint8_t *s_end, UChar32 c);
 
 /* single-code point definitions -------------------------------------------- */
