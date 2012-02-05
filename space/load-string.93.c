@@ -2,6 +2,8 @@
 
 #include "space/load-string.all.h"
 
+#include "lib/icu/utf.h"
+
 static bool newline(bool* got_cr, mushcoords* pos) {
    *got_cr = false;
    pos->x = 0;
@@ -51,4 +53,7 @@ static bool newline(bool* got_cr, mushcoords* pos) {
    }
 
 #define PLAIN_NEXT(s, s_end, c) do { (void)s_end; (c = (*(s)++)); } while (0)
-define_load_string(, char, PLAIN_NEXT)
+define_load_string(,          char,  PLAIN_NEXT)
+define_load_string(_utf8,  uint8_t,  U8_NEXT_PTR)
+define_load_string(_utf16, uint16_t, U16_NEXT_PTR)
+define_load_string(_cell,  mushcell, PLAIN_NEXT)
