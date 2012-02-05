@@ -9,13 +9,13 @@ static bool newline(bool* got_cr, mushcoords* pos) {
 }
 
 int mushspace_load_string(
-   mushspace* space, const unsigned char* str, size_t len)
+   mushspace* space, const char* str, size_t len)
 {
    bool got_cr = false;
    mushcoords pos = MUSHCOORDS(0,0,0);
 
    for (size_t i = 0; i < len; ++i) {
-      unsigned char c = str[i];
+      char c = str[i];
 
       switch (c) {
       case '\r': got_cr = true; break;
