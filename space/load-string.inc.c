@@ -327,24 +327,26 @@ static size_t get_aabbs_binary(
 }
 
 static void binary_load_arr(musharr_mushcell arr, void* p) {
-   const C **strp = p, *str = *strp;
+   binary_load_arr_auxdata *aux = p;
+   const C *str = aux->str;
    for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
       C c = NEXT(str);
       if (c != ' ')
          *arr.ptr = c;
    }
-   *strp = str;
+   aux->str = str;
 }
 
 static void binary_load_blank(size_t blanks, void* p) {
-   const C **strp = p, *str = *strp;
+   binary_load_arr_auxdata *aux = p;
+   const C *str = aux->str;
    while (blanks) {
       if (ASCII_READ(str) != ' ')
          break;
       --blanks;
       (void)ASCII_NEXT(str);
    }
-   *strp = str;
+   aux->str = str;
 }
 
 static void load_arr(

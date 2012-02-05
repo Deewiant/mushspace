@@ -13,6 +13,11 @@ MUSH_DECL_DYN_ARRAY(mushbounds)
 typedef struct {
    const void *str;
    size_t len;
+} binary_load_arr_auxdata;
+
+typedef struct {
+   const void *str;
+   size_t len;
 
    #if MUSHSPACE_DIM >= 2
       mushcell x, target_x, aabb_beg_x;
@@ -117,10 +122,12 @@ static int load_string_generic(
       mushaabb_finalize(&aabb);
    }
 
-   if (binary)
-      mushspace_map_no_place(space, &aabb, str,
+   if (binary) {
+      binary_load_arr_auxdata aux = {*str, len};
+      mushspace_map_no_place(space, &aabb, &aux,
                              binary_load_arr, binary_load_blank);
-   else {
+      *str = aux.str;
+   } else {
       load_arr_auxdata aux =
          { *str, len
       #if MUSHSPACE_DIM >= 2
