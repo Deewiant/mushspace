@@ -10,7 +10,6 @@
 MUSH_DECL_DYN_ARRAY(mushaabb)
 MUSH_DECL_DYN_ARRAY(mushbounds)
 
-#define load_arr_auxdata MUSHSPACE_CAT(mushspace,_load_arr_auxdata)
 typedef struct {
    const void *str;
    size_t len;
