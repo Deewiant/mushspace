@@ -7,6 +7,8 @@
 #include "space/map-no-place.98.h"
 #include "space/place-box.98.h"
 
+#include "lib/icu/utf.h"
+
 MUSH_DECL_DYN_ARRAY(mushaabb)
 MUSH_DECL_DYN_ARRAY(mushbounds)
 
@@ -147,4 +149,9 @@ static int load_string_generic(
 #define UTF
 #define C unsigned char
 #define NEXT(s, s_end, c) do { (void)s_end; (c = (*(s)++)); } while (0)
+#include "space/load-string.inc.c"
+
+#define UTF _utf8
+#define C uint8_t
+#define NEXT(s, s_end, c) U8_NEXT_PTR(s, s_end, c)
 #include "space/load-string.inc.c"
