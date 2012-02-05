@@ -76,23 +76,6 @@
 #define U_STABLE U_CAPI
 
 /*==========================================================================*/
-/* Boolean data type                                                        */
-/*==========================================================================*/
-
-/** The ICU boolean type @stable ICU 2.0 */
-typedef bool UBool;
-
-#ifndef TRUE
-/** The TRUE value of a UBool @stable ICU 2.0 */
-#   define TRUE  true
-#endif
-#ifndef FALSE
-/** The FALSE value of a UBool @stable ICU 2.0 */
-#   define FALSE false
-#endif
-
-
-/*==========================================================================*/
 /* Unicode data types                                                       */
 /*==========================================================================*/
 
