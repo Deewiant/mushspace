@@ -160,3 +160,8 @@ static int load_string_generic(
 #define C uint16_t
 #define NEXT(s, s_end, c) U16_NEXT_PTR(s, s_end, c)
 #include "space/load-string.inc.c"
+
+#define UTF _cell
+#define C mushcell
+#define NEXT(s, s_end, c) do { (void)s_end; (c = (*(s)++)); } while (0)
+#include "space/load-string.inc.c"
