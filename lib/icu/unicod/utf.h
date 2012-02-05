@@ -108,7 +108,7 @@
 #ifndef __UTF_H__
 #define __UTF_H__
 
-#include "unicod/utypes.h"
+#include "unicod/umachine.h"
 /* include the utfXX.h after the following definitions */
 
 /* single-code point definitions -------------------------------------------- */

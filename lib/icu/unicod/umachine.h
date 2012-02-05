@@ -56,19 +56,6 @@
 #include <stddef.h>
 
 /*==========================================================================*/
-/* XP_CPLUSPLUS is a cross-platform symbol which should be defined when     */
-/* using C++.  It should not be defined when compiling under C.             */
-/*==========================================================================*/
-
-#ifdef __cplusplus
-#   ifndef XP_CPLUSPLUS
-#       define XP_CPLUSPLUS
-#   endif
-#else
-#   undef XP_CPLUSPLUS
-#endif
-
-/*==========================================================================*/
 /* For C wrappers, we use the symbol U_STABLE.                                */
 /* This works properly if the includer is C or C++.                         */
 /* Functions are declared   U_STABLE return-type U_EXPORT2 function-name()... */
@@ -80,136 +67,12 @@
  * @stable ICU 2.4
  */
 
-/**
- * \def U_CDECL_BEGIN
- * This is used to begin a declaration of a library private ICU C API.
- * @stable ICU 2.4
- */
-
-/**
- * \def U_CDECL_END
- * This is used to end a declaration of a library private ICU C API
- * @stable ICU 2.4
- */
-
-#ifdef XP_CPLUSPLUS
-#   define U_CFUNC extern "C"
-#   define U_CDECL_BEGIN extern "C" {
-#   define U_CDECL_END   }
-#else
-#   define U_CFUNC extern
-#   define U_CDECL_BEGIN
-#   define U_CDECL_END
-#endif
-
-#ifndef U_ATTRIBUTE_DEPRECATED
-/**
- * \def U_ATTRIBUTE_DEPRECATED
- *  This is used for GCC specific attributes
- * @internal
- */
-#if defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2))
-#    define U_ATTRIBUTE_DEPRECATED __attribute__ ((deprecated))
-/**
- * \def U_ATTRIBUTE_DEPRECATED
- * This is used for Visual C++ specific attributes
- * @internal
- */
-#elif defined(U_WINDOWS) && defined(_MSC_VER) && (_MSC_VER >= 1400)
-#    define U_ATTRIBUTE_DEPRECATED __declspec(deprecated)
-#else
-#    define U_ATTRIBUTE_DEPRECATED
-#endif
-#endif
+#define U_CFUNC extern
 
 /** This is used to declare a function as a public ICU C API @stable ICU 2.0*/
 #define U_CAPI U_CFUNC U_EXPORT
 /** This is used to declare a function as a stable public ICU C API*/
 #define U_STABLE U_CAPI
-/** This is used to declare a function as a draft public ICU C API  */
-#define U_DRAFT  U_CAPI
-/** This is used to declare a function as a deprecated public ICU C API  */
-#define U_DEPRECATED U_CAPI U_ATTRIBUTE_DEPRECATED
-/** This is used to declare a function as an obsolete public ICU C API  */
-#define U_OBSOLETE U_CAPI
-/** This is used to declare a function as an internal ICU C API  */
-#define U_INTERNAL U_CAPI
-
-/*==========================================================================*/
-/* limits for int32_t etc., like in POSIX inttypes.h                        */
-/*==========================================================================*/
-
-#ifndef INT8_MIN
-/** The smallest value an 8 bit signed integer can hold @stable ICU 2.0 */
-#   define INT8_MIN        ((int8_t)(-128))
-#endif
-#ifndef INT16_MIN
-/** The smallest value a 16 bit signed integer can hold @stable ICU 2.0 */
-#   define INT16_MIN       ((int16_t)(-32767-1))
-#endif
-#ifndef INT32_MIN
-/** The smallest value a 32 bit signed integer can hold @stable ICU 2.0 */
-#   define INT32_MIN       ((int32_t)(-2147483647-1))
-#endif
-
-#ifndef INT8_MAX
-/** The largest value an 8 bit signed integer can hold @stable ICU 2.0 */
-#   define INT8_MAX        ((int8_t)(127))
-#endif
-#ifndef INT16_MAX
-/** The largest value a 16 bit signed integer can hold @stable ICU 2.0 */
-#   define INT16_MAX       ((int16_t)(32767))
-#endif
-#ifndef INT32_MAX
-/** The largest value a 32 bit signed integer can hold @stable ICU 2.0 */
-#   define INT32_MAX       ((int32_t)(2147483647))
-#endif
-
-#ifndef UINT8_MAX
-/** The largest value an 8 bit unsigned integer can hold @stable ICU 2.0 */
-#   define UINT8_MAX       ((uint8_t)(255U))
-#endif
-#ifndef UINT16_MAX
-/** The largest value a 16 bit unsigned integer can hold @stable ICU 2.0 */
-#   define UINT16_MAX      ((uint16_t)(65535U))
-#endif
-#ifndef UINT32_MAX
-/** The largest value a 32 bit unsigned integer can hold @stable ICU 2.0 */
-#   define UINT32_MAX      ((uint32_t)(4294967295U))
-#endif
-
-#if defined(U_INT64_T_UNAVAILABLE)
-# error int64_t is required for decimal format and rule-based number format.
-#else
-# ifndef INT64_C
-/**
- * Provides a platform independent way to specify a signed 64-bit integer constant.
- * note: may be wrong for some 64 bit platforms - ensure your compiler provides INT64_C
- * @stable ICU 2.8
- */
-#   define INT64_C(c) c ## LL
-# endif
-# ifndef UINT64_C
-/**
- * Provides a platform independent way to specify an unsigned 64-bit integer constant.
- * note: may be wrong for some 64 bit platforms - ensure your compiler provides UINT64_C
- * @stable ICU 2.8
- */
-#   define UINT64_C(c) c ## ULL
-# endif
-# ifndef U_INT64_MIN
-/** The smallest value a 64 bit signed integer can hold @stable ICU 2.8 */
-#     define U_INT64_MIN       ((int64_t)(INT64_C(-9223372036854775807)-1))
-# endif
-# ifndef U_INT64_MAX
-/** The largest value a 64 bit signed integer can hold @stable ICU 2.8 */
-#     define U_INT64_MAX       ((int64_t)(INT64_C(9223372036854775807)))
-# endif
-# ifndef U_UINT64_MAX
-/** The largest value a 64 bit unsigned integer can hold @stable ICU 2.8 */
-#     define U_UINT64_MAX      ((uint64_t)(UINT64_C(18446744073709551615)))
-# endif
-#endif
 
 /*==========================================================================*/
 /* Boolean data type                                                        */
@@ -235,16 +98,6 @@ typedef int8_t UBool;
 /* wchar_t-related definitions -------------------------------------------- */
 
 /**
- * \def U_HAVE_WCHAR_H
- * Indicates whether <wchar.h> is available (1) or not (0). Set to 1 by default.
- *
- * @stable ICU 2.0
- */
-#ifndef U_HAVE_WCHAR_H
-#   define U_HAVE_WCHAR_H 1
-#endif
-
-/**
  * \def U_SIZEOF_WCHAR_T
  * U_SIZEOF_WCHAR_T==sizeof(wchar_t) (0 means it is not defined or autoconf could not set it)
  *
@@ -255,42 +108,7 @@ typedef int8_t UBool;
 #   define U_SIZEOF_WCHAR_T 4
 #endif
 
-/*
- * \def U_WCHAR_IS_UTF16
- * Defined if wchar_t uses UTF-16.
- *
- * @stable ICU 2.0
- */
-/*
- * \def U_WCHAR_IS_UTF32
- * Defined if wchar_t uses UTF-32.
- *
- * @stable ICU 2.0
- */
-#if !defined(U_WCHAR_IS_UTF16) && !defined(U_WCHAR_IS_UTF32)
-#   ifdef __STDC_ISO_10646__
-#       if (U_SIZEOF_WCHAR_T==2)
-#           define U_WCHAR_IS_UTF16
-#       elif (U_SIZEOF_WCHAR_T==4)
-#           define  U_WCHAR_IS_UTF32
-#       endif
-#   elif defined __UCS2__
-#       if (__OS390__ || __OS400__) && (U_SIZEOF_WCHAR_T==2)
-#           define U_WCHAR_IS_UTF16
-#       endif
-#   elif defined __UCS4__
-#       if (U_SIZEOF_WCHAR_T==4)
-#           define U_WCHAR_IS_UTF32
-#       endif
-#   elif defined(U_WINDOWS)
-#       define U_WCHAR_IS_UTF16
-#   endif
-#endif
-
 /* UChar and UChar32 definitions -------------------------------------------- */
-
-/** Number of bytes in a UChar. @stable ICU 2.0 */
-#define U_SIZEOF_UCHAR 2
 
 /**
  * \var UChar
@@ -334,40 +152,5 @@ typedef int8_t UBool;
  * @stable ICU 2.4
  */
 typedef int32_t UChar32;
-
-/*==========================================================================*/
-/* U_INLINE and U_ALIGN_CODE   Set default values if these are not already  */
-/*                             defined.  Definitions normally are in        */
-/*                             platform.h or the corresponding file for     */
-/*                             the OS in use.                               */
-/*==========================================================================*/
-
-#ifndef U_HIDE_INTERNAL_API
-
-/**
- * \def U_ALIGN_CODE
- * This is used to align code fragments to a specific byte boundary.
- * This is useful for getting consistent performance test results.
- * @internal
- */
-#ifndef U_ALIGN_CODE
-#   define U_ALIGN_CODE(n)
-#endif
-
-#endif /* U_HIDE_INTERNAL_API */
-
-/**
- * \def U_INLINE
- * This is used to request inlining of a function, on platforms and languages which support it.
- * @internal
- */
-
-#ifndef U_INLINE
-#   ifdef XP_CPLUSPLUS
-#       define U_INLINE inline
-#   else
-#       define U_INLINE
-#   endif
-#endif
 
 #endif

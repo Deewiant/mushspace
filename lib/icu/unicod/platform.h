@@ -39,8 +39,6 @@
 #elif (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x550) \
    || (defined(__SUNPRO_C) && __SUNPRO_C >= 0x550)
 #define U_EXPORT __global
-/*#elif defined(__HP_aCC) || defined(__HP_cc)
-#define U_EXPORT __declspec(dllexport)*/
 #else
 #define U_EXPORT
 #endif
