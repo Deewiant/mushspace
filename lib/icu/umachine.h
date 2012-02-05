@@ -41,7 +41,6 @@
 /* which are contained in the platform-specific file platform.h             */
 /*==========================================================================*/
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #if !defined(__MINGW32__) && (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64))
@@ -49,12 +48,6 @@
 #else
 #include "lib/icu/platform.h"
 #endif
-
-/*
- * ANSI C headers:
- * stddef.h defines wchar_t
- */
-#include <stddef.h>
 
 /*==========================================================================*/
 /* For C wrappers, we use the symbol U_STABLE.                                */
