@@ -133,14 +133,6 @@
  */
 #define U_SENTINEL (-1)
 
-/**
- * Is this code point a surrogate (U+d800..U+dfff)?
- * @param c 32-bit code point
- * @return TRUE or FALSE
- * @stable ICU 2.4
- */
-#define U_IS_SURROGATE(c) (((c)&0xfffff800)==0xd800)
-
 /* include the utfXX.h ------------------------------------------------------ */
 
 #include "lib/icu/utf8.h"

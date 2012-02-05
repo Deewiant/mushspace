@@ -41,24 +41,6 @@
 
 /* internal definitions ----------------------------------------------------- */
 
-/**
- * Count the trail bytes for a UTF-8 lead byte.
- *
- * This is internal since it is not meant to be called directly by external clients;
- * however it is called by public macros in this file and thus must remain stable.
- * @internal
- */
-#define U8_COUNT_TRAIL_BYTES(leadByte) (utf8_countTrailBytes[(uint8_t)leadByte])
-
-/**
- * Mask a UTF-8 lead byte, leave only the lower bits that form part of the code point value.
- *
- * This is internal since it is not meant to be called directly by external clients;
- * however it is called by public macros in this file and thus must remain stable.
- * @internal
- */
-#define U8_MASK_LEAD_BYTE(leadByte, countTrailBytes) ((leadByte)&=(1<<(6-(countTrailBytes)))-1)
-
 U_STABLE UChar32 U_EXPORT2
 utf8_nextCharPtrSafeBody(const uint8_t **s, const uint8_t *s_end, UChar32 c);
 
@@ -71,14 +53,6 @@ utf8_nextCharPtrSafeBody(const uint8_t **s, const uint8_t *s_end, UChar32 c);
  * @stable ICU 2.4
  */
 #define U8_IS_LEAD(c) ((uint8_t)((c)-0xc0)<0x3e)
-
-/**
- * Is this code unit (byte) a UTF-8 trail byte?
- * @param c 8-bit code unit (byte)
- * @return TRUE or FALSE
- * @stable ICU 2.4
- */
-#define U8_IS_TRAIL(c) (((c)&0xc0)==0x80)
 
 /* definitions with forward iteration --------------------------------------- */
 

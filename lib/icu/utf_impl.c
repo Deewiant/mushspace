@@ -25,6 +25,40 @@
 #include "lib/icu/umachine.h"
 #include "lib/icu/utf.h"
 
+/**
+ * Is this code point a surrogate (U+d800..U+dfff)?
+ * @param c 32-bit code point
+ * @return TRUE or FALSE
+ * @stable ICU 2.4
+ */
+#define U_IS_SURROGATE(c) (((c)&0xfffff800)==0xd800)
+
+/**
+ * Count the trail bytes for a UTF-8 lead byte.
+ *
+ * This is internal since it is not meant to be called directly by external clients;
+ * however it is called by public macros in this file and thus must remain stable.
+ * @internal
+ */
+#define U8_COUNT_TRAIL_BYTES(leadByte) (utf8_countTrailBytes[(uint8_t)leadByte])
+
+/**
+ * Mask a UTF-8 lead byte, leave only the lower bits that form part of the code point value.
+ *
+ * This is internal since it is not meant to be called directly by external clients;
+ * however it is called by public macros in this file and thus must remain stable.
+ * @internal
+ */
+#define U8_MASK_LEAD_BYTE(leadByte, countTrailBytes) ((leadByte)&=(1<<(6-(countTrailBytes)))-1)
+
+/**
+ * Is this code unit (byte) a UTF-8 trail byte?
+ * @param c 8-bit code unit (byte)
+ * @return TRUE or FALSE
+ * @stable ICU 2.4
+ */
+#define U8_IS_TRAIL(c) (((c)&0xc0)==0x80)
+
 /*
  * This table could be replaced on many machines by
  * a few lines of assembler code using an
