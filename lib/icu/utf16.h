@@ -269,6 +269,22 @@
     } \
 }
 
+// Different from U16_NEXT in that it returns U_SENTINEL for lone surrogates.
+#define U16_NEXT_PTR(s, s_end, c) do { \
+    (c)=*(s)++; \
+    if(U16_IS_LEAD(c)) { \
+        uint16_t u__c2; \
+        if((s)<(s_end) && U16_IS_TRAIL(u__c2=*(s))) { \
+            ++(s); \
+            (c)=U16_GET_SUPPLEMENTARY((c),u__c2); \
+        } else { \
+            (c) = U_SENTINEL; \
+        } \
+    } else if (U16_IS_TRAIL(c)) { \
+        (c) = U_SENTINEL; \
+    } \
+} while (0)
+
 /**
  * Append a code point to a string, overwriting 1 or 2 code units.
  * The offset points to the current end of the string contents
