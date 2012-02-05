@@ -80,11 +80,11 @@ utf8_minLegal[4]={ 0, 0x80, 0x800, 0x10000 };
 U_CAPI UChar32 U_EXPORT2
 utf8_nextCharPtrSafeBody(const uint8_t **ps, const uint8_t *s_end, UChar32 c) {
     const uint8_t *s=*ps;
-    uint8_t count=UTF8_COUNT_TRAIL_BYTES(c);
+    uint8_t count=U8_COUNT_TRAIL_BYTES(c);
     if((s)+count<=(s_end)) {
         uint8_t trail, illegal=0;
 
-        UTF8_MASK_LEAD_BYTE((c), count);
+        U8_MASK_LEAD_BYTE((c), count);
         /* count==0 for illegally leading trail bytes and the illegal bytes 0xfe and 0xff */
         switch(count) {
         /* each branch falls through to the next one */
@@ -118,8 +118,8 @@ utf8_nextCharPtrSafeBody(const uint8_t **ps, const uint8_t *s_end, UChar32 c) {
         }
 
         /*
-         * All the error handling should return a value
-         * that needs count bytes so that UTF8_GET_CHAR_SAFE() works right.
+         * All the error handling should return a value that needs count bytes
+         * so that U8_GET() works right.
          *
          * Starting with Unicode 3.0.1, non-shortest forms are illegal.
          * Starting with Unicode 3.2, surrogate code points must not be
@@ -130,10 +130,10 @@ utf8_nextCharPtrSafeBody(const uint8_t **ps, const uint8_t *s_end, UChar32 c) {
 
         /* correct sequence - all trail bytes have (b7..b6)==(10)? */
         /* illegal is also set if count>=4 */
-        if(illegal || (c)<utf8_minLegal[count] || (UTF_IS_SURROGATE(c))) {
+        if(illegal || (c)<utf8_minLegal[count] || (U_IS_SURROGATE(c))) {
             /* don't go beyond this sequence */
             s=*ps;
-            while(count>0 && UTF8_IS_TRAIL(*s)) {
+            while(count>0 && U8_IS_TRAIL(*s)) {
                 ++(s);
                 --count;
             }
@@ -141,7 +141,7 @@ utf8_nextCharPtrSafeBody(const uint8_t **ps, const uint8_t *s_end, UChar32 c) {
         }
     } else /* too few bytes left */ {
         /* don't just set (s)=(s_end) in case there is an illegal sequence */
-        while((s)<(s_end) && UTF8_IS_TRAIL(*s)) {
+        while((s)<(s_end) && U8_IS_TRAIL(*s)) {
             ++(s);
         }
         c=U_SENTINEL;
