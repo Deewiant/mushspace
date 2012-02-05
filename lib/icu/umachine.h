@@ -71,7 +71,7 @@
 #define U_CFUNC extern
 
 /** This is used to declare a function as a public ICU C API @stable ICU 2.0*/
-#define U_CAPI U_CFUNC U_EXPORT
+#define U_CAPI extern U_EXPORT
 /** This is used to declare a function as a stable public ICU C API*/
 #define U_STABLE U_CAPI
 
