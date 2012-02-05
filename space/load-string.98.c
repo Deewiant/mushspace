@@ -155,3 +155,8 @@ static int load_string_generic(
 #define C uint8_t
 #define NEXT(s, s_end, c) U8_NEXT_PTR(s, s_end, c)
 #include "space/load-string.inc.c"
+
+#define UTF _utf16
+#define C uint16_t
+#define NEXT(s, s_end, c) U16_NEXT_PTR(s, s_end, c)
+#include "space/load-string.inc.c"
