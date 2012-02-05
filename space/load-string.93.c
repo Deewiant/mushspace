@@ -8,41 +8,47 @@ static bool newline(bool* got_cr, mushcoords* pos) {
    return ++pos->y >= 25;
 }
 
-int mushspace_load_string(
-   mushspace* space, const char* str, size_t len)
-{
-   bool got_cr = false;
-   mushcoords pos = MUSHCOORDS(0,0,0);
-
-   for (size_t i = 0; i < len; ++i) {
-      char c = str[i];
-
-      switch (c) {
-      case '\r': got_cr = true; break;
-      case '\n': if (newline(&got_cr, &pos)) goto end; else break;
-      default:
-         if (got_cr && newline(&got_cr, &pos))
-            goto end;
-
-         if (c != ' ')
-            mushstaticaabb_put(&space->box, pos, c);
-
-         if (++pos.x < 80)
-            break;
-
-         // Skip to and past EOL after column 80.
-         while (++i < len) {
-            c = str[i];
-            switch (c) {
-            case '\r': got_cr = true; break;
-            default:   if (!got_cr) break;
-            case '\n': if (newline(&got_cr, &pos)) goto end; else goto skipped;
-            }
-         }
-skipped:
-         break;
-      }
+#define define_load_string(SUF, C, NEXT) \
+   int MUSHSPACE_CAT(mushspace_load_string, SUF)( \
+      mushspace* space, const C* str, size_t len) \
+   { \
+      bool got_cr = false; \
+      mushcoords pos = MUSHCOORDS(0,0,0); \
+\
+      for (const C *str_end = str + len; str < str_end;) { \
+         mushcell c; \
+         NEXT(str, str_end, c); \
+\
+         switch (c) { \
+         case '\r': got_cr = true; break; \
+         case '\n': if (newline(&got_cr, &pos)) goto end; else break; \
+         default: \
+            if (got_cr && newline(&got_cr, &pos)) \
+               goto end; \
+\
+            if (c != ' ') \
+               mushstaticaabb_put(&space->box, pos, c); \
+\
+            if (++pos.x < 80) \
+               break; \
+\
+            /* Skip to and past EOL after column 80. */ \
+            while (str < str_end) { \
+               c = *str++; \
+               switch (c) { \
+               case '\r': got_cr = true; break; \
+               default:   if (!got_cr) break; \
+               case '\n': if (newline(&got_cr, &pos)) goto end; \
+                          else                        goto skipped; \
+               } \
+            } \
+   skipped: \
+            break; \
+         } \
+      } \
+   end: \
+      return MUSHERR_NONE; \
    }
-end:
-   return MUSHERR_NONE;
-}
+
+#define PLAIN_NEXT(s, s_end, c) do { (void)s_end; (c = (*(s)++)); } while (0)
+define_load_string(, char, PLAIN_NEXT)
