@@ -230,7 +230,4 @@
 #include "lib/icu/utf8.h"
 #include "lib/icu/utf16.h"
 
-/* utf_old.h contains deprecated, pre-ICU 2.4 definitions */
-#include "lib/icu/utf_old.h"
-
 #endif
