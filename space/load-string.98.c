@@ -146,5 +146,5 @@ static int load_string_generic(
 
 #define UTF
 #define C unsigned char
-#define NEXT(s) (*s++)
+#define NEXT(s, s_end, c) do { (void)s_end; (c = (*(s)++)); } while (0)
 #include "space/load-string.inc.c"
