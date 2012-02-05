@@ -108,7 +108,7 @@
 #ifndef __UTF_H__
 #define __UTF_H__
 
-#include "unicod/umachine.h"
+#include "lib/icu/umachine.h"
 /* include the utfXX.h after the following definitions */
 
 /* single-code point definitions -------------------------------------------- */
@@ -227,10 +227,10 @@
 
 /* include the utfXX.h ------------------------------------------------------ */
 
-#include "unicod/utf8.h"
-#include "unicod/utf16.h"
+#include "lib/icu/utf8.h"
+#include "lib/icu/utf16.h"
 
 /* utf_old.h contains deprecated, pre-ICU 2.4 definitions */
-#include "unicod/utf_old.h"
+#include "lib/icu/utf_old.h"
 
 #endif

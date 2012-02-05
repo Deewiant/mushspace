@@ -2,7 +2,7 @@
 
 include_rules
 
-INCLUDES += $(INCLUDE)$(TUP_CWD)
+INCLUDES += $(INCLUDE)$(TUP_CWD)/../..
 
 : foreach *.c |> !cc |> %B.o
 

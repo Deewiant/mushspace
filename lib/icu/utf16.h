@@ -36,7 +36,7 @@
 
 /* utf.h must be included first. */
 #ifndef __UTF_H__
-#   include "unicod/utf.h"
+#   include "lib/icu/utf.h"
 #endif
 
 /* single-code point definitions -------------------------------------------- */

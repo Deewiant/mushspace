@@ -45,9 +45,9 @@
 #include <stdint.h>
 
 #if !defined(__MINGW32__) && (defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64))
-#include "unicod/pwin32.h"
+#include "lib/icu/pwin32.h"
 #else
-#include "unicod/platform.h"
+#include "lib/icu/platform.h"
 #endif
 
 /*
