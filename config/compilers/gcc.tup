@@ -3,9 +3,9 @@
 CC = gcc
 
 SRCFLAGS     = -Wall -Wextra -pedantic
-GENFLAGS     = -fPIC
 MUSHSRCFLAGS = -std=c1x
 LIBSRCFLAGS  =
+CODEGENFLAGS = -fPIC
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 INCLUDE      = -I

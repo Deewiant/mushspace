@@ -5,9 +5,9 @@ CC = clang
 # No -pedantic in SRCFLAGS since at least 3.0 still complains about anonymous
 # structs being a GNU extension, even with -std=c1x.
 SRCFLAGS     = -Wall -Wextra
-GENFLAGS     = -fPIC
 MUSHSRCFLAGS = -std=c1x
 LIBSRCFLAGS  = -pedantic
+CODEGENFLAGS = -fPIC
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 INCLUDE      = -I
