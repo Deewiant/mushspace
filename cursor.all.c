@@ -24,7 +24,7 @@
 
 #if !MUSHSPACE_93
 static int  initial_position_fixup(mushcursor*, mushcoords, mushcoords);
-static void mushcursor_recalibrate_void(void*);
+static void mushcursor_recalibrate(void*);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
@@ -40,7 +40,7 @@ int mushcursor_init(
       return MUSHERR_OOM;
 
 #if !MUSHSPACE_93
-   if (!mushspace_add_invalidatee(space, mushcursor_recalibrate_void, cursor))
+   if (!mushspace_add_invalidatee(space, mushcursor_recalibrate, cursor))
       return MUSHERR_OOM;
 #endif
 
@@ -80,8 +80,7 @@ int mushcursor_copy(
       copy->space = space;
 
 #if !MUSHSPACE_93
-   if (!mushspace_add_invalidatee(copy->space, mushcursor_recalibrate_void,
-                                  copy))
+   if (!mushspace_add_invalidatee(copy->space, mushcursor_recalibrate, copy))
       return MUSHERR_OOM;
 #endif
 
@@ -286,21 +285,15 @@ void mushcursor_retreat(mushcursor* cursor, mushcoords delta) {
       mushcoords_sub_into(&cursor->rel_pos, delta);
 }
 
-void mushcursor_recalibrate(mushcursor* cursor) {
-#if MUSHSPACE_93
-   (void)cursor;
-#else
+#if !MUSHSPACE_93
+static void mushcursor_recalibrate(void* p) {
+   mushcursor *cursor = p;
    if (!mushcursor_get_box(cursor, mushcursor_get_pos(cursor))) {
       // Just grab a box which we aren't contained in: get/set can handle it
       // and skip_markers can sort it out. Prefer static because it's the
       // fastest to work with.
       cursor->mode = MushCursorMode_static;
    }
-#endif
-}
-#if !MUSHSPACE_93
-static void mushcursor_recalibrate_void(void* cursor) {
-   mushcursor_recalibrate(cursor);
 }
 #endif
 
