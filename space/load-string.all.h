@@ -10,13 +10,6 @@
 #define mushspace_load_string_utf16 MUSHSPACE_CAT(mushspace,_load_string_utf16)
 #define mushspace_load_string_cell  MUSHSPACE_CAT(mushspace,_load_string_cell)
 
-// Returns 0 on success or one of the following possible error codes:
-//
-// MUSHERR_OOM:     Ran out of memory somewhere.
-// MUSHERR_NO_ROOM: The string doesn't fit in the space, i.e. it would overlap
-//                  with itself. For instance, trying to binary-load 5
-//                  gigabytes of non-space data into a 32-bit space would
-//                  cause this error.
 int mushspace_load_string
    ( mushspace*, const char*, size_t len
 #ifndef MUSHSPACE_93

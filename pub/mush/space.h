@@ -33,6 +33,13 @@ mushspace2 *mushspace2_copy(void*, const mushspace2*, mushstats2*);
 mushspace3 *mushspace3_copy(void*, const mushspace3*, mushstats3*);
 mushspace93 *mushspace93_copy(void*, const mushspace93*);
 
+// Returns 0 on success or one of the following possible error codes:
+//
+// MUSHERR_OOM:     Ran out of memory somewhere.
+// MUSHERR_NO_ROOM: The string doesn't fit in the space, i.e. it would overlap
+//                  with itself. For instance, trying to binary-load 5
+//                  gigabytes of non-space data into a 32-bit space would
+//                  cause this error.
 int mushspace1_load_string
    (mushspace1*, const char*, size_t, mushcoords1*, mushcoords1, bool);
 int mushspace2_load_string
