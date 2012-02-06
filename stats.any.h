@@ -5,8 +5,6 @@
 
 #include <stdint.h>
 
-#include "config.h"
-
 typedef struct mushstats {
    uint64_t
       boxes_incorporated,
