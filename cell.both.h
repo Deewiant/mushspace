@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "config/config.h"
+
 #if MUSHSPACE_93
 typedef uint8_t mushcell;
 typedef uint8_t mushucell;
@@ -28,13 +30,34 @@ typedef uint8_t mushucell;
 #define MUSHCELL_MIN  0
 #define MUSHCELL_MAX  UINT8_MAX
 #define MUSHUCELL_MAX MUSHCELL_MAX
-#else
+
+#elif defined(MUSH_CELL_IS_LONG)
+
 typedef          long mushcell;
 typedef unsigned long mushucell;
 
 #define  MUSHCELL_MIN  LONG_MIN
 #define  MUSHCELL_MAX  LONG_MAX
 #define MUSHUCELL_MAX ULONG_MAX
+
+#elif defined(MUSH_CELL_IS_32_BIT)
+
+typedef  int32_t mushcell;
+typedef uint32_t mushucell;
+
+#define  MUSHCELL_MIN  INT32_MIN
+#define  MUSHCELL_MAX  INT32_MAX
+#define MUSHUCELL_MAX UINT32_MAX
+
+#elif defined(MUSH_CELL_IS_64_BIT)
+
+typedef  int64_t mushcell;
+typedef uint64_t mushucell;
+
+#define  MUSHCELL_MIN  INT64_MIN
+#define  MUSHCELL_MAX  INT64_MAX
+#define MUSHUCELL_MAX UINT64_MAX
+
 #endif
 
 // For things that range from 0 to MUSHSPACE_DIM or thereabouts.
