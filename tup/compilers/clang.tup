@@ -4,6 +4,8 @@
 
 CC = clang -fPIC
 
+AR = ar rcs
+
 SHAREDLIBFLAGS = -shared
 
 # No -pedantic in SRCFLAGS since at least 3.0 still complains about anonymous

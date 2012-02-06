@@ -20,4 +20,4 @@ LIBCFLAGS = $(BOTHFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
 !cc93     = |> ^ CC93  %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 $(DEF93)1 -c %f -o %o |>
 !cclib    = |> ^ CCLIB %f^ $(CC) $(LIBCFLAGS) $(INCLUDES) -c %f -o %o |>
 !ccshared = |> ^ LD    %o^ $(CC) $(LINKFLAGS) %f -o %o |>
-!ar       = |> ^ AR    %o^ ar rcs %o %f |>
+!ar       = |> ^ AR    %o^ $(AR) %o %f |>

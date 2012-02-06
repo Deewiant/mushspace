@@ -5,6 +5,11 @@
 # Can include flags that will be applied to every single command.
 CC = gcc -fPIC
 
+# The archiver command to use, when combining the object files into a static
+# library. This is followed by the library's file name and then each object
+# file as separate arguments.
+AR = ar rcs
+
 # Used when linking a shared library.
 SHAREDLIBFLAGS = -shared
 
