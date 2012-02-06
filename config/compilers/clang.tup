@@ -2,6 +2,8 @@
 
 CC = clang
 
+# No -pedantic in SRCFLAGS since at least 3.0 still complains about anonymous
+# structs being a GNU extension, even with -std=c1x.
 SRCFLAGS     = -Wall -Wextra
 GENFLAGS     = -fPIC
 MUSHSRCFLAGS = -std=c1x
