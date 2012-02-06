@@ -4,6 +4,6 @@ include_rules
 
 INCLUDES += $(INCLUDE)$(TUP_CWD)/../..
 
-: foreach *.c |> !cc |> %B.o
+: foreach *.c |> !cclib |> %B.o
 
 .gitignore
