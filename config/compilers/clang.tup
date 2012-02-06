@@ -1,0 +1,14 @@
+# File created: 2012-02-06 11:55:13
+
+CC = clang
+
+SRCFLAGS     = -Wall -Wextra
+GENFLAGS     = -fPIC
+MUSHSRCFLAGS = -std=c1x
+DEFDIM       = -DMUSHSPACE_DIM=
+DEF93        = -DMUSHSPACE_93=
+INCLUDE      = -I
+
+NATIVEFLAGS = -march=native
+OPTFLAGS    = -O4
+DEBFLAGS    = -g

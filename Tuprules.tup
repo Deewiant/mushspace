@@ -1,30 +1,6 @@
 # File created: 2011-08-07 16:12:35
 
-ifeq (@(CC),gcc)
-SRCFLAGS     = -Wall -Wextra -pedantic
-GENFLAGS     = -fPIC
-MUSHSRCFLAGS = -std=c1x
-DEFDIM       = -DMUSHSPACE_DIM=
-DEF93        = -DMUSHSPACE_93=
-INCLUDE      = -I
-
-NATIVEFLAGS = -march=native
-OPTFLAGS    = -flto -O3
-DEBFLAGS    = -g
-endif
-ifeq (@(CC),clang)
-SRCFLAGS     = -Wall -Wextra
-GENFLAGS     = -fPIC
-MUSHSRCFLAGS = -std=c1x
-DEFDIM       = -DMUSHSPACE_DIM=
-DEF93        = -DMUSHSPACE_93=
-LIBSRCFLAGS  = -pedantic
-INCLUDE      = -I
-
-NATIVEFLAGS = -march=native
-OPTFLAGS    = -O4
-DEBFLAGS    = -g
-endif
+include config/compilers/@(CC_FLAVOUR).tup
 
 NATIVEFLAGS-@(NATIVE) = $(NATIVEFLAGS)
 OPTFLAGS-@(OPTIMIZE)  = $(OPTFLAGS)
@@ -36,11 +12,11 @@ CFLAGS    = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS) $(MUSHSRCFLAGS)
 LINKFLAGS = $(GENFLAGS) $(BOTHFLAGS)
 LIBCFLAGS = $(GENFLAGS) $(BOTHFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
 
-!cc       = |> ^ CC   %f^ @(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
-!cc98     = |> ^ CC98 %f^ @(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
-!cc1d     = |> ^ CC1D %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)1 -c %f -o %o |>
-!cc2d     = |> ^ CC2D %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 -c %f -o %o |>
-!cc3d     = |> ^ CC3D %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)3 -c %f -o %o |>
-!cc93     = |> ^ CC93 %f^ @(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 $(DEF93)1 -c %f -o %o |>
-!ccshared = |> ^ LD   %o^ @(CC) $(LINKFLAGS) -shared %f -o %o |>
+!cc       = |> ^ CC   %f^ $(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
+!cc98     = |> ^ CC98 %f^ $(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
+!cc1d     = |> ^ CC1D %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)1 -c %f -o %o |>
+!cc2d     = |> ^ CC2D %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 -c %f -o %o |>
+!cc3d     = |> ^ CC3D %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)3 -c %f -o %o |>
+!cc93     = |> ^ CC93 %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 $(DEF93)1 -c %f -o %o |>
+!ccshared = |> ^ LD   %o^ $(CC) $(LINKFLAGS) -shared %f -o %o |>
 !ar       = |> ^ AR   %o^ ar rcs %o %f |>
