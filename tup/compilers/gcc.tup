@@ -1,18 +1,50 @@
 # File created: 2012-02-06 11:53:26
 
+# The compiler command to use.
+#
+# Can include flags that will be applied to every single command.
 CC = gcc
 
+# Flags used when compiling .c files:
+#
+# SRCFLAGS     - used for all .c files
+# MUSHSRCFLAGS - used for mushspace's own .c files
+# LIBSRCFLAGS  - used for libraries' .c files (all those that are in lib/)
+#
+# As mushspace is written in C11, MUSHSRCFLAGS should enable that standard.
+# Alternatively, it could enable whatever compiler-supported extensions to C99
+# (or even C89/C90) make mushspace compile. (For example, -std=gnu99 on older
+# GCC versions.)
 SRCFLAGS     = -Wall -Wextra -pedantic
 MUSHSRCFLAGS = -std=c1x
 LIBSRCFLAGS  =
 
+# Flags with very specific meanings, with data appended immediately following:
+#
+# DEFDIM  - to #define MUSHSPACE_DIM
+# DEF93   - to #define MUSHSPACE_93
+# INCLUDE - to add paths searched for #include "foo"
+#
+# The #define flags are immediately followed by the value to which the
+# corresponding variable is to be #defined.
+#
+# INCLUDE is immediately followed by a path to add to the list of paths to be
+# searched.
 DEFDIM  = -DMUSHSPACE_DIM=
 DEF93   = -DMUSHSPACE_93=
 INCLUDE = -I
 
+# CODEGENFLAGS   - used whenever code is generated
+# SHAREDLIBFLAGS - used when linking a shared library
 CODEGENFLAGS   = -fPIC
 SHAREDLIBFLAGS = -shared
 
+# NATIVEFLAGS - used when a  native    build is requested (CONFIG_NATIVE)
+# OPTFLAGS    - used when an optimized build is requested (CONFIG_OPTIMIZE)
+# DEBFLAGS    - used when a  debug     build is requested (CONFIG_DEBUG)
+#
+# These are all passed both when compiling individual .c files and when linking
+# a shared library.
 NATIVEFLAGS = -march=native
 OPTFLAGS    = -flto -O3
 DEBFLAGS    = -g
