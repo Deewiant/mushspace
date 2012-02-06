@@ -4,6 +4,8 @@
 
 #include <assert.h>
 
+static void check_one_axis(mushcoords, mushcoords, const mushbounds*,
+                           mushcell, mushcell, mushdim, bool*, mushucell*);
 static bool matches(mushucell, mushcell, mushcell, mushcell, mushcell);
 static void get_hittable_range(mushcell, mushcell, mushcell,
                                mushcell*, mushcell*);
@@ -198,43 +200,12 @@ bool mushbounds_ray_intersects(
          // and thus we'd be using method 2 instead.
          assert (!(a == MUSHCELL_MIN && b == MUSHCELL_MAX));
 
-         // For each coordinate that we might hit (being careful in case b ==
-         // MUSHCELL_MAX)...
-         for (mushcell p = a; p <= b && p >= a; p = mushcell_inc(p)) {
-            // ... figure out the move counts that hit it which would also be
-            // improvements to best_move_count.
-            mushucell moves, increment;
-
-            const mushucell n = get_move_count(
-               o.v[i], p, delta.v[i],
-               &moves, &increment, got_move_count ? &best_move_count : NULL);
-
-            // For each of the plausible move counts, in order...
-            for (mushucell c = 0; c < n; ++c) {
-               mushucell m = moves + c*increment;
-
-               // ... make sure that along the other axes, with the same number
-               // of moves, we fall within the box.
-               for (mushdim j = 0; j < MUSHSPACE_DIM; ++j) if (i != j)
-                  if (!matches(m, beg->v[j], end->v[j], o.v[j], delta.v[j]))
-                     goto next_move_count_1;
-
-               // If we did fall within the box, we have a better solution for
-               // the whole ray, and we can move to the next point. (Since
-               // get_move_count guarantees that any later m's for this point
-               // would be greater.)
-               best_move_count = m;
-               got_move_count  = true;
-               break;
-next_move_count_1:;
-            }
-         }
+         check_one_axis(o, delta, bounds, a, b, i,
+                        &got_move_count, &best_move_count);
       }
    } else {
 method2:
-      // Method 2: check all points along a selected axis. Practically
-      // identical to the point-loop in method 1: see the comments there for
-      // more info.
+      // Method 2: check all points along a selected axis.
 
       // If we aborted method selection early, our selected axis might have a
       // zero delta: rectify that.
@@ -243,28 +214,8 @@ method2:
          do ++axis2; while (!delta.v[axis2]);
       }
 
-      const mushcell b = beg->v[axis2], e = end->v[axis2];
-
-      for (mushcell p = b; p <= e && p >= b; p = mushcell_inc(p)) {
-         mushucell moves, increment;
-
-         const mushucell n = get_move_count(
-            o.v[axis2], p, delta.v[axis2],
-            &moves, &increment, got_move_count ? &best_move_count : NULL);
-
-         for (mushucell c = 0; c < n; ++c) {
-            mushucell m = moves + c*increment;
-
-            for (mushdim j = 0; j < MUSHSPACE_DIM; ++j) if (axis2 != j)
-               if (!matches(m, beg->v[j], end->v[j], o.v[j], delta.v[j]))
-                  goto next_move_count_2;
-
-            best_move_count = m;
-            got_move_count  = true;
-            break;
-next_move_count_2:;
-         }
-      }
+      check_one_axis(o, delta, bounds, beg->v[axis2], end->v[axis2], axis2,
+                     &got_move_count, &best_move_count);
    }
    if (!got_move_count)
       return false;
@@ -273,6 +224,46 @@ next_move_count_2:;
    *phit_pos    = mushcoords_add(o, mushcoords_muls(delta, best_move_count));
    assert (mushbounds_contains(bounds, *phit_pos));
    return true;
+}
+
+static void check_one_axis(
+   mushcoords o, mushcoords delta, const mushbounds* bounds,
+   mushcell a, mushcell b, mushdim axis,
+   bool* got_move_count, mushucell* best_move_count)
+{
+   const mushcoords *beg = &bounds->beg, *end = &bounds->end;
+
+   // For each coordinate that we might hit (being careful in case b ==
+   // MUSHCELL_MAX)...
+   for (mushcell p = a; p <= b && p >= a; p = mushcell_inc(p)) {
+      // ... figure out the move counts that hit it which would also be
+      // improvements to best_move_count.
+      mushucell moves, increment;
+
+      const mushucell n = get_move_count(
+         o.v[axis], p, delta.v[axis],
+         &moves, &increment, *got_move_count ? best_move_count : NULL);
+
+      // For each of the plausible move counts, in order...
+      for (mushucell c = 0; c < n; ++c) {
+         const mushucell m = moves + c*increment;
+
+         // ... make sure that along the other axes, with the same number of
+         // moves, we fall within the box.
+         for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) if (i != axis)
+            if (!matches(m, beg->v[i], end->v[i], o.v[i], delta.v[i]))
+               goto next_move_count;
+
+         // If we did fall within the box, we have a better solution for
+         // the whole ray, and we can move to the next point. (Since
+         // get_move_count guarantees that any later m's for this point
+         // would be greater.)
+         *best_move_count = m;
+         *got_move_count  = true;
+         break;
+next_move_count:;
+      }
+   }
 }
 
 static bool matches(
