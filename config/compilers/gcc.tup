@@ -6,12 +6,12 @@ SRCFLAGS     = -Wall -Wextra -pedantic
 MUSHSRCFLAGS = -std=c1x
 LIBSRCFLAGS  =
 
-CODEGENFLAGS   = -fPIC
-SHAREDLIBFLAGS = -shared
-
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 INCLUDE      = -I
+
+CODEGENFLAGS   = -fPIC
+SHAREDLIBFLAGS = -shared
 
 NATIVEFLAGS = -march=native
 OPTFLAGS    = -flto -O3
