@@ -5,6 +5,7 @@ CC = clang
 SRCFLAGS     = -Wall -Wextra
 GENFLAGS     = -fPIC
 MUSHSRCFLAGS = -std=c1x
+LIBSRCFLAGS  = -pedantic
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 INCLUDE      = -I
