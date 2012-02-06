@@ -76,12 +76,19 @@ int mushcursor_copy(
 
    memcpy(copy, cursor, sizeof *copy);
 
+   if (space)
+      copy->space = space;
+
+#if !MUSHSPACE_93
+   if (!mushspace_add_invalidatee(copy->space, mushcursor_recalibrate_void,
+                                  copy))
+      return MUSHERR_OOM;
+#endif
+
    // We assume that cursor was already in a valid state, so we don't need to
    // fix the position if the space doesn't change.
    if (!space || space == cursor->space)
       return MUSHERR_NONE;
-
-   copy->space = space;
 
 #if MUSHSPACE_93
    return MUSHERR_NONE;
