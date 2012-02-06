@@ -2,7 +2,7 @@
 
 # See gcc.tup for explanation of each setting!
 
-CC = clang
+CC = clang -fPIC
 
 # No -pedantic in SRCFLAGS since at least 3.0 still complains about anonymous
 # structs being a GNU extension, even with -std=c1x.
@@ -14,7 +14,6 @@ DEFDIM  = -DMUSHSPACE_DIM=
 DEF93   = -DMUSHSPACE_93=
 INCLUDE = -I
 
-CODEGENFLAGS   = -fPIC
 SHAREDLIBFLAGS = -shared
 
 NATIVEFLAGS = -march=native

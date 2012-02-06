@@ -3,7 +3,7 @@
 # The compiler command to use.
 #
 # Can include flags that will be applied to every single command.
-CC = gcc
+CC = gcc -fPIC
 
 # Flags used when compiling .c files:
 #
@@ -34,9 +34,7 @@ DEFDIM  = -DMUSHSPACE_DIM=
 DEF93   = -DMUSHSPACE_93=
 INCLUDE = -I
 
-# CODEGENFLAGS   - used whenever code is generated
-# SHAREDLIBFLAGS - used when linking a shared library
-CODEGENFLAGS   = -fPIC
+# Used when linking a shared library.
 SHAREDLIBFLAGS = -shared
 
 # NATIVEFLAGS - used when a  native    build is requested (CONFIG_NATIVE)
