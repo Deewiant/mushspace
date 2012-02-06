@@ -11,7 +11,7 @@
    MUSHSPACE_CAT(mushcursor,_skip_to_last_space)
 
 #if MUSHSPACE_93
-#define mushcursor_skip_markers mushcursor2_93_skip_markers_98
+#define mushcursor_skip_markers MUSHSPACE_CAT(mushcursor,_skip_markers_98)
 #else
 #define mushcursor_skip_markers MUSHSPACE_CAT(mushcursor,_skip_markers)
 #endif

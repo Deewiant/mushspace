@@ -298,7 +298,7 @@ static void mushcursor_recalibrate_void(void* cursor) {
 #endif
 
 #if MUSHSPACE_93
-void mushcursor2_93_wrap(mushcursor* cursor) {
+void mushcursor93_wrap(mushcursor* cursor) {
    cursor->rel_pos.x %= MUSHSTATICAABB_SIZE.x;
    cursor->rel_pos.y %= MUSHSTATICAABB_SIZE.y;
 }

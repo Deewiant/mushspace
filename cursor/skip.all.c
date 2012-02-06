@@ -39,7 +39,7 @@
 
 #define FIND_BOX(cursor, delta, error_code) do { \
    INFLOOP_DETECT(cursor->rel_pos); \
-   mushcursor2_93_wrap(cursor); \
+   mushcursor93_wrap(cursor); \
 } while (0)
 
 #else
@@ -137,7 +137,7 @@ int mushcursor_skip_to_last_space(mushcursor* cursor, mushcoords delta) {
 #if MUSHSPACE_93
 wrap:
       INFLOOP_DETECT(cursor->rel_pos);
-      mushcursor2_93_wrap(cursor);
+      mushcursor93_wrap(cursor);
 #else
       if (mushcursor_get_box(cursor, pos = mushcursor_get_pos(cursor)))
          continue;

@@ -60,7 +60,7 @@ typedef struct mushcursor {
 #define mushcursor_set_infloop_pos MUSHSPACE_CAT(mushcursor,_set_infloop_pos)
 
 #if MUSHSPACE_93
-void mushcursor2_93_wrap(mushcursor*);
+void mushcursor93_wrap(mushcursor*);
 #endif
 
 extern const size_t mushcursor_sizeof;

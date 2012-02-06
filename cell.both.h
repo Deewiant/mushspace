@@ -14,18 +14,18 @@
 typedef uint8_t mushcell;
 typedef uint8_t mushucell;
 
-#define mushcell_max      mushcell_93_max
-#define mushcell_min      mushcell_93_min
-#define mushcell_max_into mushcell_93_max_into
-#define mushcell_min_into mushcell_93_min_into
-#define mushcell_add      mushcell_93_add
-#define mushcell_sub      mushcell_93_sub
-#define mushcell_mul      mushcell_93_mul
-#define mushcell_inc      mushcell_93_inc
-#define mushcell_dec      mushcell_93_dec
-#define mushcell_add_into mushcell_93_add_into
-#define mushcell_sub_into mushcell_93_sub_into
-#define mushcell_space    mushcell_93_space
+#define mushcell_max      mushcell93_max
+#define mushcell_min      mushcell93_min
+#define mushcell_max_into mushcell93_max_into
+#define mushcell_min_into mushcell93_min_into
+#define mushcell_add      mushcell93_add
+#define mushcell_sub      mushcell93_sub
+#define mushcell_mul      mushcell93_mul
+#define mushcell_inc      mushcell93_inc
+#define mushcell_dec      mushcell93_dec
+#define mushcell_add_into mushcell93_add_into
+#define mushcell_sub_into mushcell93_sub_into
+#define mushcell_space    mushcell93_space
 
 #define MUSHCELL_MIN  0
 #define MUSHCELL_MAX  UINT8_MAX
