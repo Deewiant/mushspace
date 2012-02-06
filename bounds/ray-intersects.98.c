@@ -13,8 +13,8 @@ static mushucell get_move_count_expensive(mushcell, mushcell, mushucell*,
                                           mushucell*, const mushucell*);
 
 bool mushbounds_ray_intersects(
-   mushcoords o, mushcoords delta,
-   const mushbounds* bounds, mushucell* pmove_count, mushcoords* phit_pos)
+   mushcoords o, mushcoords delta, const mushbounds* bounds,
+   mushucell* pmove_count, mushcoords* phit_pos)
 {
    const mushcoords *beg = &bounds->beg, *end = &bounds->end;
 
