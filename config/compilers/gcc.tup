@@ -5,7 +5,10 @@ CC = gcc
 SRCFLAGS     = -Wall -Wextra -pedantic
 MUSHSRCFLAGS = -std=c1x
 LIBSRCFLAGS  =
-CODEGENFLAGS = -fPIC
+
+CODEGENFLAGS   = -fPIC
+SHAREDLIBFLAGS = -shared
+
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 INCLUDE      = -I

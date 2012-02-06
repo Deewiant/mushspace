@@ -7,7 +7,10 @@ CC = clang
 SRCFLAGS     = -Wall -Wextra
 MUSHSRCFLAGS = -std=c1x
 LIBSRCFLAGS  = -pedantic
-CODEGENFLAGS = -fPIC
+
+CODEGENFLAGS   = -fPIC
+SHAREDLIBFLAGS = -shared
+
 DEFDIM       = -DMUSHSPACE_DIM=
 DEF93        = -DMUSHSPACE_93=
 INCLUDE      = -I
