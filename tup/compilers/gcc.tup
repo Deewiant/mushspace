@@ -5,6 +5,9 @@
 # Can include flags that will be applied to every single command.
 CC = gcc -fPIC
 
+# Used when linking a shared library.
+SHAREDLIBFLAGS = -shared
+
 # Flags used when compiling .c files:
 #
 # SRCFLAGS     - used for all .c files
@@ -33,9 +36,6 @@ LIBSRCFLAGS  =
 DEFDIM  = -DMUSHSPACE_DIM=
 DEF93   = -DMUSHSPACE_93=
 INCLUDE = -I
-
-# Used when linking a shared library.
-SHAREDLIBFLAGS = -shared
 
 # NATIVEFLAGS - used when a  native    build is requested (CONFIG_NATIVE)
 # OPTFLAGS    - used when an optimized build is requested (CONFIG_OPTIMIZE)
