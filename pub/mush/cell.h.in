@@ -1,0 +1,74 @@
+// File created: 2012-02-06 19:13:57
+
+#ifndef MUSH_CELL_H
+#define MUSH_CELL_H
+
+typedef uint8_t mushcell93, mushucell93;
+
+#define MUSHCELL93_MIN  0
+#define MUSHCELL93_MAX  UINT8_MAX
+#define MUSHUCELL93_MAX MUSHCELL_MAX
+
+#if @CELL_SIZE@ == 0
+
+typedef          long mushcell;
+typedef unsigned long mushucell;
+
+#define  MUSHCELL_MIN  LONG_MIN
+#define  MUSHCELL_MAX  LONG_MAX
+#define MUSHUCELL_MAX ULONG_MAX
+
+#elif @CELL_SIZE@ == 32
+
+typedef  int32_t mushcell;
+typedef uint32_t mushucell;
+
+#define  MUSHCELL_MIN  INT32_MIN
+#define  MUSHCELL_MAX  INT32_MAX
+#define MUSHUCELL_MAX UINT32_MAX
+
+#elif @CELL_SIZE@ == 64
+
+typedef  int64_t mushcell;
+typedef uint64_t mushucell;
+
+#define  MUSHCELL_MIN  INT64_MIN
+#define  MUSHCELL_MAX  INT64_MAX
+#define MUSHUCELL_MAX UINT64_MAX
+
+#endif
+
+mushcell mushcell_add(mushcell, mushcell);
+mushcell93 mushcell93_add(mushcell93, mushcell93);
+
+mushcell mushcell_sub(mushcell, mushcell);
+mushcell93 mushcell93_sub(mushcell93, mushcell93);
+
+mushcell mushcell_mul(mushcell, mushcell);
+mushcell93 mushcell93_mul(mushcell93, mushcell93);
+
+mushcell mushcell_inc(mushcell);
+mushcell93 mushcell93_inc(mushcell93);
+
+mushcell mushcell_dec(mushcell);
+mushcell93 mushcell93_dec(mushcell93);
+
+void mushcell_add_into(mushcell*, mushcell);
+void mushcell93_add_into(mushcell93*, mushcell93);
+
+void mushcell_sub_into(mushcell*, mushcell);
+void mushcell93_sub_into(mushcell93*, mushcell93);
+
+mushcell mushcell_max(mushcell, mushcell);
+mushcell93 mushcell93_max(mushcell93, mushcell93);
+
+mushcell mushcell_min(mushcell, mushcell);
+mushcell93 mushcell93_min(mushcell93, mushcell93);
+
+void mushcell_max_into(mushcell*, mushcell);
+void mushcell93_max_into(mushcell93*, mushcell93);
+
+void mushcell_min_into(mushcell*, mushcell);
+void mushcell93_min_into(mushcell93*, mushcell93);
+
+#endif
