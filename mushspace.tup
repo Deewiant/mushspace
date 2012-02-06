@@ -3,7 +3,6 @@
 # included by Tupfiles to get the basic compilation rules we use.
 
 INCLUDES += $(INCLUDE)$(ROOT)
-INCLUDES += $(INCLUDE)$(ROOT)/config
 
 ifeq (@(UNEFUNGE),y)
 UNEFUNGE = y
