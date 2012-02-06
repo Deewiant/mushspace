@@ -5,16 +5,42 @@
 INCLUDES += $(INCLUDE)$(ROOT)
 INCLUDES += $(INCLUDE)$(ROOT)/config
 
+ifeq (@(UNEFUNGE),y)
+UNEFUNGE = y
+98 = y
+endif
+ifeq (@(BEFUNGE),y)
+BEFUNGE = y
+98 = y
+endif
+ifeq (@(TREFUNGE),y)
+TREFUNGE = y
+98 = y
+endif
+ifeq (@(BEFUNGE_93),y)
+93 = y
+endif
+
+ifeq ($(UNEFUNGE),y)
 : foreach *.all.c  | $(ROOT)/config/config.h |> !cc1d |> %B.1d.o
+: foreach *.98.c   | $(ROOT)/config/config.h |> !cc1d |> %B.1d.o
+endif
+ifeq ($(BEFUNGE),y)
 : foreach *.all.c  | $(ROOT)/config/config.h |> !cc2d |> %B.2d.o
+: foreach *.98.c   | $(ROOT)/config/config.h |> !cc2d |> %B.2d.o
+endif
+ifeq ($(TREFUNGE),y)
 : foreach *.all.c  | $(ROOT)/config/config.h |> !cc3d |> %B.3d.o
-: foreach *.all.c  | $(ROOT)/config/config.h |> !cc93 |> %B.93.o
-: foreach *.any.c  | $(ROOT)/config/config.h |> !cc   |> %B.o
+: foreach *.98.c   | $(ROOT)/config/config.h |> !cc3d |> %B.3d.o
+endif
+ifeq ($(98),y)
 : foreach *.both.c | $(ROOT)/config/config.h |> !cc98 |> %B.98.o
+endif
+ifeq ($(93),y)
+: foreach *.all.c  | $(ROOT)/config/config.h |> !cc93 |> %B.93.o
 : foreach *.both.c | $(ROOT)/config/config.h |> !cc93 |> %B.93.o
 : foreach *.93.c   | $(ROOT)/config/config.h |> !cc93 |> %B.o
-: foreach *.98.c   | $(ROOT)/config/config.h |> !cc1d |> %B.1d.o
-: foreach *.98.c   | $(ROOT)/config/config.h |> !cc2d |> %B.2d.o
-: foreach *.98.c   | $(ROOT)/config/config.h |> !cc3d |> %B.3d.o
+endif
+: foreach *.any.c  | $(ROOT)/config/config.h |> !cc   |> %B.o
 
 .gitignore
