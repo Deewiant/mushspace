@@ -29,7 +29,7 @@
 #define U16_GET_SUPPLEMENTARY(lead, trail) \
     (((UChar32)(lead)<<10UL)+(UChar32)(trail)-U16_SURROGATE_OFFSET)
 
-// Different from U16_NEXT in that it returns U_SENTINEL for lone surrogates.
+/* Different from U16_NEXT: it returns U_SENTINEL for lone surrogates. */
 #define U16_NEXT_PTR(s, s_end, c) do { \
     (c)=*(s)++; \
     if(U16_IS_LEAD(c)) { \
