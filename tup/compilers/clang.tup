@@ -1,5 +1,7 @@
 # File created: 2012-02-06 11:55:13
 
+# See gcc.tup for explanation of each setting!
+
 CC = clang
 
 # No -pedantic in SRCFLAGS since at least 3.0 still complains about anonymous
