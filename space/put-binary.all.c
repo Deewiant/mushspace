@@ -5,7 +5,7 @@
 void mushspace_put_binary(const mushspace* space, mushbounds bounds,
                           void(*putcell)(mushcell, void*),
 #if MUSHSPACE_DIM > 1
-                          void(*put)(unsigned char, void*),
+                          void(*put)(char, void*),
 #endif
                           void* putdata
 ) {

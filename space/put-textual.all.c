@@ -3,24 +3,23 @@
 #include "space/put-textual.all.h"
 
 static bool put_textual_row(
-   const mushcell*, size_t*, const unsigned char*, size_t*,
-   void(*)(const mushcell*, size_t, void*), void(*)(unsigned char, void*),
+   const mushcell*, size_t*, const char*, size_t*,
+   void(*)(const mushcell*, size_t, void*), void(*)(char, void*),
    void*);
 
 static void put_textual_page(
-   const mushcell*, size_t*, const unsigned char*, size_t*,
-   void(*)(const mushcell*, size_t, void*), void(*)(unsigned char, void*),
+   const mushcell*, size_t*, const char*, size_t*,
+   void(*)(const mushcell*, size_t, void*), void(*)(char, void*),
    void*);
 
-static bool put_textual_add_ws(
-   unsigned char**, size_t*, size_t*, unsigned char);
+static bool put_textual_add_ws(char**, size_t*, size_t*, char);
 
 int mushspace_put_textual(
    const mushspace* space, mushbounds bounds,
-   mushcell     **   bufp, size_t*   buflenp,
-   unsigned char** wsbufp, size_t* wsbuflenp,
+   mushcell**   bufp, size_t*   buflenp,
+   char    ** wsbufp, size_t* wsbuflenp,
    void(*putrow)(const mushcell*, size_t, void*),
-   void(*put)   (unsigned char, void*),
+   void(*put)   (char, void*),
    void* pdat)
 {
    if (!bufp != !buflenp) {
@@ -32,10 +31,10 @@ int mushspace_put_textual(
       wsbuflenp = NULL;
    }
 
-   mushcell      *  buf    =   bufp    ? *  bufp    : NULL;
-   unsigned char *wsbuf    = wsbufp    ? *wsbufp    : NULL;
-   size_t           buflen =   buflenp ? *  buflenp : 0,
-                  wsbuflen = wsbuflenp ? *wsbuflenp : 0;
+   mushcell*  buf    =   bufp    ? *  bufp    : NULL;
+   char    *wsbuf    = wsbufp    ? *wsbufp    : NULL;
+   size_t     buflen =   buflenp ? *  buflenp : 0,
+            wsbuflen = wsbuflenp ? *wsbuflenp : 0;
 
    // Clamp end to loose bounds: no point in going beyond them. Don't clamp the
    // beginning: leading whitespace is not invisible.
@@ -121,10 +120,10 @@ end:
 }
 
 static bool put_textual_row(
-   const mushcell     *   buf, size_t* i,
-   const unsigned char* wsbuf, size_t* w,
+   const mushcell*   buf, size_t* i,
+   const char*     wsbuf, size_t* w,
    void(*putrow)(const mushcell*, size_t, void*),
-   void(*put)   (unsigned char, void*),
+   void(*put)   (char, void*),
    void* pdat)
 {
    if (!*i)
@@ -146,10 +145,10 @@ static bool put_textual_row(
 }
 
 static void put_textual_page(
-   const mushcell     *   buf, size_t* i,
-   const unsigned char* wsbuf, size_t* w,
+   const mushcell*   buf, size_t* i,
+   const char*     wsbuf, size_t* w,
    void(*putrow)(const mushcell*, size_t, void*),
-   void(*put)   (unsigned char, void*),
+   void(*put)   (char, void*),
    void* pdat)
 {
    // Drop trailing newlines at EOP.
@@ -161,10 +160,10 @@ static void put_textual_page(
 }
 
 static bool put_textual_add_ws(
-   unsigned char** wsbuf, size_t* wsbuflen, size_t* w, unsigned char ws)
+   char** wsbuf, size_t* wsbuflen, size_t* w, char ws)
 {
    if (*w == *wsbuflen) {
-      unsigned char *p =
+      char *p =
          realloc(*wsbuf, *wsbuflen ? (*wsbuflen *= 2) : (*wsbuflen += 64));
       if (!p)
          return false;
