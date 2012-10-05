@@ -9,7 +9,7 @@ AR = ar rcs
 SHAREDLIBFLAGS = -shared
 
 SRCFLAGS     = -Wall -Wextra -pedantic
-MUSHSRCFLAGS = -std=c1x
+MUSHSRCFLAGS = -std=c11
 LIBSRCFLAGS  =
 
 DEFDIM  = -DMUSHSPACE_DIM=

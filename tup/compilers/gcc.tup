@@ -24,7 +24,7 @@ SHAREDLIBFLAGS = -shared
 # (or even C89/C90) make mushspace compile. (For example, -std=gnu99 on older
 # GCC versions.)
 SRCFLAGS     = -Wall -Wextra -pedantic
-MUSHSRCFLAGS = -std=c1x
+MUSHSRCFLAGS = -std=c11
 LIBSRCFLAGS  =
 
 # Flags with very specific meanings, with data appended immediately following:
