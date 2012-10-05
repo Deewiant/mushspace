@@ -10,9 +10,9 @@
 
 #define mushcoords MUSHSPACE_NAME(mushcoords)
 
-typedef union mushcoords {
 #pragma pack(push)
 #pragma pack(1)
+typedef union mushcoords {
    struct {
       mushcell x;
 #if MUSHSPACE_DIM >= 2
@@ -22,9 +22,9 @@ typedef union mushcoords {
       mushcell z;
 #endif
    };
-#pragma pack(pop)
    mushcell v[MUSHSPACE_DIM];
 } mushcoords;
+#pragma pack(pop)
 
 #define MUSHCOORDS_INIT MUSHSPACE_CAT(MUSHCOORDS_INIT,MUSHSPACE_DIM)
 #define MUSHCOORDS_INIT1(a,b,c) {{.x = a}}

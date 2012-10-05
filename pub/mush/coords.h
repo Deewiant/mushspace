@@ -7,34 +7,25 @@
 
 #include "mush/cell.h"
 
-typedef union mushcoords1 {
 #pragma pack(push)
 #pragma pack(1)
+typedef union mushcoords1 {
    struct { mushcell x; };
-#pragma pack(pop)
    mushcell v[1];
 } mushcoords1;
 typedef union mushcoords2 {
-#pragma pack(push)
-#pragma pack(1)
    struct { mushcell x, y; };
-#pragma pack(pop)
    mushcell v[2];
 } mushcoords2;
 typedef union mushcoords3 {
-#pragma pack(push)
-#pragma pack(1)
    struct { mushcell x, y, z; };
-#pragma pack(pop)
    mushcell v[3];
 } mushcoords3;
 typedef union mushcoords93 {
-#pragma pack(push)
-#pragma pack(1)
    struct { mushcell93 x, y; };
-#pragma pack(pop)
    mushcell93 v[2];
 } mushcoords93;
+#pragma pack(pop)
 
 #define MUSHCOORDS1_INIT(a)     {{.x = a}}
 #define MUSHCOORDS2_INIT(a,b)   {{.x = a, .y = b}}
