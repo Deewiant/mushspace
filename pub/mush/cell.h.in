@@ -3,6 +3,7 @@
 #ifndef MUSH_CELL_H
 #define MUSH_CELL_H
 
+#include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
 
@@ -11,6 +12,11 @@ typedef uint8_t mushcell93, mushucell93;
 #define MUSHCELL93_MIN  0
 #define MUSHCELL93_MAX  UINT8_MAX
 #define MUSHUCELL93_MAX MUSHCELL_MAX
+
+#define MUSHCELL93_PRI  PRId8
+#define MUSHUCELL93_PRI PRIu8
+#define MUSHCELL93_SCN  SCNd8
+#define MUSHUCELL93_SCN SCNu8
 
 #if @CELL_SIZE@ == 0
 
@@ -21,6 +27,11 @@ typedef unsigned long mushucell;
 #define  MUSHCELL_MAX  LONG_MAX
 #define MUSHUCELL_MAX ULONG_MAX
 
+#define MUSHCELL_PRI  "ld"
+#define MUSHUCELL_PRI "lu"
+#define MUSHCELL_SCN  MUSHCELL_PRI
+#define MUSHUCELL_SCN MUSHUCELL_PRI
+
 #elif @CELL_SIZE@ == 32
 
 typedef  int32_t mushcell;
@@ -30,6 +41,11 @@ typedef uint32_t mushucell;
 #define  MUSHCELL_MAX  INT32_MAX
 #define MUSHUCELL_MAX UINT32_MAX
 
+#define MUSHCELL_PRI  PRId32
+#define MUSHUCELL_PRI PRIu32
+#define MUSHCELL_SCN  SCNd32
+#define MUSHUCELL_SCN SCNu32
+
 #elif @CELL_SIZE@ == 64
 
 typedef  int64_t mushcell;
@@ -38,6 +54,11 @@ typedef uint64_t mushucell;
 #define  MUSHCELL_MIN  INT64_MIN
 #define  MUSHCELL_MAX  INT64_MAX
 #define MUSHUCELL_MAX UINT64_MAX
+
+#define MUSHCELL_PRI  PRId64
+#define MUSHUCELL_PRI PRIu64
+#define MUSHCELL_SCN  SCNd64
+#define MUSHUCELL_SCN SCNu64
 
 #endif
 
