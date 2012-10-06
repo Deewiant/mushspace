@@ -16,7 +16,7 @@ void tap_bool(bool b, const char* so, const char* sn) {
       tap_not_ok(sn);
 }
 
-#define tap_eqis_gen(N, T) \
+#define tap_eqis_gen(N, T, P) \
    void N(T a, T b, const char* so, const char* sn) { \
       if (a == b) { \
          tap_ok(so); \
@@ -24,10 +24,10 @@ void tap_bool(bool b, const char* so, const char* sn) {
       } \
       tap_not_ok(sn); \
       printf("  ---\n" \
-             "  first  was: %lld\n" \
-             "  second was: %lld\n" \
-             "  ...\n", (long long)a, (long long)b); \
+             "  first  was: %" P "\n" \
+             "  second was: %" P "\n" \
+             "  ...\n", a, b); \
    }
 
-tap_eqis_gen(tap_eqcs,   mushcell)
-tap_eqis_gen(tap_eqc93s, mushcell93)
+tap_eqis_gen(tap_eqcs,   mushcell,   MUSHCELL_PRI)
+tap_eqis_gen(tap_eqc93s, mushcell93, MUSHCELL93_PRI)
