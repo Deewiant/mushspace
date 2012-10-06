@@ -45,9 +45,11 @@ DEFINE_OP(sub)
 DEFINE_OP(mul)
 
 #if !MUSHSPACE_93
-
 DEFINE_CLAMPED_OP(add)
 DEFINE_CLAMPED_OP(sub)
+#endif
+
+#if !MUSHSPACE_93 || defined(MUSH_ENABLE_INFINITE_LOOP_DETECTION)
 
 bool mushcoords_equal(mushcoords a, mushcoords b) {
    // Yes, peeling the loop is worth it.
@@ -60,6 +62,10 @@ bool mushcoords_equal(mushcoords a, mushcoords b) {
 #endif
    ;
 }
+
+#endif
+
+#if !MUSHSPACE_93
 
 mushcoords mushcoords_get_end_of_contiguous_range(
    mushcoords  end_pt,
