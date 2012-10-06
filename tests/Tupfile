@@ -1,0 +1,45 @@
+# File created: 2012-10-06 11:53:04
+
+include_rules
+
+ROOT = $(TUP_CWD)/..
+
+INCLUDES += $(INCLUDE)$(ROOT)/pub
+CELL_H = $(ROOT)/pub/mush/cell.h
+
+ifeq (@(UNEFUNGE),y)
+: foreach *.all.c |> !cc1dpub |> %B.1d.o
+: foreach *.1d.c  |> !cc1dpub |> %B.1d.o
+98 = y
+endif
+ifeq (@(BEFUNGE),y)
+: foreach *.all.c |> !cc2dpub |> %B.2d.o
+: foreach *.1d.c  |> !cc2dpub |> %B.2d.o
+: foreach *.2d.c  |> !cc2dpub |> %B.2d.o
+98 = y
+endif
+ifeq (@(TREFUNGE),y)
+: foreach *.all.c |> !cc3dpub |> %B.3d.o
+: foreach *.1d.c  |> !cc3dpub |> %B.3d.o
+: foreach *.2d.c  |> !cc3dpub |> %B.3d.o
+: foreach *.3d.c  |> !cc3dpub |> %B.3d.o
+98 = y
+endif
+ifeq ($(98),y)
+: foreach *.both.c |> !cc98pub |> %B.98.o
+endif
+ifeq (@(BEFUNGE_93),y)
+: foreach *.both.c |> !cc93pub |> %B.93.o
+: foreach *.all.c  |> !cc93pub |> %B.93.o
+endif
+
+EXTRAOBJS = tap/*.o $(ROOT)/libmushspace.so
+: foreach *.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
+
+EXTRAOBJS = tap/*.o $(ROOT)/libmushspace.a
+: foreach *.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
+
+# Convenience: make sure the running script ends up in the build directory.
+: runme.sh.in |> cp %f %o |> runme.sh
+
+.gitignore

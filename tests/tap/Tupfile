@@ -1,0 +1,12 @@
+# File created: 2012-10-06 19:13:04
+
+include_rules
+
+ROOT = $(TUP_CWD)/../..
+
+INCLUDES += $(INCLUDE)$(ROOT)/pub
+CELL_H = $(ROOT)/pub/mush/cell.h
+
+: foreach *.c | $(CELL_H) |> !cc |> %B.o
+
+.gitignore

@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+prove -f ./*.t $*
+command -v valgrind >/dev/null 2>&1 || {
+   echo >&2 "############### valgrind NOT FOUND, SKIPPING valgrind tests"
+   exit
+}
+prove -fe 'valgrind -q --error-exitcode=112 --read-var-info=yes --leak-check=full --show-reachable=yes' ./*.t $*

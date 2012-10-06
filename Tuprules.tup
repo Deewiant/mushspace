@@ -11,6 +11,7 @@ BOTHFLAGS = $(DEBFLAGS-y) $(OPTFLAGS-y) $(NATIVEFLAGS-y)
 CFLAGS    = $(BOTHFLAGS) $(SRCFLAGS) $(MUSHSRCFLAGS)
 LINKFLAGS = $(BOTHFLAGS) $(SHAREDLIBFLAGS)
 LIBCFLAGS = $(BOTHFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
+EXEFLAGS  = $(BOTHFLAGS)
 
 !cc       = |> ^ CC    %f^ $(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
 !cc98     = |> ^ CC98  %f^ $(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
@@ -21,3 +22,13 @@ LIBCFLAGS = $(BOTHFLAGS) $(SRCFLAGS) $(LIBSRCFLAGS)
 !cclib    = |> ^ CCLIB %f^ $(CC) $(LIBCFLAGS) $(INCLUDES) -c %f -o %o |>
 !ccshared = |> ^ LD    %o^ $(CC) $(LINKFLAGS) %f -o %o |>
 !ar       = |> ^ AR    %o^ $(AR) %o %f |>
+
+# This is a generated public header, and thus an explicit dependency.
+&CELL_H = pub/mush/cell.h
+
+!cc98pub = | &(CELL_H) |> ^ CC98PUB %f^ $(CC) $(CFLAGS) $(INCLUDES) -c %f -o %o |>
+!cc1dpub = | &(CELL_H) |> ^ CC1DPUB %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)1 -c %f -o %o |>
+!cc2dpub = | &(CELL_H) |> ^ CC2DPUB %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 -c %f -o %o |>
+!cc3dpub = | &(CELL_H) |> ^ CC3DPUB %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)3 -c %f -o %o |>
+!cc93pub = | &(CELL_H) |> ^ CC93PUB %f^ $(CC) $(CFLAGS) $(INCLUDES) $(DEFDIM)2 $(DEF93)1 -c %f -o %o |>
+!ccexe   =             |> ^ LDEXE   %o^ $(CC) $(EXEFLAGS) %f $(EXTRAOBJS) -o %o |>
