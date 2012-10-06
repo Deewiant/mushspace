@@ -3,6 +3,9 @@
 #ifndef MUSH_CELL_H
 #define MUSH_CELL_H
 
+#include <limits.h>
+#include <stdint.h>
+
 typedef uint8_t mushcell93, mushucell93;
 
 #define MUSHCELL93_MIN  0
