@@ -1,9 +1,8 @@
 // File created: 2012-10-07 12:10:39
 
-#include <mush/coords.h>
-
 #include "tap/tap.h"
 
+#include "coords.h"
 #include "typenames.h"
 
 #define mushcoords          NAME(mushcoords)
@@ -12,20 +11,6 @@
 #define mushcoords_max_into CAT(mushcoords,_max_into)
 #define mushcoords_min_into CAT(mushcoords,_min_into)
 #define mushcoords_equal    CAT(mushcoords,_equal)
-
-#if MUSHSPACE_93
-#define MUSHCOORDS(a,b,c)      MUSHCOORDS93(a,b)
-#define MUSHCOORDS_INIT(a,b,c) MUSHCOORDS93_INIT(a,b)
-#elif MUSHSPACE_DIM == 1
-#define MUSHCOORDS(a,b,c)      MUSHCOORDS1(a)
-#define MUSHCOORDS_INIT(a,b,c) MUSHCOORDS1_INIT(a)
-#elif MUSHSPACE_DIM == 2
-#define MUSHCOORDS(a,b,c)      MUSHCOORDS2(a,b)
-#define MUSHCOORDS_INIT(a,b,c) MUSHCOORDS2_INIT(a,b)
-#elif MUSHSPACE_DIM == 3
-#define MUSHCOORDS             MUSHCOORDS3
-#define MUSHCOORDS_INIT        MUSHCOORDS3_INIT
-#endif
 
 int main(void) {
    tap_n(1 + MUSHSPACE_DIM + 5);
