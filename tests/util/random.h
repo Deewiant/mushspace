@@ -3,7 +3,9 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
-void init_genrand(unsigned long);
-extern unsigned long (*genrand_int32)(void);
+#include <stdint.h>
+
+void init_genrand(uint32_t);
+extern uint32_t (*genrand_int32)(void);
 
 #endif

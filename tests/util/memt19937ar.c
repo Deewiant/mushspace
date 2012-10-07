@@ -47,6 +47,8 @@
 #include <stdio.h>
 #endif
 
+#include <stdint.h>
+
 /* Period parameters */
 #define N 624
 #define M 397
@@ -59,28 +61,28 @@
 #define TEMPERING_SHIFT_U(y)  (y >> 11)
 #define TEMPERING_SHIFT_S(y)  (y << 7)
 
-static unsigned long mt[N]; /* the array for the state vector  */
+static uint32_t mt[N]; /* the array for the state vector  */
 static int mti=N+1; /* mti==N+1 means mt[N] is not initialized */
 static int kk = 0;
 
 /* mag01[x] = x * MATRIX_A  for x=0,1 */
-static unsigned long mag01[2]={0x0, MATRIX_A};
+static uint32_t mag01[2]={0x0, MATRIX_A};
 
 /*plot type*/
-static unsigned long case_1(void);
-static unsigned long case_2(void);
-static unsigned long case_3(void);
-static unsigned long case_4(void);
-static unsigned long case_5(void);
-static unsigned long case_6(void);
-static unsigned long case_7(void);
+static uint32_t case_1(void);
+static uint32_t case_2(void);
+static uint32_t case_3(void);
+static uint32_t case_4(void);
+static uint32_t case_5(void);
+static uint32_t case_6(void);
+static uint32_t case_7(void);
 /* generates a random number on [0,0xffffffff]-interval */
-       unsigned long (*genrand_int32)(void);
+       uint32_t (*genrand_int32)(void);
 
-static unsigned long y;
+static uint32_t y;
 
 /* initializes mt[N] with a seed */
-void init_genrand(unsigned long s)
+void init_genrand(uint32_t s)
 {
     mt[0]= s & 0xffffffffUL;
     for (mti=1; mti<N; mti++) {
@@ -100,7 +102,7 @@ void init_genrand(unsigned long s)
 /* init_key is the array for initializing keys */
 /* key_length is its length */
 /* slight change for C++, 2004/2/26 */
-void init_by_array(unsigned long init_key[], int key_length)
+void init_by_array(uint32_t init_key[], int key_length)
 {
     int i, j, k;
     init_genrand(19650218UL);
@@ -126,7 +128,7 @@ void init_by_array(unsigned long init_key[], int key_length)
     genrand_int32 = case_1;
 }
 
-unsigned long case_1(void){
+uint32_t case_1(void){
             y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
             mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1];
 		    y = mt[kk]^ ((mt[kk+224] << 14) & 0x3cd68000) ^ ((mt[kk+124] << 3) & 0x576bad28) ^ ((mt[kk+24] << 18) & 0xd6740000);
@@ -138,7 +140,7 @@ unsigned long case_1(void){
 			return y;
 			}
 
-unsigned long case_2(void){
+uint32_t case_2(void){
 			y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
             mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1];
 			y = mt[kk]^ ((mt[kk+224] << 14) & 0x3cd68000) ^ ((mt[kk+124] << 3) & 0x576bad28) ^ ((mt[kk+24] << 18) & 0xd6740000);
@@ -149,7 +151,7 @@ unsigned long case_2(void){
 			return y;
 		}
 
-unsigned long case_3(void){
+uint32_t case_3(void){
 			y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
             mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1];
 			y=mt[kk]^ ((mt[kk+224] << 14) & 0x3cd68000) ^ ((mt[kk+124] << 3) & 0x576bad28) ^ ((mt[kk+24] << 18) & 0xd6740000);
@@ -160,7 +162,7 @@ unsigned long case_3(void){
 			return y;
 		}
 
-unsigned long case_4(void){
+uint32_t case_4(void){
 			y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
             mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1];
 			y=mt[kk]^ ((mt[kk-400] << 14) & 0x3cd68000) ^ ((mt[kk+124] << 3) & 0x576bad28) ^ ((mt[kk+24] << 18) & 0xd6740000);
@@ -171,7 +173,7 @@ unsigned long case_4(void){
 			return y;
 		}
 
-unsigned long case_5(void){
+uint32_t case_5(void){
 			y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
             mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1];
 			y=mt[kk]^ ((mt[kk-400] << 14) & 0x3cd68000) ^ ((mt[kk-500] << 3) & 0x576bad28) ^ ((mt[kk+24] << 18) & 0xd6740000);
@@ -182,7 +184,7 @@ unsigned long case_5(void){
 			return y;
 		}
 
-unsigned long case_6(void){
+uint32_t case_6(void){
 			y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
             mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1];
 			y=mt[kk]^ ((mt[kk-400] << 14) & 0x3cd68000) ^ ((mt[kk-500] << 3) & 0x576bad28) ^ ((mt[kk-600] << 18) & 0xd6740000);
@@ -193,7 +195,7 @@ unsigned long case_6(void){
 			return y;
 		}
 
-unsigned long case_7(void){
+uint32_t case_7(void){
             y = (mt[N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
             mt[N-1] = mt[M-1] ^ (y >> 1) ^ mag01[y & 0x1];
 			y=mt[kk]^ ((mt[kk-400] << 14) & 0x3cd68000) ^ ((mt[kk-500] << 3) & 0x576bad28) ^ ((mt[kk-600] << 18) & 0xd6740000);
@@ -206,9 +208,9 @@ unsigned long case_7(void){
 #if 0
 
 /* generates a random number on [0,0x7fffffff]-interval */
-long genrand_int31(void)
+int32_t genrand_int31(void)
 {
-    return (long)(genrand_int32()>>1);
+    return (int32_t)(genrand_int32()>>1);
 }
 
 /* generates a random number on [0,1]-real-interval */
@@ -235,7 +237,7 @@ double genrand_real3(void)
 /* generates a random number on [0,1) with 53-bit resolution*/
 double genrand_res53(void)
 {
-    unsigned long a=genrand_int32()>>5, b=genrand_int32()>>6;
+    uint32_t a=genrand_int32()>>5, b=genrand_int32()>>6;
     return(a*67108864.0+b)*(1.0/9007199254740992.0);
 }
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
@@ -243,7 +245,7 @@ double genrand_res53(void)
 int main(void)
 {
     int i;
-    unsigned long init[4]={0x123, 0x234, 0x345, 0x456}, length=4;
+    uint32_t init[4]={0x123, 0x234, 0x345, 0x456}, length=4;
     init_by_array(init, length);
     printf("1000 outputs of genrand_int32()\n");
     for (i=0; i<1000; i++) {
