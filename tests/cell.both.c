@@ -1,6 +1,6 @@
 // File created: 2012-10-06 18:41:51
 
-#include "tap/tap.h"
+#include "util/tap.h"
 
 #if MUSHSPACE_93
 #undef MUSHCELL_MIN

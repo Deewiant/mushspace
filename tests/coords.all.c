@@ -1,9 +1,9 @@
 // File created: 2012-10-07 12:10:39
 
-#include "tap/tap.h"
-
 #include "coords.h"
 #include "typenames.h"
+
+#include "util/tap.h"
 
 #define mushcoords          NAME(mushcoords)
 #define mushcoords_add      CAT(mushcoords,_add)

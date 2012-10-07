@@ -2,10 +2,10 @@
 
 #include <mush/bounds.h>
 
-#include "tap/tap.h"
-
 #include "coords.h"
 #include "typenames.h"
+
+#include "util/tap.h"
 
 #define mushcoords                 NAME(mushcoords)
 #define mushbounds                 NAME(mushbounds)

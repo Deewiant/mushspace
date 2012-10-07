@@ -33,10 +33,10 @@ ifeq (@(BEFUNGE_93),y)
 : foreach *.all.c  |> !cc93pub |> %B.93.o
 endif
 
-EXTRAOBJS = tap/*.o $(ROOT)/libmushspace.so
+EXTRAOBJS = util/*.o $(ROOT)/libmushspace.so
 : foreach *.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
 
-EXTRAOBJS = tap/*.o $(ROOT)/libmushspace.a
+EXTRAOBJS = util/*.o $(ROOT)/libmushspace.a
 : foreach *.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
 
 # Convenience: make sure the running script ends up in the build directory.
