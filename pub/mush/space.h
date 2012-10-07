@@ -28,9 +28,9 @@ void mushspace2_free(mushspace2*);
 void mushspace3_free(mushspace3*);
 void mushspace93_free(mushspace93);
 
-mushspace1 *mushspace1_copy(void*, const mushspace1*, mushstats1*);
-mushspace2 *mushspace2_copy(void*, const mushspace2*, mushstats2*);
-mushspace3 *mushspace3_copy(void*, const mushspace3*, mushstats3*);
+mushspace1 *mushspace1_copy(void*, const mushspace1*, mushstats*);
+mushspace2 *mushspace2_copy(void*, const mushspace2*, mushstats*);
+mushspace3 *mushspace3_copy(void*, const mushspace3*, mushstats*);
 mushspace93 *mushspace93_copy(void*, const mushspace93*);
 
 // Returns 0 on success or one of the following possible error codes:
