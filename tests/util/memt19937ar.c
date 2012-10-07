@@ -47,7 +47,9 @@
 #include <stdio.h>
 #endif
 
+#include <limits.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 /* Period parameters */
 #define N 624
@@ -260,3 +262,17 @@ int main(void)
     return 0;
 }
 #endif
+
+void random_fill(void* p, size_t n) {
+   uint32_t *p32 = p;
+   for (; n >= sizeof *p32; n -= sizeof *p32)
+      *p32++ = genrand_int32();
+   if (n) {
+      unsigned char *pc = (unsigned char*)p32;
+      uint32_t i = genrand_int32();
+      while (n--) {
+         *pc++ = (unsigned char)i;
+         i >>= CHAR_BIT;
+      }
+   }
+}
