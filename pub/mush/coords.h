@@ -32,10 +32,10 @@ typedef union mushcoords93 {
 #define MUSHCOORDS3_INIT(a,b,c) {{.x = a, .y = b, .z = c}}
 #define MUSHCOORDS93_INIT(a,b)  {{.x = a, .y = b}}
 
-#define MUSHCOORDS1(a)     ((mushcoords)MUSHCOORDS1_INIT(a))
-#define MUSHCOORDS2(a,b)   ((mushcoords)MUSHCOORDS2_INIT(a,b))
-#define MUSHCOORDS3(a,b,c) ((mushcoords)MUSHCOORDS3_INIT(a,b,c))
-#define MUSHCOORDS93(a,b)  ((mushcoords)MUSHCOORDS93_INIT(a,b))
+#define MUSHCOORDS1(a)     ((mushcoords1)MUSHCOORDS1_INIT(a))
+#define MUSHCOORDS2(a,b)   ((mushcoords2)MUSHCOORDS2_INIT(a,b))
+#define MUSHCOORDS3(a,b,c) ((mushcoords3)MUSHCOORDS3_INIT(a,b,c))
+#define MUSHCOORDS93(a,b)  ((mushcoords93)MUSHCOORDS93_INIT(a,b))
 
 mushcoords1 mushcoords1_add(mushcoords1, mushcoords1);
 mushcoords2 mushcoords2_add(mushcoords2, mushcoords2);
