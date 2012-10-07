@@ -19,13 +19,29 @@ void tap_bool(bool, const char*, const char*);
 void tap_eqcs  (mushcell,   mushcell,   const char*, const char*);
 void tap_eqc93s(mushcell93, mushcell93, const char*, const char*);
 
+// TAP EQual Cell Vectors with custom message Strings
+void tap_eqcvs(const mushcell*, const mushcell*, uint8_t,
+               const char*, const char*);
+
+void tap_eqc93vs(const mushcell93*, const mushcell93*, uint8_t,
+                 const char*, const char*);
+
 #define tap_eqc93(a, b) tap_eqc93s((a), (b), #a " == " #b, #a " != " #b)
 
 #if MUSHSPACE_93
-#define tap_eqc tap_eqc93
-#define tap_eqcs tap_eqc93s
+   #define tap_eqc tap_eqc93
+   #define tap_eqcs tap_eqc93s
+
+   // TAP EQual COordinates with custom message Strings
+   #define tap_eqcos(a, b, so, sn) \
+      tap_eqc93vs((a).v, (b).v, MUSHSPACE_DIM, (so), (sn))
 #else
-#define tap_eqc(a, b) tap_eqcs((a), (b), #a " == " #b, #a " != " #b)
+   #define tap_eqc(a, b) tap_eqcs((a), (b), #a " == " #b, #a " != " #b)
+
+   #define tap_eqcos(a, b, so, sn) \
+      tap_eqcvs((a).v, (b).v, MUSHSPACE_DIM, (so), (sn))
 #endif
+
+#define tap_eqco(a, b) tap_eqcos(a, b, #a " == " #b, #a " != " #b)
 
 #endif
