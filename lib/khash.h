@@ -171,6 +171,7 @@ static const double __ac_HASH_UPPER = 0.77;
          memcpy(h->flags, o->flags, ((h->n_buckets>>4) + 1) * sizeof *h->flags); \
       }                                                                 \
       if (h->keys) {                                                    \
+         assert (h->n_buckets);                                         \
          h->keys = malloc(h->n_buckets * sizeof *h->keys);              \
          if (!h->keys) return false;                                    \
          memcpy(h->keys, o->keys, h->n_buckets * sizeof *h->keys);      \
