@@ -175,7 +175,7 @@ static size_t hash(mushcoords c) {
             k1 ^= (uint64_t)tail[ 1] <<  8;
             k1 ^= (uint64_t)tail[ 0] <<  0;
             k1 *= c1; k1 = k1 << 31 | k1 >> 33; k1 *= c2; h1 ^= k1;
-   case  0: break;
+   case  0: (void)tail; break;
    }
 
    h1 ^= sizeof c;
