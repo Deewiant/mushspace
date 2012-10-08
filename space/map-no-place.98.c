@@ -196,10 +196,7 @@ static bool mapex_in_box(
    void* caller_data,
    void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*))
 {
-   // Self-initialize: they're used uninitialized in Unefunge (and area in
-   // Befunge). This method appears to silence -Wuninitialized in both GCC and
-   // Clang.
-   size_t width = *&width, area = *&area, page_start = *&page_start;
+   size_t width, area, page_start;
 
    const mushaabb   *box    = cai.aabb;
    const mushbounds *bounds = bpos.bounds;
@@ -257,8 +254,13 @@ static bool mapex_in_box(
    hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
 #endif
 
+   // Depending on MUSHSPACE_DIM all of width, area, and page_start can be used
+   // uninitialized here, but that's fine.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
    f((musharr_mushcell){box->data, end_idx - beg_idx + 1},
      caller_data, width, area, line_start, page_start, &hit);
+#pragma GCC diagnostic pop
 
 #if MUSHSPACE_DIM >= 2
    if (hit == 0x01 && pos->y == prev_y) {
@@ -291,7 +293,7 @@ static bool mapex_in_static(
    void* caller_data,
    void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*))
 {
-   size_t width = *&width, area = *&area, page_start = *&page_start;
+   size_t width, area, page_start;
 
    const mushbounds *bounds = bpos.bounds;
    mushcoords        *pos    = bpos.pos;
@@ -335,8 +337,11 @@ static bool mapex_in_static(
    hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
    f((musharr_mushcell){space->static_box.array, end_idx - beg_idx + 1},
      caller_data, width, area, line_start, page_start, &hit);
+#pragma GCC diagnostic pop
 
 #if MUSHSPACE_DIM >= 2
    if (hit == 0x01 && pos->y == prev_y) {
