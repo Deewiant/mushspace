@@ -33,6 +33,7 @@ void mushaabb_finalize(mushaabb* aabb) {
 }
 
 bool mushaabb_alloc(mushaabb* aabb) {
+   assert (aabb->size);
    aabb->data = malloc(aabb->size);
    if (!aabb->data)
       return false;
