@@ -35,6 +35,7 @@ typedef struct mushspace {
    mushcoords last_beg, last_end;
 
    mushstats *stats;
+   bool private_stats;
 
    size_t box_count;
 

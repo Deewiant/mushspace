@@ -16,9 +16,15 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
    if (!space)
       return NULL;
 
-   if (!(space->stats = stats ? stats : malloc(sizeof *space->stats))) {
-      free(space);
-      return NULL;
+   if (stats) {
+      space->private_stats = false;
+      space->stats = stats;
+   } else {
+      space->private_stats = true;
+      if (!(space->stats = malloc(sizeof *space->stats))) {
+         free(space);
+         return NULL;
+      }
    }
 
    space->invalidatees = NULL;
@@ -47,6 +53,8 @@ void mushspace_free(mushspace* space) {
       free(space->invalidatees);
       free(space->invalidatees_data);
    }
+   if (space->private_stats)
+      free(space->stats);
 }
 
 mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
@@ -61,13 +69,19 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
       return NULL;
    }
 
-   copy->stats = stats ? stats : malloc(sizeof *copy->stats);
-   if (!copy->stats) {
-      free(copy);
-      return NULL;
-   }
-
    memcpy(copy, space, sizeof *copy);
+
+   if (stats) {
+      copy->private_stats = false;
+      copy->stats = stats;
+   } else {
+      copy->private_stats = true;
+      copy->stats = malloc(sizeof *copy->stats);
+      if (!copy->stats) {
+         free(copy);
+         return NULL;
+      }
+   }
 
    copy->boxen = malloc(copy->box_count * sizeof *copy->boxen);
    memcpy(copy->boxen, space->boxen, copy->box_count * sizeof *copy->boxen);
