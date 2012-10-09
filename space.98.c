@@ -25,7 +25,14 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
          free(space);
          return NULL;
       }
+
+// See http://lists.cs.uiuc.edu/pipermail/cfe-dev/2012-February/019920.html for
+// discussion on this. As of Clang 3.1, this is our only option apart from
+// spelling out an initializer for each field.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
       *space->stats = (mushstats){0};
+#pragma clang diagnostic pop
    }
 
    space->invalidatees = NULL;
@@ -82,7 +89,10 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
          free(copy);
          return NULL;
       }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
       *space->stats = (mushstats){0};
+#pragma clang diagnostic pop
    }
 
    copy->boxen = malloc(copy->box_count * sizeof *copy->boxen);
