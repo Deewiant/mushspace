@@ -227,15 +227,22 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
          consume_and_subsume(space, subsumees, consumee.idx, &consumer);
       free(subsumees.ptr);
 
-      if (!ok)
-         return NULL;
-
       // Try to reduce size of space->boxen if possible.
-      if (space->box_count+1 < max_needed_boxen) {
-         boxen = realloc(space->boxen, (space->box_count+1) * sizeof *boxen);
+      //
+      // In the ok case, consume_and_subsume may have reduced box_count, and in
+      // the non-ok case, we've extended the size of boxen by 1 uselessly,
+      // which we should try to undo.
+
+      const size_t reduce_to_size = space->box_count + (ok ? 1 : 0);
+
+      if (reduce_to_size < max_needed_boxen) {
+         boxen = realloc(space->boxen, reduce_to_size * sizeof *boxen);
          if (boxen)
             space->boxen = boxen;
       }
+
+      if (!ok)
+         return NULL;
 
       space->boxen[space->box_count++] = consumer;
    } else {
