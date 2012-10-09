@@ -9,17 +9,20 @@ CELL_H = $(ROOT)/pub/mush/cell.h
 
 ifeq (@(UNEFUNGE),y)
 : foreach *.all.c |> !cc1dpub |> %B.1d.o
+: foreach *.98.c  |> !cc1dpub |> %B.1d.o
 : foreach *.1d.c  |> !cc1dpub |> %B.1d.o
 98 = y
 endif
 ifeq (@(BEFUNGE),y)
 : foreach *.all.c |> !cc2dpub |> %B.2d.o
+: foreach *.98.c  |> !cc2dpub |> %B.2d.o
 : foreach *.1d.c  |> !cc2dpub |> %B.2d.o
 : foreach *.2d.c  |> !cc2dpub |> %B.2d.o
 98 = y
 endif
 ifeq (@(TREFUNGE),y)
 : foreach *.all.c |> !cc3dpub |> %B.3d.o
+: foreach *.98.c  |> !cc3dpub |> %B.3d.o
 : foreach *.1d.c  |> !cc3dpub |> %B.3d.o
 : foreach *.2d.c  |> !cc3dpub |> %B.3d.o
 : foreach *.3d.c  |> !cc3dpub |> %B.3d.o
@@ -29,8 +32,9 @@ ifeq ($(98),y)
 : foreach *.both.c |> !cc98pub |> %B.98.o
 endif
 ifeq (@(BEFUNGE_93),y)
-: foreach *.both.c |> !cc93pub |> %B.93.o
 : foreach *.all.c  |> !cc93pub |> %B.93.o
+: foreach *.both.c |> !cc93pub |> %B.93.o
+: foreach *.93.c   |> !cc93pub |> %B.93.o
 endif
 
 EXTRAOBJS = util/*.o $(ROOT)/libmushspace.so
