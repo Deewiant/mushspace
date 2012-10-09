@@ -34,7 +34,7 @@ void mushaabb_finalize(mushaabb* aabb) {
 
 bool mushaabb_alloc(mushaabb* aabb) {
    assert (aabb->size);
-   aabb->data = malloc(aabb->size);
+   aabb->data = malloc(aabb->size * sizeof *aabb->data);
    if (!aabb->data)
       return false;
    mushcell_space(aabb->data, aabb->size);
