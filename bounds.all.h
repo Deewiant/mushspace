@@ -59,9 +59,8 @@ void mushbounds_tessellate(mushbounds*, mushcoords, mushcarr_mushbounds);
 // Since the algorithm is (currently) just a fold over the boxes, this simpler
 // version exists to simplify usage in some cases.
 //
-// It requires that the given bounds overlap with the area to be avoided. This
-// is because there's no sense in avoiding part of an axis just because there's
-// a non-overlapping box there.
+// If the given bounds don't overlap with the area to be avoided, the bounds
+// are not modified.
 void mushbounds_tessellate1(mushbounds*, mushcoords, const mushbounds*);
 
 #endif
