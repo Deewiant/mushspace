@@ -48,8 +48,11 @@ uint32_t next_codepoint(codepoint_reader *reader) {
    // course we lose equidistribution like this.
    if (cp > 0x10ffff)
       cp &= 0x0fffff;
-   if (cp >= 0xd800 && cp <= 0xdfff)
+   if (cp >= 0xd800 && cp <= 0xdfff) {
       cp |= (cp & 0xf) << 16;
+      if (cp >= 0xd800 && cp <= 0xdfff)
+         cp >>= 1;
+   }
 
    assert (cp <= 0x10ffff);
    assert (!(cp >= 0xd800 && cp <= 0xdfff));
