@@ -206,40 +206,56 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
 
    free(candidates);
 
-   // Even though consume_and_subsume might reduce the box count and generally
-   // free some memory (by defragmentation if nothing else), that doesn't
-   // necessarily happen. (Due to other programs if nothing else.)
-   //
-   // So in the worst case, we do need one more AABB's worth of memory. And in
-   // that case, if we do the allocation after the consume_and_subsume and it
-   // fails, we're screwed: we've eaten the consumee but can't place the
-   // consumer. Thus we must preallocate here even if it ends up being
-   // unnecessary.
-   size_t max_needed_boxen = space->box_count + 1;
-   mushaabb *boxen = realloc(space->boxen, max_needed_boxen * sizeof *boxen);
-   if (!boxen)
-      return NULL;
-   space->boxen = boxen;
-
-   bool ok;
    if (subsumees.len) {
-      ok = consume_and_subsume(space, subsumees, consumee.idx, &consumer);
+      // Even though consume_and_subsume might reduce the box count and
+      // generally free some memory (by defragmentation if nothing else), that
+      // doesn't necessarily happen. (Due to other programs if nothing else.)
+      //
+      // So in the worst case, we do need one more AABB's worth of memory. And
+      // in that case, if we do the allocation after the consume_and_subsume
+      // and it fails, we're screwed: we've eaten the consumee but can't place
+      // the consumer. Thus we must preallocate here even if it ends up being
+      // unnecessary.
+      size_t max_needed_boxen = space->box_count + 1;
+      mushaabb *boxen =
+         realloc(space->boxen, max_needed_boxen * sizeof *boxen);
+      if (!boxen)
+         return NULL;
+      space->boxen = boxen;
+
+      const bool ok =
+         consume_and_subsume(space, subsumees, consumee.idx, &consumer);
       free(subsumees.ptr);
+
+      if (!ok)
+         return NULL;
+
+      // Try to reduce size of space->boxen if possible.
+      if (space->box_count+1 < max_needed_boxen) {
+         boxen = realloc(space->boxen, (space->box_count+1) * sizeof *boxen);
+         if (boxen)
+            space->boxen = boxen;
+      }
+
+      space->boxen[space->box_count++] = consumer;
    } else {
+      // When we have nothing to consume, things are simpler: just allocate the
+      // given AABB, make room for it, and add it.
+
       free(subsumees.ptr);
-      ok = mushaabb_alloc(&consumer);
-   }
-   if (!ok)
-      return NULL;
 
-   // Try to reduce size of space->boxen if possible.
-   if (space->box_count+1 < max_needed_boxen) {
-      boxen = realloc(space->boxen, (space->box_count+1) * sizeof *boxen);
-      if (boxen)
-         space->boxen = boxen;
-   }
+      if (!mushaabb_alloc(aabb))
+         return NULL;
 
-   space->boxen[space->box_count++] = consumer;
+      mushaabb *boxen =
+         realloc(space->boxen, (space->box_count+1) * sizeof *boxen);
+      if (!boxen) {
+         free(aabb->data);
+         return NULL;
+      }
+
+      (space->boxen = boxen)[space->box_count++] = *aabb;
+   }
 
    mushstats_add    (space->stats, MushStat_boxes_placed, 1);
    mushstats_new_max(space->stats, MushStat_max_boxes_live,
