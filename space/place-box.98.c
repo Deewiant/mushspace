@@ -147,8 +147,7 @@ incorporated:
 
 // Returns the placed box, which may be bigger than the given box. Returns NULL
 // if memory allocation failed.
-static mushaabb* really_place_box(mushspace* space, mushaabb* aabb)
-{
+static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
    for (size_t i = 0; i < space->box_count; ++i)
       assert (!mushbounds_contains_bounds(
          &space->boxen[i].bounds, &aabb->bounds));
