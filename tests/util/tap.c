@@ -2,12 +2,18 @@
 
 #include "tap.h"
 
-static int tap_cur = 0;
+static int tap_cur = 0, tap_max;
 
-void tap_n(int n) { printf("1..%d\n", n); }
+void tap_n(int n) { printf("1..%d\n", tap_max = n); }
 
 void tap_ok    (const char* s) { printf(    "ok %d - %s\n", ++tap_cur, s); }
 void tap_not_ok(const char* s) { printf("not ok %d - %s\n", ++tap_cur, s); }
+void tap_skip  (const char* s) { printf(  "skip %d - %s\n", ++tap_cur, s); }
+
+void tap_skip_remaining(const char* s) {
+   while (tap_cur < tap_max)
+      tap_skip(s);
+}
 
 void tap_bool(bool b, const char* so, const char* sn) {
    if (b)

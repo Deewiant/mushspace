@@ -12,6 +12,9 @@ void tap_n(int);
 
 void tap_ok    (const char*);
 void tap_not_ok(const char*);
+void tap_skip  (const char*);
+
+void tap_skip_remaining(const char*);
 
 void tap_bool(bool, const char*, const char*);
 
