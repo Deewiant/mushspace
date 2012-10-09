@@ -25,6 +25,7 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
          free(space);
          return NULL;
       }
+      *space->stats = (mushstats){0};
    }
 
    space->invalidatees = NULL;
@@ -81,6 +82,7 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
          free(copy);
          return NULL;
       }
+      *space->stats = (mushstats){0};
    }
 
    copy->boxen = malloc(copy->box_count * sizeof *copy->boxen);
