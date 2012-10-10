@@ -69,12 +69,12 @@ int mushcursor_init(void**, mushspace*, mushcoords
                    , mushcoords
 #endif
                    );
-int mushcursor_free(mushcursor*);
 int mushcursor_copy(void**, const mushcursor*, mushspace*
 #if !MUSHSPACE_93
                    , const mushcoords*
 #endif
                    );
+void mushcursor_free(mushcursor*);
 
 mushcoords mushcursor_get_pos(const mushcursor*);
 void       mushcursor_set_pos(      mushcursor*, mushcoords);

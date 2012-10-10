@@ -255,34 +255,34 @@ bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
    id[n-1] = d;
    return true;
 }
-bool mushspace_del_invalidatee(mushspace* space, void* d) {
+void mushspace_del_invalidatee(mushspace* spac, void* d) {
    size_t i = 0;
-   void  **id         = space->invalidatees_data;
-   void (**is)(void*) = space->invalidatees;
+   void  **id         = spac->invalidatees_data;
+   void (**is)(void*) = spac->invalidatees;
 
-   while (id[i] != d) {
+   for (; id[i] != d; ++i)
       assert (is[i]);
-      ++i;
-   }
 
    if (is[i+1]) {
       size_t rest_len = i+1;
       while (is[rest_len])
          ++rest_len;
 
-      memmove(id + i, id + i + 1, rest_len * sizeof *id);
-      memmove(is + i, is + i + 1, rest_len * sizeof *is);
+      memmove(id + i, id + i + 1,  rest_len      * sizeof *id);
+      memmove(is + i, is + i + 1, (rest_len + 1) * sizeof *is);
+   } else
+      is[i] = NULL;
+
+   if (i) {
+      // Potential realloc failures don't matter; we'll just be using some
+      // extra memory. The element has already been deleted (and the list
+      // properly null-terminated) above.
+
+      if ((id = realloc(id,  i    * sizeof *id))) spac->invalidatees_data = id;
+      if ((is = realloc(is, (i+1) * sizeof *is))) spac->invalidatees      = is;
+   } else {
+      free(id);
+      free(is);
+      spac->invalidatees = NULL;
    }
-
-   id = realloc(id, i * sizeof *id);
-   if (i && !id)
-      return false;
-
-   is = realloc(is, i * sizeof *is);
-   if (i && !is)
-      return false;
-
-   space->invalidatees      = is;
-   space->invalidatees_data = id;
-   return true;
 }

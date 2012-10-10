@@ -54,13 +54,11 @@ int mushcursor_init(
 #endif
 }
 
-int mushcursor_free(mushcursor* cursor) {
+void mushcursor_free(mushcursor* cursor) {
 #if MUSHSPACE_93
    (void)cursor;
-   return MUSHERR_NONE;
 #else
-   return mushspace_del_invalidatee(cursor->space, cursor) ? MUSHERR_NONE
-                                                           : MUSHERR_OOM;
+   mushspace_del_invalidatee(cursor->space, cursor);
 #endif
 }
 

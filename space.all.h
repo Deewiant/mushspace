@@ -107,7 +107,7 @@ int mushspace_map(mushspace*, mushbounds,
                   void(*)(musharr_mushcell, void*), void*);
 
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
-bool mushspace_del_invalidatee(mushspace*, void*);
+void mushspace_del_invalidatee(mushspace*, void*);
 void mushspace_invalidate_all (mushspace*);
 
 mushaabb* mushspace_find_box        (const mushspace*, mushcoords);
