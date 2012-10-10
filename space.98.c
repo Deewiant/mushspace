@@ -225,25 +225,34 @@ void mushspace_remove_boxes(mushspace* space, size_t i, size_t j) {
 bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
    size_t n = 0;
    void (**is)(void*) = space->invalidatees;
-   if (is)
+   if (is) {
       while (*is++)
          ++n;
+   } else
+      n = 1;
 
-   is = realloc(is, n * sizeof *is);
+   is = realloc(is, (n+1) * sizeof *is);
    if (!is)
       return false;
 
-   void **id = realloc(space->invalidatees_data, n * sizeof *id);
-   if (!id) {
-      free(is);
-      return false;
-   }
+   // The realloc succeeded, so space->invalidatees is invalid, so we have to
+   // overwrite it immediately. If the realloc below fails, this is still fine;
+   // we're just using one function pointer's worth of memory for nothing.
+   space->invalidatees = is;
 
-   space->invalidatees      = is;
+   // We need to place the terminator immediately, though, since if this was
+   // the first invalidatee and the realloc below fails, we'd leave
+   // invalidatees as a nonnull but unterminated array.
+   is[n] = NULL;
+
+   void **id = realloc(space->invalidatees_data, n * sizeof *id);
+   if (!id)
+      return false;
+
    space->invalidatees_data = id;
 
-   is[n] = i;
-   id[n] = d;
+   is[n-1] = i;
+   id[n-1] = d;
    return true;
 }
 bool mushspace_del_invalidatee(mushspace* space, void* d) {
