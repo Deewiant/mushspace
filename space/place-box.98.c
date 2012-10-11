@@ -219,8 +219,10 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
       size_t max_needed_boxen = space->box_count + 1;
       mushaabb *boxen =
          realloc(space->boxen, max_needed_boxen * sizeof *boxen);
-      if (!boxen)
+      if (!boxen) {
+         free(subsumees.ptr);
          return NULL;
+      }
       space->boxen = boxen;
 
       const bool ok =
