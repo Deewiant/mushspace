@@ -23,7 +23,7 @@ SHAREDLIBFLAGS = -shared
 # Alternatively, it could enable whatever compiler-supported extensions to C99
 # (or even C89/C90) make mushspace compile. (For example, -std=gnu99 on older
 # GCC versions.)
-SRCFLAGS     = -Wall -Wextra -pedantic
+SRCFLAGS     = -Wall -Wextra -Wno-unknown-pragmas -pedantic
 MUSHSRCFLAGS = -std=c11
 LIBSRCFLAGS  =
 
