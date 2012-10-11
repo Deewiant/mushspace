@@ -1,0 +1,37 @@
+# File created: 2012-10-11 09:24:22
+
+# See gcc.tup for explanation of each setting!
+
+# Note that when using this compiler, you need to run "tup upd" with the
+# "scan-build" command, i.e. "scan-build tup upd".
+
+export CCC_ANALYZER_ANALYSIS
+export CCC_ANALYZER_STORE_MODEL
+export CCC_ANALYZER_CONSTRAINTS_MODEL
+export CCC_ANALYZER_OUTPUT_FORMAT
+export CCC_ANALYZER_VERBOSE
+export CCC_ANALYZER_LOG
+export CCC_ANALYZER_HTML
+export CCC_CC
+export CCC_REPORT_FAILURES
+export CLANG
+
+# Hard-coded the path since we can't add a $-variable from a run script, nor
+# access environment variables directly in tup.
+CC = /usr/lib/clang-analyzer/scan-build/ccc-analyzer -fPIC
+
+AR = ar rcs
+
+SHAREDLIBFLAGS = -shared
+
+SRCFLAGS     = -Wall -Wextra -pedantic
+MUSHSRCFLAGS = -std=c11
+LIBSRCFLAGS  =
+
+DEFDIM  = -DMUSHSPACE_DIM=
+DEF93   = -DMUSHSPACE_93=
+INCLUDE = -I
+
+NATIVEFLAGS = -march=native
+OPTFLAGS    = -O4
+DEBFLAGS    = -g
