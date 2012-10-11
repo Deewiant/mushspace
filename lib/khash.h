@@ -259,9 +259,17 @@ static const double __ac_HASH_UPPER = 0.77;
             }                                                           \
          }                                                              \
          if (h->n_buckets > new_n_buckets) {                            \
-            h->keys = (khkey_t*)realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
-            if (kh_is_map)                                              \
-               h->vals = (khval_t*)realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
+            if (new_n_buckets) {                                        \
+               h->keys = (khkey_t*)realloc(h->keys, new_n_buckets * sizeof(khkey_t)); \
+               if (kh_is_map)                                           \
+                  h->vals = (khval_t*)realloc(h->vals, new_n_buckets * sizeof(khval_t)); \
+            } else {                                                    \
+               free(h->keys);                                           \
+               if (kh_is_map)                                           \
+                  free(h->vals);                                        \
+               h->keys = NULL;                                          \
+               h->vals = NULL;                                          \
+            }                                                           \
          }                                                              \
          free(h->flags);                                                \
          h->flags = new_flags;                                          \
