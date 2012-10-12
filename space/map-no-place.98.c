@@ -114,7 +114,9 @@ static bool map_in_box(
 
    assert (beg_idx <= end_idx);
 
-   f((musharr_mushcell){box->data, end_idx - beg_idx + 1}, caller_data);
+   const size_t length = end_idx - beg_idx + 1;
+
+   f((musharr_mushcell){box->data + beg_idx, length}, caller_data);
    return hit_end;
 }
 
@@ -131,7 +133,9 @@ static bool map_in_static(
 
    assert (beg_idx <= end_idx);
 
-   f((musharr_mushcell){space->static_box.array, end_idx - beg_idx + 1},
+   const size_t length = end_idx - beg_idx + 1;
+
+   f((musharr_mushcell){space->static_box.array + beg_idx, length},
      caller_data);
    return hit_end;
 }
@@ -254,11 +258,13 @@ static bool mapex_in_box(
    hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
 #endif
 
+   const size_t length = end_idx - beg_idx + 1;
+
    // Depending on MUSHSPACE_DIM all of width, area, and page_start can be used
    // uninitialized here, but that's fine.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
-   f((musharr_mushcell){box->data, end_idx - beg_idx + 1},
+   f((musharr_mushcell){box->data + beg_idx, length},
      caller_data, width, area, line_start, page_start, &hit);
 #pragma GCC diagnostic pop
 
@@ -337,9 +343,11 @@ static bool mapex_in_static(
    hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
 #endif
 
+   const size_t length = end_idx - beg_idx + 1;
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
-   f((musharr_mushcell){space->static_box.array, end_idx - beg_idx + 1},
+   f((musharr_mushcell){space->static_box.array + beg_idx, length},
      caller_data, width, area, line_start, page_start, &hit);
 #pragma GCC diagnostic pop
 
