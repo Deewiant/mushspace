@@ -67,9 +67,9 @@ typedef struct mushstaticaabb {
 
       mushcell array[
            MUSHSTATICAABB_SIZE_X
-#if MUSHSPACE_DIM == 2
+#if MUSHSPACE_DIM >= 2
          * MUSHSTATICAABB_SIZE_Y
-#if MUSHSPACE_DIM == 3
+#if MUSHSPACE_DIM >= 3
          * MUSHSTATICAABB_SIZE_Z
 #endif
 #endif
