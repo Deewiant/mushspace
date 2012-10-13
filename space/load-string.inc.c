@@ -286,43 +286,56 @@ static bool newline(
 static size_t get_aabbs_binary(
    const C* str, const C* str_end, mushcoords target, mushbounds* bounds)
 {
-   size_t a = 0;
-   mushcoords beg = target, end = target;
+   mushcoords beg = target;
 
-   const size_t len = str_end - str;
-
-   size_t leading_spaces = 0;
-
-   for (; str < str_end && ASCII_READ(str) == ' '; (void)ASCII_NEXT(str))
-      ++leading_spaces;
-
-   if (str == str_end) {
-      // All spaces: nothing to load.
-      return 0;
+   const C* str_trimmed_beg = str;
+   for (;;) {
+      if (str_trimmed_beg == str_end) {
+         // All spaces: nothing to load.
+         return 0;
+      }
+      if (ASCII_READ(str_trimmed_beg) != ' ')
+         break;
+      (void)ASCII_NEXT(str_trimmed_beg);
    }
+
+   const size_t leading_spaces = str_trimmed_beg - str;
 
    beg.x += leading_spaces;
 
    // No need to check bounds here since we've already established that it's
    // not all spaces.
-   str = str_end;
-   while (ASCII_PREV(str) == ' ');
+   const C* str_trimmed_end = str_end;
+   while (ASCII_PREV(str_trimmed_end) == ' ');
+   (void)ASCII_NEXT(str_trimmed_end);
 
-   const size_t trailing_spaces = str_end - str,
-                loadee_len      = len - (leading_spaces + trailing_spaces),
-                loadee_end      = leading_spaces + loadee_len;
+   const size_t trailing_spaces = str_end - str_trimmed_end;
 
-   if (loadee_len > (size_t)MUSHCELL_MAX) {
+   // A good compiler should be able to optimize the loop away for non-UTF.
+   size_t codepoints = 0;
+   for (const C* p = str; p < str_trimmed_end; ++codepoints) {
+      mushcell c;
+      NEXT(p, str_trimmed_end, c);
+      (void)c;
+   }
+
+   const size_t loadee_len         = codepoints - trailing_spaces,
+                loadee_trimmed_len = loadee_len - leading_spaces;
+
+   if (loadee_trimmed_len > (size_t)MUSHCELL_MAX) {
       // Oops, that's not going to fit! Bail.
       return SIZE_MAX;
    }
 
-   if (end.x > MUSHCELL_MAX - (mushcell)loadee_end) {
+   mushcoords end = target;
+   size_t a = 0;
+
+   if (target.x > MUSHCELL_MAX - (mushcell)loadee_len) {
       end.x = MUSHCELL_MAX;
       bounds[a++] = (mushbounds){beg, end};
-      beg.x = MUSHCELL_MIN;
+      beg.x = end.x = MUSHCELL_MIN;
    }
-   end.x += loadee_end;
+   end.x += loadee_len - 1;
 
    bounds[a++] = (mushbounds){beg, end};
    return a;
