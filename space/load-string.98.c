@@ -13,13 +13,11 @@ MUSH_DECL_DYN_ARRAY(mushaabb)
 MUSH_DECL_DYN_ARRAY(mushbounds)
 
 typedef struct {
-   const void *str;
-   size_t len;
+   const void *str, *end;
 } binary_load_arr_auxdata;
 
 typedef struct {
-   const void *str;
-   size_t len;
+   const void *str, *end;
 
    #if MUSHSPACE_DIM >= 2
       mushcell x, target_x, aabb_beg_x;
@@ -30,9 +28,10 @@ typedef struct {
 } load_arr_auxdata;
 
 static int load_string_generic(
-   mushspace* space, const void** str, size_t len,
+   mushspace* space, const void** str, const void* str_end,
    mushcoords* end, mushcoords target, bool binary,
-   void (*get_aabbs)(const void*, size_t, mushcoords, bool, musharr_mushaabb*),
+   void (*get_aabbs)(const void*, const void*, mushcoords, bool,
+                     musharr_mushaabb*),
    void (*load_arr)         (musharr_mushcell, void*,
                              size_t, size_t, size_t, size_t, uint8_t*),
    void (*load_blank)       (size_t, void*),
@@ -40,7 +39,7 @@ static int load_string_generic(
    void (*binary_load_blank)(size_t, void*))
 {
    musharr_mushaabb aabbs;
-   get_aabbs(*str, len, target, binary, &aabbs);
+   get_aabbs(*str, str_end, target, binary, &aabbs);
 
    if (!aabbs.ptr) {
       // The error code was placed in aabbs.len.
@@ -131,13 +130,13 @@ static int load_string_generic(
    }
 
    if (binary) {
-      binary_load_arr_auxdata aux = {*str, len};
+      binary_load_arr_auxdata aux = {*str, str_end};
       mushspace_map_no_place(space, &aabb, &aux,
                              binary_load_arr, binary_load_blank);
       *str = aux.str;
    } else {
       load_arr_auxdata aux =
-         { *str, len
+         { *str, str_end
       #if MUSHSPACE_DIM >= 2
          , target.x, target.x, aabb.bounds.beg.x
       #if MUSHSPACE_DIM >= 3

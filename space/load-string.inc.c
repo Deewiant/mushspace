@@ -21,7 +21,7 @@
 #endif
 
 static void get_aabbs(
-   const void*, size_t, mushcoords target, bool binary, musharr_mushaabb*);
+   const void*, const void*, mushcoords tgt, bool binary, musharr_mushaabb*);
 
 #if MUSHSPACE_DIM >= 2
 static bool newline(
@@ -29,8 +29,7 @@ static bool newline(
    mushcoords, size_t*, uint8_t*);
 #endif
 
-static size_t get_aabbs_binary(
-   const C*, size_t len, mushcoords target, mushbounds*);
+static size_t get_aabbs_binary(const C*, const C*, mushcoords, mushbounds*);
 
 static void binary_load_arr(musharr_mushcell, void*);
 static void binary_load_blank(size_t, void*);
@@ -46,7 +45,7 @@ int MUSHSPACE_CAT(mushspace_load_string,UTF)(
 
    const void *p = str;
    int ret = load_string_generic(
-      space, &p, len, end, target, binary,
+      space, &p, str_end, end, target, binary,
       get_aabbs, load_arr, load_blank, binary_load_arr, binary_load_blank);
 
    if (ret == MUSHERR_NONE) {
@@ -68,18 +67,18 @@ int MUSHSPACE_CAT(mushspace_load_string,UTF)(
 // If nothing would be loaded, aabbs_out->ptr is set to NULL and an error code
 // (an int) is written into aabbs_out->len.
 static void get_aabbs(
-   const void* vstr, size_t len, mushcoords target, bool binary,
+   const void* vstr, const void* vend, mushcoords target, bool binary,
    musharr_mushaabb* aabbs_out)
 {
    static mushaabb aabbs[1 << MUSHSPACE_DIM];
 
    mushbounds *bounds = (mushbounds*)aabbs;
-   const C *str = vstr;
+   const C *str = vstr, *str_end = vend;
 
    aabbs_out->ptr = aabbs;
 
    if (binary) {
-      size_t n = get_aabbs_binary(str, len, target, bounds);
+      size_t n = get_aabbs_binary(str, str_end, target, bounds);
       if (n == SIZE_MAX) {
          *aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM};
          return;
@@ -144,7 +143,7 @@ static void get_aabbs(
    #endif
 
    mushcell c;
-   for (const C *str_end = str + len; str < str_end;) {
+   while (str < str_end) {
       NEXT(str, str_end, c);
       switch (c) {
       default:
@@ -285,12 +284,12 @@ static bool newline(
 #endif
 
 static size_t get_aabbs_binary(
-   const C* str, size_t len, mushcoords target, mushbounds* bounds)
+   const C* str, const C* str_end, mushcoords target, mushbounds* bounds)
 {
    size_t a = 0;
    mushcoords beg = target, end = target;
 
-   const C *str_end = str + len;
+   const size_t len = str_end - str;
 
    size_t leading_spaces = 0;
 
@@ -331,8 +330,9 @@ static size_t get_aabbs_binary(
 
 static void binary_load_arr(musharr_mushcell arr, void* p) {
    binary_load_arr_auxdata *aux = p;
-   const C *str = aux->str, *str_end = str + aux->len;
+   const C *str = aux->str, *str_end = aux->end;
    for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
+      assert (str < str_end);
       mushcell c;
       NEXT(str, str_end, c);
       if (c != ' ')
@@ -343,8 +343,10 @@ static void binary_load_arr(musharr_mushcell arr, void* p) {
 
 static void binary_load_blank(size_t blanks, void* p) {
    binary_load_arr_auxdata *aux = p;
-   const C *str = aux->str;
+   const C *str = aux->str, *str_end = aux->end;
+   (void)str_end;
    while (blanks) {
+      assert (str < str_end);
       if (ASCII_READ(str) != ' ')
          break;
       --blanks;
@@ -365,7 +367,7 @@ static void load_arr(
    #endif
 
    load_arr_auxdata *aux = p;
-   const C *str = aux->str, *str_end = str + aux->len;
+   const C *str = aux->str, *str_end = aux->end;
 
    // x and y are used only for skipping leading spaces/newlines and thus
    // aren't really representative of the cursor position at any point.
@@ -531,8 +533,10 @@ end:
 
 static void load_blank(size_t blanks, void* p) {
    load_arr_auxdata *aux = p;
-   const C *str = aux->str;
+   const C *str = aux->str, *str_end = aux->end;
+   (void)str_end;
    while (blanks) {
+      assert (str < str_end);
       C c = ASCII_READ(str);
       if (!(c == ' ' || c == '\r' || c == '\n' || c == '\f'))
          break;
