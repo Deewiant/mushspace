@@ -543,6 +543,9 @@ static bool consume_and_subsume(
       return false;
    }
 
+   // So that remove_boxes doesn't try to free it: it's already been realloced.
+   space->boxen[consumee].data = NULL;
+
    // NOTE: strictly speaking we should sort subsumees and go from
    // subsumees.len down to 0, since we don't want below-boxes to overwrite
    // top-boxes' data. However, irrelevize_subsumption_order copies the data so
