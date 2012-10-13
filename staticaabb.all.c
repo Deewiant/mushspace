@@ -52,7 +52,7 @@ size_t mushstaticaabb_get_idx_no_offset(mushcoords c) {
 #if MUSHSPACE_DIM >= 2
    i += MUSHSTATICAABB_SIZE.x * c.y;
 #if MUSHSPACE_DIM >= 3
-   i += MUSHSTATICAABB_SIZE.y * c.z;
+   i += (MUSHSTATICAABB_SIZE.x * MUSHSTATICAABB_SIZE.y) * c.z;
 #endif
 #endif
    return i;
