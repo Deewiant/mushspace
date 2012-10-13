@@ -65,10 +65,10 @@ int main(void) {
    mushspace_get_loose_bounds(space, &bounds); \
    \
    tap_leqcos(bounds.beg, expected_loose.beg, \
-              "get_loose_bounds reports correct beg", \
+              "get_loose_bounds reports appropriate beg", \
               "get_loose_bounds reports too large beg"); \
    tap_geqcos(bounds.end, expected_loose.end, \
-              "get_loose_bounds reports correct end", \
+              "get_loose_bounds reports appropriate end", \
               "get_loose_bounds reports too small end"); \
    \
    ok = mushspace_get_tight_bounds(space, &bounds); \
