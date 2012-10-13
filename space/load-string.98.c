@@ -50,6 +50,12 @@ static int load_string_generic(
    if (end)
       *end = target;
 
+   if (!aabbs.len) {
+      if (end)
+         end->x = mushcell_dec(end->x);
+      return MUSHERR_NONE;
+   }
+
    for (size_t i = 0; i < aabbs.len; ++i) {
       if (end)
          mushcoords_max_into(end, aabbs.ptr[i].bounds.end);
