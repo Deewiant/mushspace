@@ -369,7 +369,10 @@ static void load_arr(
          // Ignore leading spaces (west of aabb.beg.x)
          bool leading_space = i == line_start;
          #if MUSHSPACE_DIM >= 2
-            leading_space &= (x = mushcell_inc(x)) < aabb_beg_x;
+            if (leading_space) {
+               leading_space = x < aabb_beg_x;
+               x = mushcell_inc(x);
+            }
          #endif
          if (!leading_space)
             ++i;
@@ -391,7 +394,10 @@ static void load_arr(
          // Ignore leading newlines (north of aabb.beg.y)
          bool leading_newline = i == page_start;
          #if MUSHSPACE_DIM >= 3
-            leading_newline &= (y = mushcell_inc(y)) < aabb_beg_y;
+            if (leading_newline) {
+               leading_newline = y < aabb_beg_y;
+               y = mushcell_inc(y);
+            }
          #endif
          if (!leading_newline) {
             i = line_start += width;
