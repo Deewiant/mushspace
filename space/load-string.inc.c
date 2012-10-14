@@ -158,11 +158,11 @@ static void get_aabbs(
             found_nonspace_for = found_nonspace_for_anyone = a;
             last_nonspace = pos;
 
-            if (get_beg) for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-               if (get_beg & 1 << i) {
-                  mushcell_min_into(&bounds[a].beg.v[i], pos.v[i]);
-                  get_beg &= ~(1 << i);
-               }
+            if (get_beg) {
+               for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+                  if (get_beg & 1 << i)
+                     mushcell_min_into(&bounds[a].beg.v[i], pos.v[i]);
+               get_beg = 0;
             }
          }
          if ((pos.x = mushcell_inc(pos.x)) == MUSHCELL_MIN) {
