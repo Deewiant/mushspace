@@ -66,6 +66,7 @@ static void get_aabbs(
    static mushaabb aabbs[1 << MUSHSPACE_DIM];
 
    mushbounds *bounds = (mushbounds*)aabbs;
+
    const C *str = vstr, *str_end = vend;
 
    aabbs_out->ptr = aabbs;
@@ -78,6 +79,10 @@ static void get_aabbs(
       }
       assert (n <= 2);
       aabbs_out->len = n;
+
+      // aabbs overlaps bounds so we don't need to copy the first one.
+      for (size_t i = 1; i < n; ++i)
+         aabbs[i].bounds = bounds[i];
       return;
    }
 
@@ -226,8 +231,8 @@ static void get_aabbs(
 
    // Since a is a bitmask, the AABBs that we used aren't necessarily in order.
    // Fix that.
-   size_t n = 0;
-   for (size_t i = 0; i <= max_a; ++i) {
+   size_t n = 1;
+   for (size_t i = 1; i <= max_a; ++i) {
       const mushbounds *box = &bounds[i];
 
       if (!(box->beg.x == MUSHCELL_MAX && box->end.x == MUSHCELL_MIN)) {
@@ -237,9 +242,7 @@ static void get_aabbs(
          for (mushdim j = 0; j < MUSHSPACE_DIM; ++j)
             assert (box->beg.v[j] <= box->end.v[j]);
 
-         if (i != n)
-            bounds[n] = bounds[i];
-         ++n;
+         aabbs[n++].bounds = bounds[i];
       }
    }
    aabbs_out->len = n;
