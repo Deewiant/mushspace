@@ -358,9 +358,7 @@ static void load_arr(
    #endif
    #endif
 
-   for (size_t i = 0; i < arr.len;) {
-      assert (str < str_end);
-
+   for (size_t i = 0; i < arr.len && str < str_end;) {
       mushcell c;
       NEXT(str, str_end, c);
       switch (c) {
