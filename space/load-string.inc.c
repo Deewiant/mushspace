@@ -181,6 +181,8 @@ static void get_aabbs(
 
       case '\r':
          #if MUSHSPACE_DIM >= 2
+            if (got_cr)
+               hit_newline;
             got_cr = true;
          #endif
          break;
