@@ -11,7 +11,7 @@
 #define mushspace_load_string_cell  MUSHSPACE_CAT(mushspace,_load_string_cell)
 
 int mushspace_load_string
-   ( mushspace*, const char*, size_t len
+   ( mushspace*, const unsigned char*, size_t len
 #ifndef MUSHSPACE_93
    , mushcoords* end, mushcoords target, bool binary
 #endif

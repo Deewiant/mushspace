@@ -41,12 +41,12 @@ mushspace93 *mushspace93_copy(void*, const mushspace93*);
 //                  gigabytes of non-space data into a 32-bit space would
 //                  cause this error.
 int mushspace1_load_string
-   (mushspace1*, const char*, size_t, mushcoords1*, mushcoords1, bool);
+   (mushspace1*, const unsigned char*, size_t, mushcoords1*, mushcoords1,bool);
 int mushspace2_load_string
-   (mushspace2*, const char*, size_t, mushcoords2*, mushcoords2, bool);
+   (mushspace2*, const unsigned char*, size_t, mushcoords2*, mushcoords2,bool);
 int mushspace3_load_string
-   (mushspace3*, const char*, size_t, mushcoords3*, mushcoords3, bool);
-int mushspace93_load_string(mushspace93*, const char*, size_t);
+   (mushspace3*, const unsigned char*, size_t, mushcoords3*, mushcoords3,bool);
+int mushspace93_load_string(mushspace93*, const unsigned char*, size_t);
 
 int mushspace1_load_string_utf8
    (mushspace1*, const uint8_t*, size_t, mushcoords1*, mushcoords1, bool);

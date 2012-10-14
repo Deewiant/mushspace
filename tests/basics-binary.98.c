@@ -195,7 +195,7 @@ int main(void) {
    for (mushcell cp##s; (cp##s = next_codepoint(&cp_reader)) != UINT32_MAX; \
         ++ii##s)
 
-   LOAD_STRING(,       char,     dummy, 0,        DIRECT_FOREACH_CP);
+   LOAD_STRING(, unsigned char,  dummy, 0,        DIRECT_FOREACH_CP);
    LOAD_STRING(_cell,  mushcell, dummy, 0,        DIRECT_FOREACH_CP);
    LOAD_STRING(_utf8,  uint8_t,  encode_utf8,  4, READER_FOREACH_CP);
    LOAD_STRING(_utf16, uint16_t, encode_utf16, 2, READER_FOREACH_CP);
