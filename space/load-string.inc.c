@@ -414,9 +414,9 @@ static void load_arr(
 
    #if MUSHSPACE_DIM < 2
       case '\r': case '\n':
+   #endif
    #if MUSHSPACE_DIM < 3
       case '\f':
-   #endif
    #endif
          break;
       }
