@@ -3,7 +3,6 @@
 // Not built by itself, only #included into load-string.98.c.
 
 #define get_aabbs         MUSHSPACE_CAT(get_aabbs,UTF)
-#define newline           MUSHSPACE_CAT(newline,UTF)
 #define get_aabbs_binary  MUSHSPACE_CAT(get_aabbs_binary,UTF)
 #define binary_load_arr   MUSHSPACE_CAT(binary_load_arr,UTF)
 #define binary_load_blank MUSHSPACE_CAT(binary_load_blank,UTF)
@@ -22,12 +21,6 @@
 
 static void get_aabbs(
    const void*, const void*, mushcoords tgt, bool binary, musharr_mushaabb*);
-
-#if MUSHSPACE_DIM >= 2
-static bool newline(
-   bool*, mushcoords*, mushcoords, musharr_mushbounds, size_t*, size_t*,
-   mushcoords, size_t*, uint8_t*);
-#endif
 
 static size_t get_aabbs_binary(const C*, const C*, mushcoords, mushbounds*);
 
@@ -128,30 +121,39 @@ static void get_aabbs(
 
    #if MUSHSPACE_DIM >= 2
       bool got_cr = false;
-
-      const musharr_mushbounds bounds_arr = {bounds, MUSH_ARRAY_LEN(aabbs)};
-
-      #define hit_newline do { \
-         if (!newline(&got_cr, &pos, target, \
-                      bounds_arr, &a, &max_a, \
-                      last_nonspace, &found_nonspace_for, &get_beg))\
-         { \
-            *aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM}; \
-            return; \
-         } \
-      } while (0)
    #endif
 
    mushcell c;
    while (str < str_end) {
       NEXT(str, str_end, c);
+
+      #if MUSHSPACE_DIM >= 2
+         if (got_cr || c == '\n') {
+            got_cr = false;
+
+            mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
+
+            pos.x = target.x;
+
+            if ((pos.y = mushcell_inc(pos.y)) == MUSHCELL_MIN) {
+               if (found_nonspace_for == a)
+                  mushcoords_max_into(&bounds[a].end, last_nonspace);
+
+               found_nonspace_for = MUSH_ARRAY_LEN(aabbs);
+
+               max_a = mush_size_t_max(max_a, a |= 0x02);
+
+            } else if (pos.y == target.y) {
+               *aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM};
+               return;
+            }
+            a &= ~0x01;
+            get_beg = found_nonspace_for == a ? 0x01 : 0x03;
+         }
+      #endif
+
       switch (c) {
       default:
-         #if MUSHSPACE_DIM >= 2
-            if (got_cr)
-               hit_newline;
-         #endif
-
          if (c != ' ') {
             found_nonspace_for = found_nonspace_for_anyone = a;
             last_nonspace = pos;
@@ -181,23 +183,12 @@ static void get_aabbs(
 
       case '\r':
          #if MUSHSPACE_DIM >= 2
-            if (got_cr)
-               hit_newline;
             got_cr = true;
          #endif
-         break;
-
       case '\n':
-         #if MUSHSPACE_DIM >= 2
-            hit_newline;
-         #endif
          break;
 
       case '\f':
-         #if MUSHSPACE_DIM >= 2
-            if (got_cr)
-               hit_newline;
-         #endif
          #if MUSHSPACE_DIM >= 3
             mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
             mushcell_max_into(&bounds[a].end.y, last_nonspace.y);
@@ -223,9 +214,6 @@ static void get_aabbs(
          break;
       }
    }
-   #if MUSHSPACE_DIM >= 2
-   #undef hit_newline
-   #endif
 
    if (found_nonspace_for_anyone == MUSH_ARRAY_LEN(aabbs)) {
       // Nothing to load. Not an error, but don't need to do anything so bail.
@@ -256,34 +244,6 @@ static void get_aabbs(
    }
    aabbs_out->len = n;
 }
-
-#if MUSHSPACE_DIM >= 2
-static bool newline(
-   bool* got_cr, mushcoords* pos, mushcoords target,
-   musharr_mushbounds bounds, size_t* a, size_t* max_a,
-   mushcoords last_nonspace, size_t* found_nonspace_for, uint8_t* get_beg)
-{
-   *got_cr = false;
-
-   mushcell_max_into(&bounds.ptr[*a].end.x, last_nonspace.x);
-
-   pos->x = target.x;
-
-   if ((pos->y = mushcell_inc(pos->y)) == MUSHCELL_MIN) {
-      if (*found_nonspace_for == *a)
-         mushcoords_max_into(&bounds.ptr[*a].end, last_nonspace);
-
-      *found_nonspace_for = bounds.len;
-
-      *max_a = mush_size_t_max(*max_a, *a |= 0x02);
-   } else if (pos->y == target.y)
-      return false;
-
-   *a &= ~0x01;
-   *get_beg = *found_nonspace_for == *a ? 0x01 : 0x03;
-   return true;
-}
-#endif
 
 static size_t get_aabbs_binary(
    const C* str, const C* str_end, mushcoords target, mushbounds* bounds)
