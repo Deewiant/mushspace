@@ -216,8 +216,8 @@ static void get_aabbs(
    }
 
    if (found_nonspace_for_anyone == MUSH_ARRAY_LEN(aabbs)) {
-      // Nothing to load. Not an error, but don't need to do anything so bail.
-      *aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NONE};
+      // Nothing to load.
+      aabbs_out->len = 0;
       return;
    }
 
