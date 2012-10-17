@@ -445,7 +445,7 @@ restart:
       j = MUSHSPACE_DIM - 1;
 #endif
 
-      skipped +=   mushcell_sub(mushcell_sub(pos->v[j], old.v[j]), 1)
+      skipped +=   mushcell_dec(mushcell_sub(pos->v[j], old.v[j]))
                  * mushaabb_volume_on(aabb, j);
 
       // When memcpying pos->v above, we may not end up in any box.
