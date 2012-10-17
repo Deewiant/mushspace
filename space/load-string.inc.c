@@ -159,17 +159,16 @@ static void get_aabbs(
 
       switch (c) {
       default:
-         if (c != ' ') {
-            found_nonspace_for = found_nonspace_for_anyone = a;
-            last_nonspace = pos;
+         found_nonspace_for = found_nonspace_for_anyone = a;
+         last_nonspace = pos;
 
-            if (get_beg) {
-               for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-                  if (get_beg & 1 << i)
-                     mushcell_min_into(&bounds[a].beg.v[i], pos.v[i]);
-               get_beg = 0;
-            }
+         if (get_beg) {
+            for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+               if (get_beg & 1 << i)
+                  mushcell_min_into(&bounds[a].beg.v[i], pos.v[i]);
+            get_beg = 0;
          }
+      case ' ':
          if ((pos.x = mushcell_inc(pos.x)) == MUSHCELL_MIN) {
             if (found_nonspace_for == a)
                mushcoords_max_into(&bounds[a].end, last_nonspace);
