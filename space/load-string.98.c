@@ -19,10 +19,14 @@ typedef struct {
 typedef struct {
    const void *str, *end;
 
+   const mushcoords aabb_beg;
+
+   mushcoords pos;
+
    #if MUSHSPACE_DIM >= 2
-      mushcell x, target_x, aabb_beg_x;
+      mushcell target_x;
    #if MUSHSPACE_DIM >= 3
-      mushcell y, target_y, aabb_beg_y;
+      mushcell target_y;
    #endif
    #endif
 } load_arr_auxdata;
@@ -137,11 +141,13 @@ static int load_string_generic(
    } else {
       load_arr_auxdata aux =
          { *str, str_end
+         , aabb.bounds.beg
+         , target
       #if MUSHSPACE_DIM >= 2
-         , target.x, target.x, aabb.bounds.beg.x
-      #if MUSHSPACE_DIM >= 3
-         , target.y, target.y, aabb.bounds.beg.y
+         , target.x
       #endif
+      #if MUSHSPACE_DIM >= 3
+         , target.y
       #endif
       };
 
