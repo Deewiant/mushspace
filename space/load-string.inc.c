@@ -153,7 +153,7 @@ static void get_aabbs(
                return;
             }
             a &= ~0x01;
-            get_beg = found_nonspace_for == a ? 0x01 : 0x03;
+            get_beg = found_nonspace_for == a ? 0x01 : DimensionBits;
          }
       #endif
 
@@ -213,7 +213,7 @@ static void get_aabbs(
                return;
             }
             a &= ~0x03;
-            get_beg = found_nonspace_for == a ? 0x03 : 0x07;
+            get_beg = found_nonspace_for == a ? 0x03 : DimensionBits;
          #endif
          break;
       }
