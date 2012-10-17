@@ -111,8 +111,8 @@ static void get_aabbs(
    uint8_t get_beg = DimensionBits;
 
    // We want minimal boxes, and thus exclude spaces at edges. These are
-   // helpers toward that. lastNonSpace points to the last found nonspace
-   // and foundNonSpaceFor is the index of the box it belonged to.
+   // helpers toward that. last_nonspace points to the last found nonspace and
+   // found_nonspace_for is the index of the box it belonged to.
    mushcoords last_nonspace = target;
    size_t found_nonspace_for = MUSH_ARRAY_LEN(aabbs);
 
