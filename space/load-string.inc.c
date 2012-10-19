@@ -480,9 +480,15 @@ static void load_arr(
 
       // Done after every space or nonwhite: if we run out of X-bounds but
       // there's still Y or Z remaining, eat trailing spaces on this line.
+      //
+      // We can only run off the end of the string here in >= 3d, since in 2d
+      // we have to reach bounds->end.y.
       #define LOAD_ARR_TRY_FINISH_LINE \
          if (pos.x == bounds->end.x && !mushcoords_equal(pos, bounds->end)) \
-         while (str < str_end) { \
+         for (;;) { \
+            if (MUSHSPACE_DIM > 2 && str >= str_end) \
+               break; \
+            assert (str < str_end); \
             const mushcell c = ASCII_READ(str); \
             (void)ASCII_NEXT(str); \
             \
@@ -537,7 +543,8 @@ static void load_arr(
             // If we run out of Y-bounds but there's still Z remaining, eat
             // trailing whitespace on this page.
             if (pos.y == bounds->end.y && pos.z != bounds->end.z)
-            while (str < str_end) {
+            for (;;) {
+               assert (str < str_end);
                const mushcell c = ASCII_READ(str);
                (void)ASCII_NEXT(str);
                switch (c) {
