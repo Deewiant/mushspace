@@ -43,15 +43,16 @@ uint32_t next_codepoint(codepoint_reader *reader) {
       reader->unused_bits = 0;
 
    // If it's unencodable, make it not, by applying some arbitrary operations.
+   // Since we use this for Funge-Spaces, make it whitespace: that's more
+   // likely to cause issues.
    //
-   // Arguably better than ignoring around half of our random data, although of
-   // course we lose equidistribution like this.
-   if (cp > 0x10ffff)
-      cp &= 0x0fffff;
-   if (cp >= 0xd800 && cp <= 0xdfff) {
-      cp |= (cp & 0xf) << 16;
-      if (cp >= 0xd800 && cp <= 0xdfff)
-         cp >>= 1;
+   // Bias plain spaces somewhat. As there are two kinds of newlines, this
+   // gives us a 3:2:1 ratio of x:y:z whitespace.
+   if (cp > 0x10ffff || (cp >= 0xd800 && cp <= 0xdfff)) switch (cp % 6) {
+   case 0: case 1: case 2: cp = ' ';  break;
+   case 3: cp = '\n'; break;
+   case 4: cp = '\r'; break;
+   case 5: cp = '\f'; break;
    }
 
    assert (cp <= 0x10ffff);
