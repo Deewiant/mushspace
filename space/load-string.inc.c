@@ -471,46 +471,52 @@ static void load_arr(
       mushcell c;
       NEXT(str, str_end, c);
       switch (c) {
+
+      #if MUSHSPACE_DIM >= 3
+      #define FF_TO_FF case '\f': goto CASE_FF;
+      #else
+      #define FF_TO_FF case '\f': break;
+      #endif
+
+      // Done after every space or nonwhite: if we run out of X-bounds but
+      // there's still Y or Z remaining, eat trailing spaces on this line.
+      #define LOAD_ARR_TRY_FINISH_LINE \
+         if (pos.x == bounds->end.x && !mushcoords_equal(pos, bounds->end)) \
+         while (str < str_end) { \
+            const mushcell c = ASCII_READ(str); \
+            (void)ASCII_NEXT(str); \
+            \
+            /* No need to update pos in here: pos.x will be reset by any of
+               the nonspace cases and the others won't change anyway. */ \
+            switch (c) { \
+            case ' ': break; \
+            \
+            case '\n': goto CASE_LF; \
+            case '\r': goto CASE_CR; \
+            \
+            FF_TO_FF \
+            \
+            default: assert (false); \
+            } \
+         }
+
       default:
-         pos.x = mushcell_inc(pos.x);
          arr.ptr[i++] = c;
+         #if MUSHSPACE_DIM >= 2
+            LOAD_ARR_TRY_FINISH_LINE;
+         #endif
+         pos.x = mushcell_inc(pos.x);
          break;
 
       case ' ':
          #if MUSHSPACE_DIM >= 2
-            // If we run out of X-bounds but there's still Y or Z remaining,
-            // eat trailing spaces on this line.
-            if (pos.x == bounds->end.x &&
-                (   pos.y != bounds->end.y
-            #if MUSHSPACE_DIM >= 3
-                 || pos.z != bounds->end.z
-            #endif
-                )
-               )
-            while (str < str_end) {
-               const mushcell c = ASCII_READ(str);
-               (void)ASCII_NEXT(str);
-
-               // No need to update pos in here: pos.x will be reset by any of
-               // the nonspace cases and the others won't change anyway.
-               switch (c) {
-               case ' ': break;
-
-               case '\n': goto CASE_LF;
-               case '\r': goto CASE_CR;
-
-               #if MUSHSPACE_DIM >= 3
-               case '\f': goto CASE_FF;
-               #else
-               case '\f': break;
-               #endif
-
-               default: assert (false);
-               }
-            }
+            LOAD_ARR_TRY_FINISH_LINE;
          #endif
          ++i;
          pos.x = mushcell_inc(pos.x);
+
+   #undef FF_TO_FF
+   #undef LOAD_ARR_TRY_FINISH_LINE
 
    #if MUSHSPACE_DIM < 2
       case '\r': case '\n':
