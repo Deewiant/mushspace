@@ -119,6 +119,14 @@ static void get_aabbs(
    // Not per-box: if this remains unchanged, we don't need to load a thing.
    size_t found_nonspace_for_anyone = MUSH_ARRAY_LEN(aabbs);
 
+   // A bit of a HACK to make sure that we don't mess up the starting
+   // Y-coordinate.
+   //
+   // TODO: there should be a better solution than this.
+   #if MUSHSPACE_DIM >= 3
+      size_t found_nonspace_on_page = found_nonspace_for;
+   #endif
+
    for (size_t i = 0; i < MUSH_ARRAY_LEN(aabbs); ++i) {
       bounds[i].beg = MUSHCOORDS(MUSHCELL_MAX, MUSHCELL_MAX, MUSHCELL_MAX);
       bounds[i].end = MUSHCOORDS(MUSHCELL_MIN, MUSHCELL_MIN, MUSHCELL_MIN);
@@ -146,20 +154,41 @@ static void get_aabbs(
 
                found_nonspace_for = MUSH_ARRAY_LEN(aabbs);
 
+               #if MUSHSPACE_DIM >= 3
+                  found_nonspace_on_page = found_nonspace_for;
+               #endif
+
                max_a = mush_size_t_max(max_a, a |= 0x02);
 
             } else if (pos.y == target.y) {
                *aabbs_out = (musharr_mushaabb){NULL, MUSHERR_NO_ROOM};
                return;
             }
+
             a &= ~0x01;
-            get_beg = found_nonspace_for == a ? 0x01 : DimensionBits;
+
+            // If we've found a nonspace in these bounds, we don't need to look
+            // for a smaller Y-coordinate: our Y will never get smaller since
+            // we just saw this line break.
+            if (found_nonspace_for == a) {
+#if MUSHSPACE_DIM >= 3
+               // But only if we've seen a nonspace on this page. Otherwise we
+               // might still run into a smaller Y, in which case we leave
+               // get_beg as-is.
+               if (found_nonspace_on_page == a)
+#endif
+                  get_beg = 0x01;
+            } else
+               get_beg = DimensionBits;
          }
       #endif
 
       switch (c) {
       default:
          found_nonspace_for = found_nonspace_for_anyone = a;
+         #if MUSHSPACE_DIM >= 3
+            found_nonspace_on_page = found_nonspace_for;
+         #endif
          last_nonspace = pos;
 
          if (get_beg) {
@@ -174,6 +203,9 @@ static void get_aabbs(
                mushcoords_max_into(&bounds[a].end, last_nonspace);
 
             found_nonspace_for = MUSH_ARRAY_LEN(aabbs);
+            #if MUSHSPACE_DIM >= 3
+               found_nonspace_on_page = found_nonspace_for;
+            #endif
             get_beg = DimensionBits;
 
             max_a = mush_size_t_max(max_a, a |= 0x01);
@@ -205,6 +237,9 @@ static void get_aabbs(
                   mushcoords_max_into(&bounds[a].end, last_nonspace);
 
                found_nonspace_for = MUSH_ARRAY_LEN(aabbs);
+               #if MUSHSPACE_DIM >= 3
+                  found_nonspace_on_page = found_nonspace_for;
+               #endif
 
                max_a = mush_size_t_max(max_a, a |= 0x04);
 
@@ -214,6 +249,7 @@ static void get_aabbs(
             }
             a &= ~0x03;
             get_beg = found_nonspace_for == a ? 0x03 : DimensionBits;
+            found_nonspace_on_page = MUSH_ARRAY_LEN(aabbs);
          #endif
          break;
       }
