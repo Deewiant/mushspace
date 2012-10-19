@@ -200,7 +200,7 @@ static bool mapex_in_box(
    void* caller_data,
    void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*))
 {
-   size_t width, area, page_start;
+   size_t width, area, line_start, page_start;
 
    const mushaabb   *box    = cai.aabb;
    const mushbounds *bounds = bpos.bounds;
@@ -209,11 +209,11 @@ static bool mapex_in_box(
    // These depend on the original pos and thus have to be initialized before
    // the call to mushcoords_get_end_of_contiguous_range.
 
+#if MUSHSPACE_DIM >= 2
    // {box->bounds.beg.x, pos->y, pos->z}
    mushcoords ls = *pos;
    ls.x = box->bounds.beg.x;
 
-#if MUSHSPACE_DIM >= 2
    // {box->bounds.beg.x, box->bounds.beg.y, pos->z}
    mushcoords ps = box->bounds.beg;
    memcpy(ps.v + 2, pos->v + 2, (MUSHSPACE_DIM - 2) * sizeof(mushcell));
@@ -241,21 +241,21 @@ static bool mapex_in_box(
 
    assert (beg_idx <= end_idx);
 
-   uint8_t hit = 0;
-
-   // Unefunge needs this to skip leading spaces.
-   const size_t line_start = mushaabb_get_idx(box, ls) - beg_idx;
+   uint8_t hit;
 
 #if MUSHSPACE_DIM >= 2
+   hit = 0;
+
    width = box->width;
    hit |= (pos->x == bounds->beg.x && pos->y != ls.y) << 0;
 
-   // Befunge needs this to skip leading newlines.
-   page_start = mushaabb_get_idx(box, ps) - beg_idx;
+   line_start = mushaabb_get_idx(box, ls) - beg_idx;
 #endif
 #if MUSHSPACE_DIM >= 3
    area = box->area;
    hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
+
+   page_start = mushaabb_get_idx(box, ps) - beg_idx;
 #endif
 
    const size_t length = end_idx - beg_idx + 1;
@@ -299,15 +299,15 @@ static bool mapex_in_static(
    void* caller_data,
    void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*))
 {
-   size_t width, area, page_start;
+   size_t width, area, line_start, page_start;
 
    const mushbounds *bounds = bpos.bounds;
    mushcoords        *pos    = bpos.pos;
 
+#if MUSHSPACE_DIM >= 2
    mushcoords ls = *pos;
    ls.x = MUSHSTATICAABB_BEG.x;
 
-#if MUSHSPACE_DIM >= 2
    mushcoords ps = MUSHSTATICAABB_BEG;
    memcpy(ps.v + 2, pos->v + 2, (MUSHSPACE_DIM - 2) * sizeof(mushcell));
 #endif
@@ -328,19 +328,21 @@ static bool mapex_in_static(
 
    assert (beg_idx <= end_idx);
 
-   uint8_t hit = 0;
-
-   const size_t line_start = mushstaticaabb_get_idx(ls) - beg_idx;
+   uint8_t hit;
 
 #if MUSHSPACE_DIM >= 2
+   hit = 0;
+
    width = MUSHSTATICAABB_SIZE.x;
    hit |= (pos->x == bounds->beg.x && pos->y != ls.y) << 0;
 
-   page_start = mushstaticaabb_get_idx(ps) - beg_idx;
+   line_start = mushstaticaabb_get_idx(ls) - beg_idx;
 #endif
 #if MUSHSPACE_DIM >= 3
    area = MUSHSTATICAABB_SIZE.x * MUSHSTATICAABB_SIZE.y;
    hit |= (pos->y == bounds->beg.y && pos->z != ls.z) << 1;
+
+   page_start = mushstaticaabb_get_idx(ps) - beg_idx;
 #endif
 
    const size_t length = end_idx - beg_idx + 1;
