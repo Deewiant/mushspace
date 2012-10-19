@@ -381,7 +381,7 @@ static void load_arr(
    load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
 
-   const mushcoords aabb_beg = aux->aabb_beg;
+   const mushbounds *bounds = aux->bounds;
 
    // Pos is used only for skipping leading spaces/newlines and thus isn't
    // really representative of the cursor position at most points.
@@ -394,19 +394,34 @@ static void load_arr(
    #endif
    #endif
 
-   // Careful!
+   // Eat whitespace without affecting the array index until we enter the
+   // bounds. At that point, the array index does start to matter.
    //
-   // We *NEED* to use != to compare coordinates to aabb_beg here, throughout.
-   // We only keep track of coordinates that are "less than" aabb_beg or
-   // exactly on it, but it could be the case that target > aabb_beg because of
-   // wraparound. We don't need to treat that case in any special way because
-   // we don't actually need to do less-than comparisons: we can just use !=.
-
-   // Ignore whitespace until the box's start. Note that we know by this point
-   // that there's nonspace in the string, so we don't need to worry about
-   // running out of its bounds.
-   while (!mushcoords_equal(aabb_beg, pos)) {
-      assert (str < str_end);
+   // Two examples. Consider the target position as (1000,1000,1000) in each.
+   //
+   // 1. [3d, bounds beg (1000,1000,1001)] FF LF FF data...
+   //
+   // The FF brings us to (1000,1000,1001) without affecting the array index.
+   // Then the LF and FF should affect it as usual.
+   //
+   // 2. [3d, bounds beg (1001,1000,1000)] LF space data...
+   //
+   // The LF brings us to (1000,1001,1000). The next space then brings us to
+   // (1001,1001,1000).
+   //
+   // Here, the line feed should have affected the array index, even though
+   // it's not in bounds. It's not clear how this should be figured out in
+   // advance, if that's even possible.
+   //
+   // But as soon as we jump into bounds we can compute the correct index based
+   // on how pos differs compared to bounds->beg. This is what we do after
+   // exiting this loop.
+   while (!mushbounds_safe_contains(bounds, pos)) {
+      if (str >= str_end) {
+         // All whitespace: nothing to do. Can happen if this isn't the first
+         // array into which we load.
+         return;
+      }
 
       const mushcell c = ASCII_READ(str);
       (void)ASCII_NEXT(str);
@@ -444,16 +459,58 @@ static void load_arr(
       }
    }
 
-   for (size_t i = 0; i < arr.len && str < str_end;) {
+   size_t i = 0;
+   #if MUSHSPACE_DIM >= 3
+      i  = line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
+   #endif
+   #if MUSHSPACE_DIM >= 2
+      i  = line_start              += (size_t)(pos.y - bounds->beg.y) * width;
+   #endif
+      i                            += (size_t)(pos.x - bounds->beg.x);
+   while (i < arr.len && str < str_end) {
       mushcell c;
       NEXT(str, str_end, c);
       switch (c) {
       default:
+         pos.x = mushcell_inc(pos.x);
          arr.ptr[i++] = c;
          break;
 
       case ' ':
+         #if MUSHSPACE_DIM >= 2
+            // If we run out of X-bounds but there's still Y or Z remaining,
+            // eat trailing spaces on this line.
+            if (pos.x == bounds->end.x &&
+                (   pos.y != bounds->end.y
+            #if MUSHSPACE_DIM >= 3
+                 || pos.z != bounds->end.z
+            #endif
+                )
+               )
+            while (str < str_end) {
+               const mushcell c = ASCII_READ(str);
+               (void)ASCII_NEXT(str);
+
+               // No need to update pos in here: pos.x will be reset by any of
+               // the nonspace cases and the others won't change anyway.
+               switch (c) {
+               case ' ': break;
+
+               case '\n': goto CASE_LF;
+               case '\r': goto CASE_CR;
+
+               #if MUSHSPACE_DIM >= 3
+               case '\f': goto CASE_FF;
+               #else
+               case '\f': break;
+               #endif
+
+               default: assert (false);
+               }
+            }
+         #endif
          ++i;
+         pos.x = mushcell_inc(pos.x);
 
    #if MUSHSPACE_DIM < 2
       case '\r': case '\n':
@@ -470,22 +527,31 @@ static void load_arr(
             (void)ASCII_NEXT(str);
       CASE_LF:
       case '\n': {
+         #if MUSHSPACE_DIM >= 3
+            // If we run out of Y-bounds but there's still Z remaining, eat
+            // trailing whitespace on this page.
+            if (pos.y == bounds->end.y && pos.z != bounds->end.z)
+            while (str < str_end) {
+               const mushcell c = ASCII_READ(str);
+               (void)ASCII_NEXT(str);
+               switch (c) {
+               case ' ': break;
+
+               case '\n': break;
+               case '\r': break;
+               case '\f': goto CASE_FF;
+
+               default: assert (false);
+               }
+            }
+         #endif
+
          i = line_start += width;
          pos.x = target_x;
          pos.y = mushcell_inc(pos.y);
 
-         if (i >= arr.len) {
-            // The next cell we would want to load falls on the next line:
-            // report that.
-            *hit = 1 << 0;
-
-            aux->str = str;
-            aux->pos = pos;
-            return;
-         }
-
          // There may be leading spaces on the next line. Eat them.
-         while (pos.x != aabb_beg.x && str < str_end) {
+         while (pos.x != bounds->beg.x && str < str_end) {
             // The aabb in aabb_beg is specifically the one containing str, so
             // if our line_start is outside it that must mean that there are
             // spaces on the beginning of every line.
@@ -499,15 +565,24 @@ static void load_arr(
             // that's fine.
             case '\n': goto CASE_LF;
             case '\r': goto CASE_CR;
-            case '\f':
-               #if MUSHSPACE_DIM < 3
-                  break;
-               #else
-                  goto CASE_FF;
-               #endif
+
+            #if MUSHSPACE_DIM >= 3
+            case '\f': goto CASE_FF;
+            #else
+            case '\f': break;
+            #endif
 
             default: assert (false);
             }
+         }
+         if (i >= arr.len) {
+            // The next cell we would want to load falls on the next line:
+            // report that.
+            *hit = 1 << 0;
+
+            aux->str = str;
+            aux->pos = pos;
+            return;
          }
          break;
       }
@@ -520,17 +595,11 @@ static void load_arr(
          pos.y = target_y;
          pos.z = mushcell_inc(pos.z);
 
-         if (i >= arr.len) {
-            *hit = 1 << 1;
-
-            aux->str = str;
-            aux->pos = pos;
-            return;
-         }
-
          // There may be leading spaces and/or line breaks on the next page.
          // Eat them.
-         while ((pos.x != aabb_beg.x || pos.y != aabb_beg.y) && str < str_end) {
+         while ((pos.x != bounds->beg.x || pos.y != bounds->beg.y)
+             && str < str_end)
+         {
             const mushcell c = ASCII_READ(str);
             (void)ASCII_NEXT(str);
             switch (c) {
@@ -542,6 +611,12 @@ static void load_arr(
                if (str < str_end && ASCII_READ(str) == '\n')
                   (void)ASCII_NEXT(str);
             case '\n':
+               // We're already at the correct Y, so we move away from it. This
+               // is like any other line break, and their case can handle the
+               // leading spaces remaining.
+               if (pos.y == bounds->beg.y)
+                  goto CASE_LF;
+
                pos.x = target_x;
                pos.y = mushcell_inc(pos.y);
                break;
@@ -552,6 +627,13 @@ static void load_arr(
 
             default: assert (false);
             }
+         }
+         if (i >= arr.len) {
+            *hit = 1 << 1;
+
+            aux->str = str;
+            aux->pos = pos;
+            return;
          }
          break;
    #endif
