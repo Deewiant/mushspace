@@ -143,13 +143,13 @@ int main(void) {
       ok = false; \
       tap_not_ok("get doesn't match data given to load_string" #suf); \
       printf("  ---\n" \
-             "  expected: %" MUSHCELL_PRI "\n" \
-             "  got: %" MUSHCELL_PRI "\n" \
+             "  expected: %" MUSHCELL_PRIx "\n" \
+             "  got: %" MUSHCELL_PRIx "\n" \
              "  failed index: %zu\n", \
              cp##suf, gc, ii##suf); \
       printf("  failed pos: ("); \
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i) \
-         printf(" %" MUSHCELL_PRI, pos.v[i]); \
+         printf(" %" MUSHCELL_PRId, pos.v[i]); \
       printf(" )\n" \
              "  ...\n"); \
       break; \
@@ -205,7 +205,7 @@ int main(void) {
              err, i); \
       printf("  failed pos: ("); \
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i) \
-         printf(" %" MUSHCELL_PRI, pos.v[i]); \
+         printf(" %" MUSHCELL_PRId, pos.v[i]); \
       printf(" )\n" \
              "  ...\n"); \
       tap_skip_remaining("put failed"); \
@@ -225,12 +225,12 @@ int main(void) {
       tap_not_ok("get doesn't match what was put" S); \
       printf("  ---\n" \
              "  failed index: %zu\n" \
-             "  expected: %" MUSHCELL_PRI "\n" \
-             "  got: %" MUSHCELL_PRI "\n", \
+             "  expected: %" MUSHCELL_PRIx "\n" \
+             "  got: %" MUSHCELL_PRIx "\n", \
              i, dc, gc); \
       printf("  failed pos: ("); \
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i) \
-         printf(" %" MUSHCELL_PRI, pos.v[i]); \
+         printf(" %" MUSHCELL_PRId, pos.v[i]); \
       printf(" )\n" \
              "  ...\n"); \
       break; \
@@ -280,12 +280,12 @@ int main(void) {
       tap_not_ok("get in copy doesn't match data");
       printf("  ---\n"
              "  failed index: %zu\n"
-             "  expected: %" MUSHCELL_PRI "\n"
-             "  got: %" MUSHCELL_PRI "\n",
+             "  expected: %" MUSHCELL_PRIx "\n"
+             "  got: %" MUSHCELL_PRIx "\n",
              i, dc, gc);
       printf("  failed pos: (");
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i)
-         printf(" %" MUSHCELL_PRI, pos.v[i]);
+         printf(" %" MUSHCELL_PRId, pos.v[i]);
       printf(" )\n"
              "  ...\n");
       break;

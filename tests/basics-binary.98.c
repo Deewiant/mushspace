@@ -171,8 +171,8 @@ int main(void) {
       tap_not_ok("get doesn't match data given to load_string" #suf); \
       printf("  ---\n" \
              "  failed index: %zu\n" \
-             "  expected: %" MUSHCELL_PRI "\n" \
-             "  got: %" MUSHCELL_PRI "\n" \
+             "  expected: %" MUSHCELL_PRIx "\n" \
+             "  got: %" MUSHCELL_PRIx "\n" \
              "  ...\n", \
              ii##suf, cp##suf, gc); \
       break; \
@@ -266,8 +266,8 @@ int main(void) {
       tap_not_ok("get doesn't match what was put" S); \
       printf("  ---\n" \
              "  failed index: %zu\n" \
-             "  expected: %" MUSHCELL_PRI "\n" \
-             "  got: %" MUSHCELL_PRI "\n" \
+             "  expected: %" MUSHCELL_PRIx "\n" \
+             "  got: %" MUSHCELL_PRIx "\n" \
              "  ...\n", \
              i, dc, gc); \
       break; \
@@ -314,8 +314,8 @@ int main(void) {
       tap_not_ok("get in copy doesn't match data");
       printf("  ---\n"
              "  failed index: %zu\n"
-             "  expected: %" MUSHCELL_PRI "\n"
-             "  got: %" MUSHCELL_PRI "\n"
+             "  expected: %" MUSHCELL_PRIx "\n"
+             "  got: %" MUSHCELL_PRIx "\n"
              "  ...\n",
              i, dc, gc);
       break;

@@ -35,8 +35,8 @@ void tap_bool(bool b, const char* so, const char* sn) {
              "  ...\n", a, b); \
    }
 
-tap_eqis_gen(tap_eqcs,   mushcell,   MUSHCELL_PRI)
-tap_eqis_gen(tap_eqc93s, mushcell93, MUSHCELL93_PRI)
+tap_eqis_gen(tap_eqcs,   mushcell,   MUSHCELL_PRId)
+tap_eqis_gen(tap_eqc93s, mushcell93, MUSHCELL93_PRId)
 
 #define tap_opivs_gen(N, op, T, P) \
    void N(const T* a, const T* b, uint8_t d, const char* so, const char* sn) {\
@@ -53,9 +53,9 @@ tap_eqis_gen(tap_eqc93s, mushcell93, MUSHCELL93_PRI)
       tap_ok(so); \
    }
 
-tap_opivs_gen(tap_eqcvs,    ==, mushcell,   MUSHCELL_PRI)
-tap_opivs_gen(tap_leqcvs,   <=, mushcell,   MUSHCELL_PRI)
-tap_opivs_gen(tap_geqcvs,   >=, mushcell,   MUSHCELL_PRI)
-tap_opivs_gen(tap_eqc93vs,  ==, mushcell93, MUSHCELL93_PRI)
-tap_opivs_gen(tap_leqc93vs, <=, mushcell93, MUSHCELL93_PRI)
-tap_opivs_gen(tap_geqc93vs, >=, mushcell93, MUSHCELL93_PRI)
+tap_opivs_gen(tap_eqcvs,    ==, mushcell,   MUSHCELL_PRId)
+tap_opivs_gen(tap_leqcvs,   <=, mushcell,   MUSHCELL_PRId)
+tap_opivs_gen(tap_geqcvs,   >=, mushcell,   MUSHCELL_PRId)
+tap_opivs_gen(tap_eqc93vs,  ==, mushcell93, MUSHCELL93_PRId)
+tap_opivs_gen(tap_leqc93vs, <=, mushcell93, MUSHCELL93_PRId)
+tap_opivs_gen(tap_geqc93vs, >=, mushcell93, MUSHCELL93_PRId)

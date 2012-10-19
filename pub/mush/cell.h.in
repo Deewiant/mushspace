@@ -13,10 +13,14 @@ typedef uint8_t mushcell93, mushucell93;
 #define MUSHCELL93_MAX  UINT8_MAX
 #define MUSHUCELL93_MAX MUSHCELL_MAX
 
-#define MUSHCELL93_PRI  PRId8
-#define MUSHUCELL93_PRI PRIu8
-#define MUSHCELL93_SCN  SCNd8
-#define MUSHUCELL93_SCN SCNu8
+#define MUSHCELL93_PRId PRId8
+#define MUSHCELL93_PRIu PRIu8
+#define MUSHCELL93_PRIx PRIx8
+#define MUSHCELL93_PRIo PRIo8
+#define MUSHCELL93_SCNd SCNd8
+#define MUSHCELL93_SCNu SCNu8
+#define MUSHCELL93_SCNx SCNx8
+#define MUSHCELL93_SCNo SCNo8
 
 #if @CELL_SIZE@ == 0
 
@@ -27,10 +31,14 @@ typedef unsigned long mushucell;
 #define  MUSHCELL_MAX  LONG_MAX
 #define MUSHUCELL_MAX ULONG_MAX
 
-#define MUSHCELL_PRI  "ld"
-#define MUSHUCELL_PRI "lu"
-#define MUSHCELL_SCN  MUSHCELL_PRI
-#define MUSHUCELL_SCN MUSHUCELL_PRI
+#define MUSHCELL_PRId "ld"
+#define MUSHCELL_PRIu "lu"
+#define MUSHCELL_PRIx "lx"
+#define MUSHCELL_PRIo "lo"
+#define MUSHCELL_SCNd MUSHCELL_PRId
+#define MUSHCELL_SCNu MUSHCELL_PRIu
+#define MUSHCELL_SCNx MUSHCELL_PRIx
+#define MUSHCELL_SCNo MUSHCELL_PRIo
 
 #elif @CELL_SIZE@ == 32
 
@@ -41,10 +49,14 @@ typedef uint32_t mushucell;
 #define  MUSHCELL_MAX  INT32_MAX
 #define MUSHUCELL_MAX UINT32_MAX
 
-#define MUSHCELL_PRI  PRId32
-#define MUSHUCELL_PRI PRIu32
-#define MUSHCELL_SCN  SCNd32
-#define MUSHUCELL_SCN SCNu32
+#define MUSHCELL_PRId PRId32
+#define MUSHCELL_PRIu PRIu32
+#define MUSHCELL_PRIx PRIx32
+#define MUSHCELL_PRIo PRIo32
+#define MUSHCELL_SCNd SCNd32
+#define MUSHCELL_SCNu SCNu32
+#define MUSHCELL_SCNx SCNx32
+#define MUSHCELL_SCNo SCNo32
 
 #elif @CELL_SIZE@ == 64
 
@@ -55,10 +67,14 @@ typedef uint64_t mushucell;
 #define  MUSHCELL_MAX  INT64_MAX
 #define MUSHUCELL_MAX UINT64_MAX
 
-#define MUSHCELL_PRI  PRId64
-#define MUSHUCELL_PRI PRIu64
-#define MUSHCELL_SCN  SCNd64
-#define MUSHUCELL_SCN SCNu64
+#define MUSHCELL_PRId PRId64
+#define MUSHCELL_PRIu PRIu64
+#define MUSHCELL_PRIx PRIx64
+#define MUSHCELL_PRIo PRIo64
+#define MUSHCELL_SCNd SCNd64
+#define MUSHCELL_SCNu SCNu64
+#define MUSHCELL_SCNx SCNx64
+#define MUSHCELL_SCNo SCNo64
 
 #endif
 
