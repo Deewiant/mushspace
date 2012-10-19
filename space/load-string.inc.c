@@ -275,30 +275,26 @@ static size_t get_aabbs_binary(
 
    // A good compiler should be able to optimize the loop away for non-UTF.
    size_t codepoints = 0;
-   for (const C* p = str; p < str_trimmed_end; ++codepoints) {
+   for (const C* p = str_trimmed_beg; p < str_trimmed_end; ++codepoints) {
       mushcell c;
       NEXT(p, str_trimmed_end, c);
       (void)c;
    }
 
-   // codepoints already excludes trailing spaces.
-   const size_t loadee_len         = codepoints,
-                loadee_trimmed_len = loadee_len - leading_spaces;
-
-   if (loadee_trimmed_len > (size_t)MUSHCELL_MAX) {
+   if (codepoints > (size_t)MUSHCELL_MAX) {
       // Oops, that's not going to fit! Bail.
       return SIZE_MAX;
    }
 
-   mushcoords end = target;
+   mushcoords end = beg;
    size_t a = 0;
 
-   if (target.x > MUSHCELL_MAX - (mushcell)loadee_len) {
+   if (target.x > MUSHCELL_MAX - (mushcell)(codepoints - 1)) {
       end.x = MUSHCELL_MAX;
       bounds[a++] = (mushbounds){beg, end};
       beg.x = end.x = MUSHCELL_MIN;
    }
-   end.x += loadee_len - 1;
+   end.x += codepoints - 1;
 
    bounds[a++] = (mushbounds){beg, end};
    return a;
