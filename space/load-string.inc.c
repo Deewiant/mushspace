@@ -273,8 +273,6 @@ static size_t get_aabbs_binary(
    while (ASCII_PREV(str_trimmed_end) == ' ');
    (void)ASCII_NEXT(str_trimmed_end);
 
-   const size_t trailing_spaces = str_end - str_trimmed_end;
-
    // A good compiler should be able to optimize the loop away for non-UTF.
    size_t codepoints = 0;
    for (const C* p = str; p < str_trimmed_end; ++codepoints) {
@@ -283,7 +281,8 @@ static size_t get_aabbs_binary(
       (void)c;
    }
 
-   const size_t loadee_len         = codepoints - trailing_spaces,
+   // codepoints already excludes trailing spaces.
+   const size_t loadee_len         = codepoints,
                 loadee_trimmed_len = loadee_len - leading_spaces;
 
    if (loadee_trimmed_len > (size_t)MUSHCELL_MAX) {
