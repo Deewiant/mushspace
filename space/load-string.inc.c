@@ -303,6 +303,10 @@ static size_t get_aabbs_binary(
 static void binary_load_arr(musharr_mushcell arr, void* p) {
    binary_load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
+
+   while (ASCII_READ(str) == ' ')
+      (void)ASCII_NEXT(str);
+
    for (mushcell *end = arr.ptr + arr.len; arr.ptr < end; ++arr.ptr) {
       assert (str < str_end);
       mushcell c;
