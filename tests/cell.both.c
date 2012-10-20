@@ -5,11 +5,20 @@
 #if MUSHSPACE_93
 #undef MUSHCELL_MIN
 #undef MUSHCELL_MAX
+#define mushcell mushcell93
 #define MUSHCELL_MIN MUSHCELL93_MIN
 #define MUSHCELL_MAX MUSHCELL93_MAX
 #define mushcell_add mushcell93_add
 #define mushcell_sub mushcell93_sub
 #define mushcell_mul mushcell93_mul
+#define mushcell_inc mushcell93_inc
+#define mushcell_dec mushcell93_dec
+#define mushcell_add_into mushcell93_add_into
+#define mushcell_sub_into mushcell93_sub_into
+#define mushcell_min mushcell93_min
+#define mushcell_max mushcell93_max
+#define mushcell_min_into mushcell93_min_into
+#define mushcell_max_into mushcell93_max_into
 #endif
 
 int main(void) {
