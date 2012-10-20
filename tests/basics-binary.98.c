@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
    codepoint_reader cp_reader;
 
-#define BOUNDS_CHECK(skip_tight) \
+#define BOUNDS_CHECK \
    mushspace_get_loose_bounds(space, &bounds); \
    \
    tap_leqcos(bounds.beg, expected_loose.beg, \
@@ -81,17 +81,12 @@ int main(int argc, char **argv) {
    tap_bool(ok, "get_tight_bounds says that the space is nonempty", \
                 "get_tight_bounds says that the space is empty"); \
    \
-   if (skip_tight) { \
-      tap_skip("manually computed tight bounds not available"); \
-      tap_skip("manually computed tight bounds not available"); \
-   } else { \
-      tap_eqcos(bounds.beg, expected_tight.beg, \
-                "get_tight_bounds reports correct beg", \
-                "get_tight_bounds reports incorrect beg"); \
-      tap_eqcos(bounds.end, expected_tight.end, \
-                "get_tight_bounds reports correct end", \
-                "get_tight_bounds reports incorrect end"); \
-   }
+   tap_eqcos(bounds.beg, expected_tight.beg, \
+             "get_tight_bounds reports correct beg", \
+             "get_tight_bounds reports incorrect beg"); \
+   tap_eqcos(bounds.end, expected_tight.end, \
+             "get_tight_bounds reports correct end", \
+             "get_tight_bounds reports incorrect end"); \
 
 #define LOAD_STRING(suf, T, ENCODER, BLOWUP, FOREACH_CP) \
    space = mushspace_init(space_buf, NULL); \
@@ -129,9 +124,6 @@ int main(int argc, char **argv) {
    spaces_beg = 0; \
    spaces_end = 0; \
    \
-   /* Only needed when we don't wrap, but it's a convenient all-spaces check so
-    * do it in all cases.
-    */ \
    while (encoded_data##suf[spaces_beg] == ' ') { \
       if (++spaces_beg == encoded_len##suf) { \
          tap_skip_remaining("space is all spaces"); \
@@ -139,26 +131,16 @@ int main(int argc, char **argv) {
       } \
    } \
    \
-   const bool wrapped##suf = beg.x > (mushcell)(MUSHCELL_MAX - cells##suf); \
-   \
    expected_loose.beg = expected_tight.beg = beg; \
    expected_loose.end = expected_tight.end = \
       mushcoords_add(beg, MUSHCOORDS(cells##suf-1, 0, 0)); \
-   if (wrapped##suf) { \
-      expected_loose.beg.x = MUSHCELL_MIN; \
-      expected_loose.end.x = MUSHCELL_MAX; \
-      \
-      /* Computing the correct expected tight bounds here could be done for
-       * non-UTF without too much trouble, but meh. Other tests will handle it.
-       */ \
-   } else { \
-      size_t s = encoded_len##suf; \
-      while (s-- > 0 && encoded_data##suf[s] == ' '); \
-      spaces_end = encoded_len##suf - s - 1; \
-      \
-      expected_loose.beg.x = expected_tight.beg.x += spaces_beg; \
-      expected_loose.end.x = expected_tight.end.x -= spaces_end; \
-   } \
+   \
+   size_t s##suf = encoded_len##suf; \
+   while (s##suf-- > 0 && encoded_data##suf[s##suf] == ' '); \
+   spaces_end = encoded_len##suf - s##suf - 1; \
+   \
+   expected_loose.beg.x = expected_tight.beg.x += spaces_beg; \
+   expected_loose.end.x = expected_tight.end.x -= spaces_end; \
    \
    if (BLOWUP) \
       free(encoded_data##suf); \
@@ -186,7 +168,7 @@ int main(int argc, char **argv) {
    if (ok) \
       tap_ok("get matches data given to load_string" #suf); \
    \
-   BOUNDS_CHECK(wrapped##suf); \
+   BOUNDS_CHECK; \
    mushspace_free(space);
 
 #define DIRECT_FOREACH_CP(s) \
@@ -212,27 +194,14 @@ int main(int argc, char **argv) {
    spaces_beg = 0;
    spaces_end = 0;
 
-   size_t spaces_beg_i = 0,
-          spaces_end_i = data_cell_count;
-
-   const bool wrapped2 = beg.x > (mushcell)(MUSHCELL_MAX - data_cell_count);
-   if (wrapped2) {
-      spaces_beg_i = MUSHCELL_MAX - beg.x + 1;
-      spaces_end_i = spaces_beg_i;
-   }
-
-   for (size_t i = spaces_beg_i; i < data_cell_count && data_cell[i++] == ' ';)
+   for (size_t i = 0; i < data_cell_count && data_cell[i++] == ' ';)
       ++spaces_beg;
-   for (size_t i = spaces_end_i; i-- > 0 && data_cell[i] == ' ';)
+   for (size_t i = data_cell_count; i-- > 0 && data_cell[i] == ' ';)
       ++spaces_end;
 
    expected_loose.beg = expected_tight.beg = beg;
    expected_loose.end = expected_tight.end =
       mushcoords_add(beg, MUSHCOORDS(data_cell_count - 1, 0, 0));
-   if (wrapped2) {
-      expected_tight.beg.x = expected_loose.beg.x = MUSHCELL_MIN;
-      expected_tight.end.x = expected_loose.end.x = MUSHCELL_MAX;
-   }
    expected_loose.beg.x = expected_tight.beg.x += spaces_beg;
    expected_loose.end.x = expected_tight.end.x -= spaces_beg;
 
@@ -281,7 +250,7 @@ int main(int argc, char **argv) {
    if (ok) \
       tap_ok("get matches what was put" S); \
    \
-   BOUNDS_CHECK(false);
+   BOUNDS_CHECK;
 
 #define FORWARD for (size_t i = 0; i < data_cell_count; ++i)
 #define REVERSE for (size_t i = data_cell_count; i--;)
@@ -329,7 +298,7 @@ int main(int argc, char **argv) {
    if (ok)
       tap_ok("get in copy matched data");
 
-   BOUNDS_CHECK(false);
+   BOUNDS_CHECK;
 
    free(data);
    mushspace_free(space);
