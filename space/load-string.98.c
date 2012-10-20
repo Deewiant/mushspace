@@ -38,9 +38,9 @@ static int load_string_generic(
                      musharr_mushaabb*),
    void (*load_arr)         (musharr_mushcell, void*,
                              size_t, size_t, size_t, size_t, uint8_t*),
-   void (*load_blank)       (size_t, void*),
+   void (*load_blank)       (size_t, size_t, void*),
    void (*binary_load_arr)  (musharr_mushcell, void*),
-   void (*binary_load_blank)(size_t, void*))
+   void (*binary_load_blank)(size_t, size_t, void*))
 {
    musharr_mushaabb aabbs;
    get_aabbs(*str, str_end, target, binary, &aabbs);

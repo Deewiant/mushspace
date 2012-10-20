@@ -24,7 +24,7 @@ static bool mapex_in_static(
 
 static bool get_next_in(
    const mushspace*, const mushbounds*, mushcoords*,
-   void*, void(*g)(size_t, void*));
+   void*, void(*g)(size_t, size_t, void*));
 
 static void get_next_in1(
    mushucell, const mushbounds*, mushcell, size_t, mushcoords, size_t,
@@ -32,7 +32,7 @@ static void get_next_in1(
 
 void mushspace_map_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
-   void(*f)(musharr_mushcell, void*), void(*g)(size_t, void*))
+   void(*f)(musharr_mushcell, void*), void(*g)(size_t, size_t, void*))
 {
    mushcoords       pos = bounds->beg;
    mushbounded_pos bpos = {bounds, &pos};
@@ -156,7 +156,7 @@ static bool map_in_static(
 void mushspace_mapex_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
    void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*),
-   void(*g)(size_t, void*))
+   void(*g)(size_t, size_t, void*))
 {
    mushcoords       pos = bounds->beg;
    mushbounded_pos bpos = {bounds, &pos};
@@ -372,15 +372,15 @@ bump_z:
 }
 
 // The next (linewise) allocated point after *pos which is also within the
-// given AABB. Calls g with the first argument being the number of unallocated
-// cells skipped. This may require multiple calls if the number doesn't fit in
-// a size_t.
+// given AABB. Calls g with the first two arguments being the number of
+// unallocated cells skipped (equivalently to a mush_double_size_t). This may
+// require multiple calls.
 //
 // Assumes that the point, if it exists, was allocated within some box: doesn't
 // look at bakaabb at all.
 static bool get_next_in(
    const mushspace* space, const mushbounds* bounds,
-   mushcoords* pos, void* gdata, void(*g)(size_t, void*))
+   mushcoords* pos, void* gdata, void(*g)(size_t, size_t, void*))
 {
 restart:
    {
@@ -404,8 +404,8 @@ restart:
 
    // A helper to make sure that skipped doesn't overflow.
    #define CLEAR_HI(x) \
-      for (; x.hi > 0; mush_double_size_t_sub1_into(&x, SIZE_MAX)) \
-         g(SIZE_MAX, gdata);
+      g(x.hi, x.lo, gdata); \
+      x = (mush_double_size_t){0,0};
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
@@ -461,9 +461,8 @@ restart:
       // three or more dimensions, and with three dimensions only here (on the
       // last axis).
       if (MUSHSPACE_DIM == 3 && volume.hi == 0 && volume.lo == 0) {
-         volume.hi = SIZE_MAX;
          volume.lo = 1;
-         g(SIZE_MAX, gdata);
+         g(SIZE_MAX, SIZE_MAX, gdata);
       }
 
       CLEAR_HI(volume);
@@ -492,9 +491,8 @@ restart:
       // Otherwise, go again with the new *pos.
       goto restart;
    }
-   CLEAR_HI(skipped);
-   if (skipped.lo != 0)
-      g(skipped.lo, gdata);
+   if (skipped.hi || skipped.lo)
+      g(skipped.hi, skipped.lo, gdata);
    return found;
 }
 
