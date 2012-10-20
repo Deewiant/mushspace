@@ -328,7 +328,8 @@ static size_t get_aabbs_binary(
    if (target.x > MUSHCELL_MAX - (mushcell)(codepoints - 1)) {
       end.x = MUSHCELL_MAX;
       bounds[a++] = (mushbounds){beg, end};
-      beg.x = end.x = MUSHCELL_MIN;
+      end.x = mushcell_sub(MUSHCELL_MIN, end.x - beg.x + 1);
+      beg.x = MUSHCELL_MIN;
    }
    end.x += codepoints - 1;
 
