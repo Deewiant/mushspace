@@ -381,10 +381,12 @@ static void load_arr(
    load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
 
+   // These bounds can be unsafe, as they encompass the whole loaded area and
+   // thus may have wrapped along any number of axes.
    const mushbounds *bounds = aux->bounds;
 
-   // Pos is used only for skipping leading spaces/newlines and thus isn't
-   // really representative of the cursor position at most points.
+   // pos is not kept completely up to date with regard to the cursor position:
+   // whitespace past bounds->end is not kept track of.
    mushcoords pos = aux->pos;
 
    #if MUSHSPACE_DIM >= 2
@@ -481,11 +483,27 @@ static void load_arr(
       // Done after every space or nonwhite: if we run out of X-bounds but
       // there's still Y or Z remaining, eat trailing spaces on this line.
       //
-      // We can only run off the end of the string here in >= 3d, since in 2d
-      // we have to reach bounds->end.y.
+      // The fundamental reason for doing this is that our loop terminates once
+      // i reaches arr.len. Spaces can cause us to overrun that temporarily,
+      // before a line/page break snaps us back to a still-in-range
+      // line_start/page_start.
+      //
+      // Consider this 2d case, where the s's represent spaces:
+      //
+      // +--+
+      // |xx|ssss
+      // |xx|
+      // +--+
+      //
+      // After the second space, we've reached arr.len, since we increment i
+      // for each one and arr.len is 4 due to the 2x2 box. So we need to handle
+      // them specially, such as like this.
+      //
       #define LOAD_ARR_TRY_FINISH_LINE \
          if (pos.x == bounds->end.x && !mushcoords_equal(pos, bounds->end)) \
          for (;;) { \
+            /* We can only run off the end of the string here in >= 3d, since
+               in 2d we have to reach bounds->end.y. */ \
             if (MUSHSPACE_DIM > 2 && str >= str_end) \
                break; \
             assert (str < str_end); \
