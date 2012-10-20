@@ -474,73 +474,37 @@ static void load_arr(
       NEXT(str, str_end, c);
       switch (c) {
 
-      #if MUSHSPACE_DIM >= 3
-      #define FF_TO_FF case '\f': goto CASE_FF;
-      #else
-      #define FF_TO_FF case '\f': break;
-      #endif
-
-      // Done after every space or nonwhite: if we run out of X-bounds but
-      // there's still Y or Z remaining, eat trailing spaces on this line.
-      //
-      // The fundamental reason for doing this is that our loop terminates once
-      // i reaches arr.len. Spaces can cause us to overrun that temporarily,
-      // before a line/page break snaps us back to a still-in-range
-      // line_start/page_start.
-      //
-      // Consider this 2d case, where the s's represent spaces:
-      //
-      // +--+
-      // |xx|ssss
-      // |xx|
-      // +--+
-      //
-      // After the second space, we've reached arr.len, since we increment i
-      // for each one and arr.len is 4 due to the 2x2 box. So we need to handle
-      // them specially, such as like this.
-      //
-      #define LOAD_ARR_TRY_FINISH_LINE \
-         if (pos.x == bounds->end.x && !mushcoords_equal(pos, bounds->end)) \
-         for (;;) { \
-            /* We can only run off the end of the string here in >= 3d, since
-               in 2d we have to reach bounds->end.y. */ \
-            if (MUSHSPACE_DIM > 2 && str >= str_end) \
-               break; \
-            assert (str < str_end); \
-            const mushcell c = ASCII_READ(str); \
-            (void)ASCII_NEXT(str); \
-            \
-            /* No need to update pos in here: pos.x will be reset by any of
-               the nonspace cases and the others won't change anyway. */ \
-            switch (c) { \
-            case ' ': break; \
-            \
-            case '\n': goto CASE_LF; \
-            case '\r': goto CASE_CR; \
-            \
-            FF_TO_FF \
-            \
-            default: assert (false); \
-            } \
-         }
-
       default:
          arr.ptr[i++] = c;
-         #if MUSHSPACE_DIM >= 2
-            LOAD_ARR_TRY_FINISH_LINE;
-         #endif
          pos.x = mushcell_inc(pos.x);
          break;
 
       case ' ':
-         #if MUSHSPACE_DIM >= 2
-            LOAD_ARR_TRY_FINISH_LINE;
-         #endif
+         // Disregard trailing spaces.
+         //
+         // The fundamental reason for doing this is that our loop terminates
+         // once i reaches arr.len. Spaces can cause us to overrun that
+         // temporarily, before a line/page break snaps us back to a
+         // still-in-range line_start/page_start.
+         //
+         // Consider this 2d case, where the s's represent spaces:
+         //
+         // +--+
+         // |xx|ssss
+         // |xx|
+         // +--+
+         //
+         // After the second space, we've reached arr.len, since we increment i
+         // for each one and arr.len is 4 due to the 2x2 box. So we need to
+         // handle them specially, such as like this.
+         //
+         // Nonspaces can also cause us to fall out of bounds->end, which is
+         // why we check for being past of it instead of on it, like in the
+         // line break case below.
+         if (MUSHSPACE_DIM >= 2 && pos.x == mushcell_inc(bounds->end.x))
+            break;
          ++i;
          pos.x = mushcell_inc(pos.x);
-
-   #undef FF_TO_FF
-   #undef LOAD_ARR_TRY_FINISH_LINE
 
    #if MUSHSPACE_DIM < 2
       case '\r': case '\n':
@@ -557,25 +521,8 @@ static void load_arr(
             (void)ASCII_NEXT(str);
       CASE_LF:
       case '\n': {
-         #if MUSHSPACE_DIM >= 3
-            // If we run out of Y-bounds but there's still Z remaining, eat
-            // trailing whitespace on this page.
-            if (pos.y == bounds->end.y && pos.z != bounds->end.z)
-            for (;;) {
-               assert (str < str_end);
-               const mushcell c = ASCII_READ(str);
-               (void)ASCII_NEXT(str);
-               switch (c) {
-               case ' ': break;
-
-               case '\n': break;
-               case '\r': break;
-               case '\f': goto CASE_FF;
-
-               default: assert (false);
-               }
-            }
-         #endif
+         if (MUSHSPACE_DIM >= 3 && pos.y == bounds->end.y)
+            break;
 
          i = line_start += width;
          pos.x = target_x;
