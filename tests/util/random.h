@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 void init_genrand(uint32_t);
+void init_by_array(uint32_t*, int);
 extern uint32_t (*genrand_int32)(void);
 
 void random_fill(void*, size_t);
