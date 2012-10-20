@@ -4,6 +4,7 @@
 #define MUSHSPACE_BOUNDS_H
 
 #include "coords.all.h"
+#include "double-size-t.any.h"
 #include "stdlib.any.h"
 #include "typenames.any.h"
 
@@ -31,7 +32,7 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 
 size_t mushbounds_clamped_size(const mushbounds*);
 
-size_t mushbounds_volume_on(const mushbounds*, mushdim);
+mush_double_size_t mushbounds_volume_on(const mushbounds*, mushdim);
 
 // The safe version works even if the bounds have beg > end.
 bool mushbounds_contains     (const mushbounds*, mushcoords);

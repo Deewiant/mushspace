@@ -1,5 +1,6 @@
 // File created: 2012-01-27 20:58:47
 
+#include "double-size-t.any.h"
 #include "space/map-no-place.98.h"
 
 #include <assert.h>
@@ -22,7 +23,8 @@ static bool mapex_in_static(
    void(*)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*));
 
 static bool get_next_in(
-   const mushspace*, const mushbounds*, mushcoords*, size_t*);
+   const mushspace*, const mushbounds*, mushcoords*,
+   void*, void(*g)(size_t, void*));
 
 static void get_next_in1(
    mushucell, const mushbounds*, mushcell, size_t, mushcoords, size_t,
@@ -71,11 +73,7 @@ void mushspace_map_no_place(
 
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.
-      size_t skipped = 0;
-      bool found = get_next_in(space, bounds, &pos, &skipped);
-      if (g)
-         g(skipped, fg);
-      if (!found)
+      if (!get_next_in(space, bounds, &pos, fg, g))
          return;
    }
 }
@@ -185,11 +183,7 @@ void mushspace_mapex_no_place(
 
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.
-      size_t skipped = 0;
-      bool found = get_next_in(space, bounds, &pos, &skipped);
-      if (g)
-         g(skipped, fg);
-      if (!found)
+      if (!get_next_in(space, bounds, &pos, fg, g))
          return;
    }
 }
@@ -378,14 +372,15 @@ bump_z:
 }
 
 // The next (linewise) allocated point after *pos which is also within the
-// given AABB. Updates *skipped to reflect the number of unallocated cells
-// skipped.
+// given AABB. Calls g with the first argument being the number of unallocated
+// cells skipped. This may require multiple calls if the number doesn't fit in
+// a size_t.
 //
 // Assumes that the point, if it exists, was allocated within some box: doesn't
 // look at bakaabb at all.
 static bool get_next_in(
    const mushspace* space, const mushbounds* bounds,
-   mushcoords* pos, size_t* skipped)
+   mushcoords* pos, void* gdata, void(*g)(size_t, void*))
 {
 restart:
    {
@@ -403,6 +398,14 @@ restart:
    mushcell_idx
       best_coord   = {.idx = box_count + 1},
       best_wrapped = {.idx = box_count + 1};
+
+   bool found = false;
+   mush_double_size_t skipped = {0,0};
+
+   // A helper to make sure that skipped doesn't overflow.
+   #define CLEAR_HI(x) \
+      for (; x.hi > 0; mush_double_size_t_sub1_into(&x, SIZE_MAX)) \
+         g(SIZE_MAX, gdata);
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
@@ -434,43 +437,65 @@ restart:
 
       // Old was already a space, or we wouldn't've called this function in the
       // first place. (See assertions.) Hence skipped is always at least one.
-      ++*skipped;
+      mush_double_size_t_add_into(&skipped, (mush_double_size_t){0,1});
 
       mushdim j;
 #if MUSHSPACE_DIM >= 2
-      for (j = 0; j < MUSHSPACE_DIM-1; ++j)
-         *skipped +=   mushcell_sub(bounds->end.v[j], old.v[j])
-                     * mushbounds_volume_on(bounds, j);
+      for (j = 0; j < MUSHSPACE_DIM-1; ++j) {
+         mush_double_size_t volume = mushbounds_volume_on(bounds, j);
+         CLEAR_HI(volume);
+         mush_double_size_t_mul1_into(
+            &volume, mushcell_sub(bounds->end.v[j], old.v[j]));
+         CLEAR_HI(skipped);
+         mush_double_size_t_add_into(&skipped, volume);
+      }
 #else
       // Avoid "condition is always true" warnings by doing this instead of the
       // above loop.
       j = MUSHSPACE_DIM - 1;
 #endif
 
-      skipped +=   mushcell_dec(mushcell_sub(pos->v[j], old.v[j]))
-                 * mushbounds_volume_on(bounds, j);
+      mush_double_size_t volume = mushbounds_volume_on(bounds, j);
+
+      // All-zero means (SIZE_MAX+1) * (SIZE_MAX+1). This can only happen with
+      // three or more dimensions, and with three dimensions only here (on the
+      // last axis).
+      if (MUSHSPACE_DIM == 3 && volume.hi == 0 && volume.lo == 0) {
+         volume.hi = SIZE_MAX;
+         volume.lo = 1;
+         g(SIZE_MAX, gdata);
+      }
+
+      CLEAR_HI(volume);
+      mush_double_size_t_mul1_into(
+         &volume, mushcell_dec(mushcell_sub(pos->v[j], old.v[j])));
+
+      CLEAR_HI(skipped);
+      mush_double_size_t_add_into(&skipped, volume);
 
       // When memcpying pos->v above, we may not end up in any box.
 
-      // If we didn't memcpy it's a guaranteed hit.
-      if (!i)
-         return true;
+      if (// If we didn't memcpy it's a guaranteed hit.
+          !i
 
-      // If we ended up in the box, that's fine too.
-      if (best_coord.idx < box_count
-       && mushbounds_contains(&space->boxen[best_coord.idx].bounds, *pos))
-         return true;
+          // If we ended up in the box, that's fine too.
+       || (   best_coord.idx < box_count
+           && mushbounds_contains(&space->boxen[best_coord.idx].bounds, *pos))
 
-      // If we ended up in some other box, that's also fine.
-      if (mushstaticaabb_contains(*pos))
-         return true;
-      if (mushspace_find_box(space, *pos))
-         return true;
+          // If we ended up in some other box, that's also fine.
+       || mushstaticaabb_contains(*pos) || mushspace_find_box(space, *pos))
+      {
+         found = true;
+         break;
+      }
 
       // Otherwise, go again with the new *pos.
       goto restart;
    }
-   return false;
+   CLEAR_HI(skipped);
+   if (skipped.lo != 0)
+      g(skipped.lo, gdata);
+   return found;
 }
 
 static void get_next_in1(

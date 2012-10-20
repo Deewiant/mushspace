@@ -13,11 +13,13 @@ size_t mushbounds_clamped_size(const mushbounds* bounds) {
 }
 
 #if !MUSHSPACE_93
-size_t mushbounds_volume_on(const mushbounds* bounds, mushdim axis) {
+mush_double_size_t mushbounds_volume_on(const mushbounds* bounds, mushdim axis)
+{
    assert (axis < MUSHSPACE_DIM);
-   size_t sz = 1;
+   mush_double_size_t sz = {0,1};
    for (mushdim i = 0; i < axis; ++i)
-      sz *= bounds->end.v[i] - bounds->beg.v[i] + 1;
+      mush_double_size_t_mul1_into(
+         &sz, mushcell_inc(mushcell_sub(bounds->end.v[i], bounds->beg.v[i])));
    return sz;
 }
 #endif
