@@ -22,13 +22,13 @@ size_t mush_size_t_add_clamped(size_t a, size_t b) {
 
 #if GNU_X86_ASM && SIZE_MAX <= 0xffffffff
 
-   __asm(  "addl %2,%1; movl %3,%0; cmovnol %1,%0"
+   __asm(  "addl %2,%1; movl %3,%0; cmovncl %1,%0"
          : "=r"(result), "+r"(a)
          : "r"(b), "n"(SIZE_MAX));
 
 #elif GNU_X86_ASM && SIZE_MAX <= 0xffffffffffffffff
 
-   __asm(  "addq %2,%1; movq %3,%0; cmovnoq %1,%0"
+   __asm(  "addq %2,%1; movq %3,%0; cmovncq %1,%0"
          : "=r"(result), "+r"(a)
          : "r"(b), "n"(SIZE_MAX));
 
@@ -44,7 +44,7 @@ size_t mush_size_t_mul_clamped(size_t a, size_t b) {
 #if GNU_X86_ASM && SIZE_MAX <= 0xffffffff
 
    size_t size;
-   __asm(  "movl %2,%0; mull %3; movl %4,%1; cmovol %1,%0"
+   __asm(  "movl %2,%0; mull %3; movl %4,%1; cmovcl %1,%0"
          : "=a"(result), "=r"(size)
          : "r"(a), "r"(b), "i"(~0)
          : "edx");
@@ -52,7 +52,7 @@ size_t mush_size_t_mul_clamped(size_t a, size_t b) {
 #elif GNU_X86_ASM && SIZE_MAX <= 0xffffffffffffffff
 
    size_t size;
-   __asm(  "movq %2,%0; mulq %3; movq %4,%1; cmovoq %1,%0"
+   __asm(  "movq %2,%0; mulq %3; movq %4,%1; cmovcq %1,%0"
          : "=a"(result), "=r"(size)
          : "r"(a), "r"(b), "i"(SIZE_MAX)
          : "rdx");
