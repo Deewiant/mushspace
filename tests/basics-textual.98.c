@@ -36,12 +36,19 @@ static size_t dummy(const void* a, const void* b, size_t c) {
    return c;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
    // We don't check bounds here: we'd end up essentially duplicating the logic
    // from load_string, and there's little point in that.
    tap_n(3*4 + 3*2 + 2);
 
-   init_genrand(time(NULL));
+   if (argc > 1) {
+      long s = atol(argv[1]);
+      init_by_array((uint32_t*)&s, sizeof s / sizeof(uint32_t));
+   } else {
+      time_t s = time(NULL);
+      init_by_array((uint32_t*)&s, sizeof s / sizeof(uint32_t));
+   }
+
    unsigned char *data = malloc(DATA_LEN);
    random_fill(data, DATA_LEN);
 

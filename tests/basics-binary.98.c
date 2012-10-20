@@ -38,10 +38,17 @@ static size_t dummy(const void* a, const void* b, size_t c) {
    return c;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
    tap_n((4+5)*4 + (3+5)*2 + (2+5));
 
-   init_genrand(time(NULL));
+   if (argc > 1) {
+      long s = atol(argv[1]);
+      init_by_array((uint32_t*)&s, sizeof s / sizeof(uint32_t));
+   } else {
+      time_t s = time(NULL);
+      init_by_array((uint32_t*)&s, sizeof s / sizeof(uint32_t));
+   }
+
    unsigned char *data = malloc(DATA_LEN);
    random_fill(data, DATA_LEN);
 
