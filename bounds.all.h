@@ -56,15 +56,11 @@ bool mushbounds_can_fuse(const mushbounds*, const mushbounds*);
 #endif
 
 // Modifies the given bounds to be such that they contain the given coordinates
-// but don't overlap with any of the given boxes. The coordinates should, of
-// course, be already contained between the beg and end.
-void mushbounds_tessellate(mushbounds*, mushcoords, mushcarr_mushbounds);
-
-// Since the algorithm is (currently) just a fold over the boxes, this simpler
-// version exists to simplify usage in some cases.
+// but don't overlap with the given const bounds. The coordinates should, of
+// course, be already contained in the (non-const) bounds.
 //
-// If the given bounds don't overlap with the area to be avoided, the bounds
-// are not modified.
-void mushbounds_tessellate1(mushbounds*, mushcoords, const mushbounds*);
+// If the given bounds don't overlap with the area to be avoided, they are not
+// modified.
+void mushbounds_tessellate(mushbounds*, mushcoords, const mushbounds*);
 
 #endif

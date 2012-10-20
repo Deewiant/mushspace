@@ -111,14 +111,6 @@ bool mushbounds_can_fuse(const mushbounds* a, const mushbounds* b) {
 }
 
 void mushbounds_tessellate(
-   mushbounds* bounds, mushcoords pos, mushcarr_mushbounds bs)
-{
-   assert (mushbounds_contains(bounds, pos));
-
-   for (size_t i = 0; i < bs.len; ++i)
-      mushbounds_tessellate1(bounds, pos, &bs.ptr[i]);
-}
-void mushbounds_tessellate1(
    mushbounds* bounds, mushcoords pos, const mushbounds* avoid)
 {
    assert (mushbounds_contains(bounds, pos));

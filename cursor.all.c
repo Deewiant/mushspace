@@ -314,10 +314,11 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
       cursor->actual_bounds = sp->bak.bounds;
 
       // bak is the lowest, so we tessellate with all boxes.
-      mushbounds_tessellate1(&cursor->actual_bounds, pos,
-                             &MUSHSTATICAABB_BOUNDS);
-      mushbounds_tessellate (&cursor->actual_bounds, pos,
-         (mushcarr_mushbounds){(const mushbounds*)sp->boxen, sp->box_count});
+      mushbounds_tessellate(&cursor->actual_bounds, pos,
+                            &MUSHSTATICAABB_BOUNDS);
+      for (size_t i = 0; i < sp->box_count; ++i)
+         mushbounds_tessellate(&cursor->actual_bounds, pos,
+                               &sp->boxen[i].bounds);
       break;
 
    case MushCursorMode_dynamic: {
@@ -335,9 +336,9 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
       cursor->obeg = bounds->beg;
 
       // Here we need to tessellate only with the boxes above cursor->box.
-      mushbounds_tessellate1(bounds, pos, &MUSHSTATICAABB_BOUNDS);
-      mushbounds_tessellate (bounds, pos,
-         (mushcarr_mushbounds){(const mushbounds*)sp->boxen, cursor->box_idx});
+      mushbounds_tessellate(bounds, pos, &MUSHSTATICAABB_BOUNDS);
+      for (size_t i = 0; i < cursor->box_idx; ++i)
+         mushbounds_tessellate(bounds, pos, &sp->boxen[i].bounds);
 
       cursor->rel_pos    = mushcoords_sub(pos, cursor->obeg);
       cursor->rel_bounds =
