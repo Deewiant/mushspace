@@ -5,5 +5,18 @@ include_rules
 ROOT = $(TUP_CWD)
 include $(ROOT)/mushspace.tup
 
-: *.o aabb/*.o bounds/*.o cursor/*.o space/*.o lib/icu/*.o |> !ccshared |> libmushspace.so
-: *.o aabb/*.o bounds/*.o cursor/*.o space/*.o lib/icu/*.o |> !ar |> libmushspace.a
+COMMON = *.any.o aabb/*.any.o bounds/*.any.o cursor/*.any.o space/*.any.o lib/icu/*.o
+COMMON98 = *.98.o aabb/*.98.o bounds/*.98.o cursor/*.98.o space/*.98.o
+
+# Only needed by Funge-98 tests that don't rely on a specific dimensionality.
+: $(COMMON) $(COMMON98) |> !ar       |> libmushspace.98.a
+: $(COMMON) $(COMMON98) |> !ccshared |> libmushspace.98.so
+
+: $(COMMON)             *.93.o aabb/*.93.o bounds/*.93.o cursor/*.93.o space/*.93.o |> !ar |> libmushspace.93.a
+: $(COMMON) $(COMMON98) *.1d.o aabb/*.1d.o bounds/*.1d.o cursor/*.1d.o space/*.1d.o |> !ar |> libmushspace.1d.a
+: $(COMMON) $(COMMON98) *.2d.o aabb/*.2d.o bounds/*.2d.o cursor/*.2d.o space/*.2d.o |> !ar |> libmushspace.2d.a
+: $(COMMON) $(COMMON98) *.3d.o aabb/*.3d.o bounds/*.3d.o cursor/*.3d.o space/*.3d.o |> !ar |> libmushspace.3d.a
+: $(COMMON)             *.93.o aabb/*.93.o bounds/*.93.o cursor/*.93.o space/*.93.o |> !ccshared |> libmushspace.93.so
+: $(COMMON) $(COMMON98) *.1d.o aabb/*.1d.o bounds/*.1d.o cursor/*.1d.o space/*.1d.o |> !ccshared |> libmushspace.1d.so
+: $(COMMON) $(COMMON98) *.2d.o aabb/*.2d.o bounds/*.2d.o cursor/*.2d.o space/*.2d.o |> !ccshared |> libmushspace.2d.so
+: $(COMMON) $(COMMON98) *.3d.o aabb/*.3d.o bounds/*.3d.o cursor/*.3d.o space/*.3d.o |> !ccshared |> libmushspace.3d.so

@@ -37,11 +37,32 @@ ifeq (@(BEFUNGE_93),y)
 : foreach *.93.c   |> !cc93pub |> %B.o
 endif
 
-EXTRAOBJS = util/*.o $(ROOT)/libmushspace.so
-: foreach *.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
+UTIL = util/*.o
 
-EXTRAOBJS = util/*.o $(ROOT)/libmushspace.a
-: foreach *.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.93.so
+: foreach *.93.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.93.a
+: foreach *.93.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
+
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.98.so
+: foreach *.98.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.98.a
+: foreach *.98.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
+
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.1d.so
+: foreach *.1d.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.1d.a
+: foreach *.1d.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
+
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.2d.so
+: foreach *.2d.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.2d.a
+: foreach *.2d.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
+
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.3d.so
+: foreach *.3d.o | $(EXTRAOBJS) |> !ccexe |> %B.shared.t
+EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.3d.a
+: foreach *.3d.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
 
 # Convenience: make sure the running script ends up in the build directory.
 : runme.sh.in |> cp %f %o |> runme.sh
