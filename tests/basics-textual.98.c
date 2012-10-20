@@ -29,7 +29,7 @@
 #define mushspace_put               CAT(mushspace,_put)
 #define mushspace_copy              CAT(mushspace,_copy)
 
-#define DATA_LEN ((1 << 20) * 21)
+#define DATA_LEN ((1 << 6) * 21)
 
 static size_t dummy(const void* a, const void* b, size_t c) {
    (void)a; (void)b;

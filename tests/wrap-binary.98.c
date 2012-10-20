@@ -31,7 +31,7 @@
 #define mushspace_put               CAT(mushspace,_put)
 #define mushspace_copy              CAT(mushspace,_copy)
 
-#define DATA_LEN ((1 << 20) * 21)
+#define DATA_LEN ((1 << 6) * 21)
 
 #define WRAP_AFTER 100
 
