@@ -28,7 +28,6 @@ typedef struct mushaabb {
 #define mushaabb_make_unsafe       MUSHSPACE_CAT(mushaabb,_make_unsafe)
 #define mushaabb_finalize          MUSHSPACE_CAT(mushaabb,_finalize)
 #define mushaabb_alloc             MUSHSPACE_CAT(mushaabb,_alloc)
-#define mushaabb_volume_on         MUSHSPACE_CAT(mushaabb,_volume_on)
 #define mushaabb_get               MUSHSPACE_CAT(mushaabb,_get)
 #define mushaabb_put               MUSHSPACE_CAT(mushaabb,_put)
 #define mushaabb_get_no_offset     MUSHSPACE_CAT(mushaabb,_get_no_offset)
@@ -44,8 +43,6 @@ void mushaabb_make       (mushaabb*, const mushbounds*);
 void mushaabb_make_unsafe(mushaabb*, const mushbounds*);
 void mushaabb_finalize   (mushaabb*);
 bool mushaabb_alloc      (mushaabb*);
-
-size_t mushaabb_volume_on(const mushaabb*, mushdim);
 
 mushcell mushaabb_get(const mushaabb*, mushcoords);
 void     mushaabb_put(      mushaabb*, mushcoords, mushcell);

@@ -170,7 +170,7 @@ int mushspace_map(mushspace* space, mushbounds bounds,
    if (!mushspace_place_box(space, &aabb, NULL, NULL))
       return MUSHERR_OOM;
 
-   mushspace_map_no_place(space, &aabb, data, f, NULL);
+   mushspace_map_no_place(space, &bounds, data, f, NULL);
    return MUSHERR_NONE;
 }
 void mushspace_map_existing(
@@ -179,7 +179,7 @@ void mushspace_map_existing(
 {
    mushaabb aabb;
    mushaabb_make(&aabb, &bounds);
-   mushspace_map_no_place(space, &aabb, data, f, g);
+   mushspace_map_no_place(space, &bounds, data, f, g);
 }
 
 void mushspace_invalidate_all(mushspace* space) {

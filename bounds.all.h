@@ -16,6 +16,7 @@ typedef struct mushbounds {
 MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 
 #define mushbounds_clamped_size    MUSHSPACE_CAT(mushbounds,_clamped_size)
+#define mushbounds_volume_on       MUSHSPACE_CAT(mushbounds,_volume_on)
 #define mushbounds_contains        MUSHSPACE_CAT(mushbounds,_contains)
 #define mushbounds_safe_contains   MUSHSPACE_CAT(mushbounds,_safe_contains)
 #define mushbounds_contains_bounds MUSHSPACE_CAT(mushbounds,_contains_bounds)
@@ -29,6 +30,8 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
    MUSHSPACE_CAT(mushbounds,_on_same_primary_axis)
 
 size_t mushbounds_clamped_size(const mushbounds*);
+
+size_t mushbounds_volume_on(const mushbounds*, mushdim);
 
 // The safe version works even if the bounds have beg > end.
 bool mushbounds_contains     (const mushbounds*, mushcoords);

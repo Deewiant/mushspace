@@ -41,18 +41,6 @@ bool mushaabb_alloc(mushaabb* aabb) {
    return true;
 }
 
-size_t mushaabb_volume_on(const mushaabb* aabb, mushdim axis) {
-   assert (axis < MUSHSPACE_DIM);
-#if MUSHSPACE_DIM >= 2
-   if (axis == 1) return aabb->width;
-#if MUSHSPACE_DIM >= 3
-   if (axis == 2) return aabb->area;
-#endif
-#endif
-   (void)aabb; (void)axis;
-   return 1;
-}
-
 mushcell mushaabb_get(const mushaabb* aabb, mushcoords c) {
    assert (mushbounds_contains(&aabb->bounds, c));
    return aabb->data[mushaabb_get_idx(aabb, c)];

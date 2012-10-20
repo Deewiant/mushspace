@@ -22,18 +22,18 @@ static bool mapex_in_static(
    void(*)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*));
 
 static bool get_next_in(
-   const mushspace*, const mushaabb*, mushcoords*, size_t*);
+   const mushspace*, const mushbounds*, mushcoords*, size_t*);
 
 static void get_next_in1(
    mushucell, const mushbounds*, mushcell, size_t, mushcoords, size_t,
    mushcell_idx*, mushcell_idx*);
 
 void mushspace_map_no_place(
-   mushspace* space, const mushaabb* aabb, void* fg,
+   mushspace* space, const mushbounds* bounds, void* fg,
    void(*f)(musharr_mushcell, void*), void(*g)(size_t, void*))
 {
-   mushcoords       pos = aabb->bounds.beg;
-   mushbounded_pos bpos = {&aabb->bounds, &pos};
+   mushcoords       pos = bounds->beg;
+   mushbounded_pos bpos = {bounds, &pos};
 
    for (;;) next_pos: {
       if (mushstaticaabb_contains(pos)) {
@@ -60,11 +60,11 @@ void mushspace_map_no_place(
          f((musharr_mushcell){p,1}, fg);
 
          for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-            if (pos.v[i] != aabb->bounds.end.v[i]) {
+            if (pos.v[i] != bounds->end.v[i]) {
                ++pos.v[i];
                goto next_pos;
             }
-            pos.v[i] = aabb->bounds.beg.v[i];
+            pos.v[i] = bounds->beg.v[i];
          }
          return;
       }
@@ -72,7 +72,7 @@ void mushspace_map_no_place(
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.
       size_t skipped = 0;
-      bool found = get_next_in(space, aabb, &pos, &skipped);
+      bool found = get_next_in(space, bounds, &pos, &skipped);
       if (g)
          g(skipped, fg);
       if (!found)
@@ -156,12 +156,12 @@ static bool map_in_static(
 // Does not use bakaabb, and indeed cannot due to the above data not making
 // sense with it.
 void mushspace_mapex_no_place(
-   mushspace* space, const mushaabb* aabb, void* fg,
+   mushspace* space, const mushbounds* bounds, void* fg,
    void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*),
    void(*g)(size_t, void*))
 {
-   mushcoords       pos = aabb->bounds.beg;
-   mushbounded_pos bpos = {&aabb->bounds, &pos};
+   mushcoords       pos = bounds->beg;
+   mushbounded_pos bpos = {bounds, &pos};
 
    for (;;) next_pos: {
       if (mushstaticaabb_contains(pos)) {
@@ -186,7 +186,7 @@ void mushspace_mapex_no_place(
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.
       size_t skipped = 0;
-      bool found = get_next_in(space, aabb, &pos, &skipped);
+      bool found = get_next_in(space, bounds, &pos, &skipped);
       if (g)
          g(skipped, fg);
       if (!found)
@@ -384,7 +384,7 @@ bump_z:
 // Assumes that the point, if it exists, was allocated within some box: doesn't
 // look at bakaabb at all.
 static bool get_next_in(
-   const mushspace* space, const mushaabb* aabb,
+   const mushspace* space, const mushbounds* bounds,
    mushcoords* pos, size_t* skipped)
 {
 restart:
@@ -408,12 +408,12 @@ restart:
 
       // Go through every box, starting from the static one.
 
-      get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
+      get_next_in1(i, bounds, pos->v[i], box_count,
                    MUSHSTATICAABB_BEG, box_count,
                    &best_coord, &best_wrapped);
 
       for (mushucell b = 0; b < box_count; ++b)
-         get_next_in1(i, &aabb->bounds, pos->v[i], box_count,
+         get_next_in1(i, bounds, pos->v[i], box_count,
                       space->boxen[b].bounds.beg, b,
                       &best_coord, &best_wrapped);
 
@@ -429,7 +429,7 @@ restart:
 
       const mushcoords old = *pos;
 
-      memcpy(pos->v, aabb->bounds.beg.v, i * sizeof(mushcell));
+      memcpy(pos->v, bounds->beg.v, i * sizeof(mushcell));
       pos->v[i] = best_coord.cell;
 
       // Old was already a space, or we wouldn't've called this function in the
@@ -439,8 +439,8 @@ restart:
       mushdim j;
 #if MUSHSPACE_DIM >= 2
       for (j = 0; j < MUSHSPACE_DIM-1; ++j)
-         *skipped +=   mushcell_sub(aabb->bounds.end.v[j], old.v[j])
-                     * mushaabb_volume_on(aabb, j);
+         *skipped +=   mushcell_sub(bounds->end.v[j], old.v[j])
+                     * mushbounds_volume_on(bounds, j);
 #else
       // Avoid "condition is always true" warnings by doing this instead of the
       // above loop.
@@ -448,7 +448,7 @@ restart:
 #endif
 
       skipped +=   mushcell_dec(mushcell_sub(pos->v[j], old.v[j]))
-                 * mushaabb_volume_on(aabb, j);
+                 * mushbounds_volume_on(bounds, j);
 
       // When memcpying pos->v above, we may not end up in any box.
 

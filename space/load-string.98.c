@@ -71,6 +71,7 @@ static int load_string_generic(
    //
    // Note that it may have beg > end along any number of axes!
    mushaabb aabb = aabbs.ptr[0];
+   mushbounds *bounds = &aabb.bounds;
    if (aabbs.len > 1) {
       // If any box was placed past an axis, the end of that axis is the
       // maximum of the ends of such boxes. Otherwise, it's the maximum of all
@@ -83,8 +84,6 @@ static int load_string_generic(
       // They may be smaller than the range from target to the end point due to
       // dropping space-filled lines and columns, but they haven't been
       // subsumed into bigger boxes or anything.
-
-      mushbounds *bounds = &aabb.bounds;
 
       uint8_t found_past = 0, found_before = 0;
 
@@ -130,18 +129,17 @@ static int load_string_generic(
             }
          }
       }
-      mushaabb_finalize(&aabb);
    }
 
    if (binary) {
       binary_load_arr_auxdata aux = {*str, str_end};
-      mushspace_map_no_place(space, &aabb, &aux,
+      mushspace_map_no_place(space, bounds, &aux,
                              binary_load_arr, binary_load_blank);
       *str = aux.str;
    } else {
       load_arr_auxdata aux =
          { *str, str_end
-         , &aabb.bounds
+         , bounds
          , target
       #if MUSHSPACE_DIM >= 2
          , target.x
@@ -151,7 +149,7 @@ static int load_string_generic(
       #endif
       };
 
-      mushspace_mapex_no_place(space, &aabb, &aux, load_arr, load_blank);
+      mushspace_mapex_no_place(space, bounds, &aux, load_arr, load_blank);
       *str = aux.str;
    }
    return MUSHERR_NONE;
