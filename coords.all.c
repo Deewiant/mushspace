@@ -83,6 +83,7 @@ mushcoords mushcoords_get_end_of_contiguous_range(
 #else
    (void)tessell_beg; (void)area_beg;
 #endif
+   *reached_to = false;
 
    for (mushucell i = 0; i < D-1; ++i) {
       if (end_pt.v[i] == to.v[i]) {
