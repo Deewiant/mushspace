@@ -51,7 +51,7 @@ mushcell mushcell_add_clamped(mushcell a, mushcell b) {
          : "r"(b), "n"(MUSHCELL_MAX));
 
 #else
-   result = a > MUSHCELL_MAX - b ? MUSHCELL_MAX : a + b;
+   result = a > mushcell_sub(MUSHCELL_MAX, b) ? MUSHCELL_MAX : a + b;
 #endif
    return result;
 }
@@ -71,7 +71,7 @@ mushcell mushcell_sub_clamped(mushcell a, mushcell b) {
          : "r"(b), "n"(MUSHCELL_MIN));
 
 #else
-   result = a < MUSHCELL_MIN + b ? MUSHCELL_MIN : a + b;
+   result = a < mushcell_add(MUSHCELL_MIN, b) ? MUSHCELL_MIN : a + b;
 #endif
    return result;
 }
