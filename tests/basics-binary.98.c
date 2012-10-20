@@ -54,8 +54,7 @@ int main(int argc, char **argv) {
 
    const size_t codepoints = DATA_LEN * CHAR_BIT / 21;
 
-   mushcoords beg, end;
-   random_fill(beg.v, sizeof beg.v);
+   mushcoords beg = MUSHCOORDS(1000000,1000000,1000000), end;
 
    void *space_buf = malloc(mushspace_sizeof);
    mushspace *space;
