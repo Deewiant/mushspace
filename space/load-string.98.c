@@ -9,7 +9,6 @@
 
 #include "lib/icu/utf.h"
 
-MUSH_DECL_DYN_ARRAY(mushaabb)
 MUSH_DECL_DYN_ARRAY(mushbounds)
 
 typedef struct {
@@ -35,44 +34,45 @@ static int load_string_generic(
    mushspace* space, const void** str, const void* str_end,
    mushcoords* end, mushcoords target, bool binary,
    void (*get_aabbs)(const void*, const void*, mushcoords, bool,
-                     musharr_mushaabb*),
+                     musharr_mushbounds*),
    void (*load_arr)         (musharr_mushcell, void*,
                              size_t, size_t, size_t, size_t, uint8_t*),
    void (*load_blank)       (size_t, size_t, void*),
    void (*binary_load_arr)  (musharr_mushcell, void*),
    void (*binary_load_blank)(size_t, size_t, void*))
 {
-   musharr_mushaabb aabbs;
-   get_aabbs(*str, str_end, target, binary, &aabbs);
+   musharr_mushbounds boundses;
+   get_aabbs(*str, str_end, target, binary, &boundses);
 
-   if (!aabbs.ptr) {
-      // The error code was placed in aabbs.len.
-      return (int)aabbs.len;
+   if (!boundses.ptr) {
+      // The error code was placed in boundses.len.
+      return (int)boundses.len;
    }
 
    if (end)
       *end = target;
 
-   if (!aabbs.len) {
+   if (!boundses.len) {
       if (end)
          end->x = mushcell_dec(end->x);
       return MUSHERR_NONE;
    }
 
-   for (size_t i = 0; i < aabbs.len; ++i) {
+   for (size_t i = 0; i < boundses.len; ++i) {
       if (end)
-         mushcoords_max_into(end, aabbs.ptr[i].bounds.end);
+         mushcoords_max_into(end, boundses.ptr[i].end);
 
-      if (!mushspace_place_box(space, &aabbs.ptr[i], NULL, NULL))
+      mushaabb aabb;
+      mushaabb_make_unsafe(&aabb, &boundses.ptr[i]);
+      if (!mushspace_place_box(space, &aabb, NULL, NULL))
          return MUSHERR_OOM;
    }
 
    // Build one to rule them all.
    //
    // Note that it may have beg > end along any number of axes!
-   mushaabb aabb = aabbs.ptr[0];
-   mushbounds *bounds = &aabb.bounds;
-   if (aabbs.len > 1) {
+   mushbounds *bounds = &boundses.ptr[0];
+   if (boundses.len > 1) {
       // If any box was placed past an axis, the end of that axis is the
       // maximum of the ends of such boxes. Otherwise, it's the maximum of all
       // the boxes' ends.
@@ -92,8 +92,8 @@ static int load_string_generic(
          else                                found_before |= 1 << i;
       }
 
-      for (size_t b = 1; b < aabbs.len; ++b) {
-         const mushbounds *box = &aabbs.ptr[b].bounds;
+      for (size_t b = 1; b < boundses.len; ++b) {
+         const mushbounds *box = &boundses.ptr[b];
 
          for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
             const uint8_t axis = 1 << i;
