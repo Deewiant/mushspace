@@ -34,7 +34,7 @@ endif
 ifeq (@(BEFUNGE_93),y)
 : foreach *.all.c  |> !cc93pub |> %B.93.o
 : foreach *.both.c |> !cc93pub |> %B.93.o
-: foreach *.93.c   |> !cc93pub |> %B.93.o
+: foreach *.93.c   |> !cc93pub |> %B.o
 endif
 
 EXTRAOBJS = util/*.o $(ROOT)/libmushspace.so
