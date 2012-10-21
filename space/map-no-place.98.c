@@ -399,9 +399,13 @@ restart:
    mush_double_size_t skipped = {0,0};
 
    // A helper to make sure that skipped doesn't overflow.
-   #define CLEAR_HI(x) \
-      g(x.hi, x.lo, gdata); \
-      x = (mush_double_size_t){0,0};
+   #define SAFE_ADD(x) do { \
+      if (skipped.hi > SIZE_MAX - (x).hi) { \
+         g(x.hi, x.lo, gdata); \
+         x = (mush_double_size_t){0,0}; \
+      } \
+      mush_double_size_t_add_into(&skipped, x); \
+   } while (0)
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
@@ -439,11 +443,15 @@ restart:
 #if MUSHSPACE_DIM >= 2
       for (j = 0; j < MUSHSPACE_DIM-1; ++j) {
          mush_double_size_t volume = mushbounds_volume_on(bounds, j);
-         CLEAR_HI(volume);
-         mush_double_size_t_mul1_into(
-            &volume, mushcell_sub(bounds->end.v[j], old.v[j]));
-         CLEAR_HI(skipped);
-         mush_double_size_t_add_into(&skipped, volume);
+         size_t volume_skips = mushcell_sub(bounds->end.v[j], old.v[j]);
+
+         // Make sure the multiplication doesn't overflow.
+         if (volume.hi)
+            while (volume_skips > SIZE_MAX / volume.hi)
+               g(volume.hi, volume.lo, gdata);
+
+         mush_double_size_t_mul1_into(&volume, volume_skips);
+         SAFE_ADD(volume);
       }
 #else
       // Avoid "condition is always true" warnings by doing this instead of the
@@ -452,21 +460,22 @@ restart:
 #endif
 
       mush_double_size_t volume = mushbounds_volume_on(bounds, j);
+      size_t volume_skips = mushcell_dec(mushcell_sub(pos->v[j], old.v[j]));
 
       // All-zero means (SIZE_MAX+1) * (SIZE_MAX+1). This can only happen with
       // three or more dimensions, and with three dimensions only here (on the
       // last axis).
       if (MUSHSPACE_DIM == 3 && volume.hi == 0 && volume.lo == 0) {
          volume.lo = 1;
-         g(SIZE_MAX, SIZE_MAX, gdata);
+         for (size_t i = volume_skips; i--;)
+            g(SIZE_MAX, SIZE_MAX, gdata);
       }
 
-      CLEAR_HI(volume);
-      mush_double_size_t_mul1_into(
-         &volume, mushcell_dec(mushcell_sub(pos->v[j], old.v[j])));
-
-      CLEAR_HI(skipped);
-      mush_double_size_t_add_into(&skipped, volume);
+      if (volume.hi)
+         while (volume_skips > SIZE_MAX / volume.hi)
+            g(volume.hi, volume.lo, gdata);
+      mush_double_size_t_mul1_into(&volume, volume_skips);
+      SAFE_ADD(volume);
 
       // When memcpying pos->v above, we may not end up in any box.
 
