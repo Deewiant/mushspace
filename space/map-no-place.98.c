@@ -444,9 +444,8 @@ restart:
       // first place. (See assertions.) Hence skipped is always at least one.
       mush_double_size_t_add_into(&skipped, (mush_double_size_t){0,1});
 
-      mushdim j;
-#if MUSHSPACE_DIM >= 2
-      for (j = 0; j < MUSHSPACE_DIM-1; ++j) {
+      // Add up the number of cells we skipped along the axes that got reset.
+      for (mushdim j = 0; j < i; ++j) {
          mush_double_size_t volume = mushbounds_volume_on(bounds, j);
          size_t volume_skips = mushcell_sub(bounds->end.v[j], old.v[j]);
 
@@ -458,14 +457,9 @@ restart:
          mush_double_size_t_mul1_into(&volume, volume_skips);
          SAFE_ADD(volume);
       }
-#else
-      // Avoid "condition is always true" warnings by doing this instead of the
-      // above loop.
-      j = MUSHSPACE_DIM - 1;
-#endif
 
-      mush_double_size_t volume = mushbounds_volume_on(bounds, j);
-      size_t volume_skips = mushcell_dec(mushcell_sub(pos->v[j], old.v[j]));
+      mush_double_size_t volume = mushbounds_volume_on(bounds, i);
+      size_t volume_skips = mushcell_dec(mushcell_sub(pos->v[i], old.v[i]));
 
       // All-zero means (SIZE_MAX+1) * (SIZE_MAX+1). This can only happen with
       // three or more dimensions, and with three dimensions only here (on the
