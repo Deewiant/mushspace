@@ -359,6 +359,8 @@ static size_t get_aabbs_binary(
 
       end.x = mushcell_sub(MUSHCELL_MIN, end.x - beg.x + 1);
       beg.x = MUSHCELL_MIN + postwrap_spaces;
+
+      codepoints -= prewrap_spaces;
    }
    end.x += codepoints - 1;
 
