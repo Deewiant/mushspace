@@ -160,11 +160,13 @@ static int load_string_generic(
 #define NEXT(s, s_end, c) do { (void)s_end; (c = (*(s)++)); } while (0)
 #include "space/load-string.inc.c"
 
+#define IS_UTF
 #define UTF _utf8
 #define C uint8_t
 #define NEXT(s, s_end, c) U8_NEXT_PTR(s, s_end, c)
 #include "space/load-string.inc.c"
 
+#define IS_UTF
 #define UTF _utf16
 #define C uint16_t
 #define NEXT(s, s_end, c) U16_NEXT_PTR(s, s_end, c)

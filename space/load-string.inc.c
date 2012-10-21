@@ -305,10 +305,12 @@ static size_t get_aabbs_binary(
 
    const size_t wrap_after_idx = (size_t)MUSHCELL_MAX - (size_t)beg.x;
 
-   // A good compiler should be able to optimize the loop away for non-UTF.
    size_t  prewrap_spaces = 0,
           postwrap_spaces = 0,
-          codepoints      = 0;
+          codepoints;
+
+#ifdef IS_UTF
+   codepoints = 0;
    bool wrap_spaces_done = false;
    for (const C* p = str_trimmed_beg; p < str_trimmed_end; ++codepoints) {
       mushcell c;
@@ -325,6 +327,21 @@ static size_t get_aabbs_binary(
          wrap_spaces_done = true;
    }
 
+   const bool wrapped = beg.x > MUSHCELL_MAX - (mushcell)(codepoints - 1);
+#else
+   // Help the poor compiler out.
+   codepoints = str_trimmed_end - str_trimmed_beg;
+
+   const bool wrapped = beg.x > MUSHCELL_MAX - (mushcell)(codepoints - 1);
+
+   if (wrapped) {
+      for (const C* p = str_trimmed_beg + wrap_after_idx; *++p == ' ';)
+         ++postwrap_spaces;
+      for (const C* p = str_trimmed_beg + wrap_after_idx; *p-- == ' ';)
+         ++prewrap_spaces;
+   }
+#endif
+
    if (codepoints >
           mush_size_t_add_clamped(
              (size_t)MUSHCELL_MAX - (size_t)MUSHCELL_MIN, 1))
@@ -336,8 +353,7 @@ static size_t get_aabbs_binary(
    mushcoords end = beg;
    size_t a = 0;
 
-   if (beg.x > MUSHCELL_MAX - (mushcell)(codepoints - 1)) {
-
+   if (wrapped) {
       end.x = MUSHCELL_MAX - prewrap_spaces;
       bounds[a++] = (mushbounds){beg, end};
 
