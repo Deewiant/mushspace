@@ -368,12 +368,12 @@ bump_z:
 }
 
 // The next (linewise) allocated point after *pos which is also within the
-// given AABB. Calls g with the first two arguments being the number of
+// given bounds. Calls g with the first two arguments being the number of
 // unallocated cells skipped (equivalently to a mush_double_size_t). This may
 // require multiple calls.
 //
-// Assumes that the point, if it exists, was allocated within some box: doesn't
-// look at bakaabb at all.
+// Assumes that that next point, if it exists, was allocated within some box:
+// doesn't look at bakaabb at all.
 static bool get_next_in(
    const mushspace* space, const mushbounds* bounds,
    mushcoords* pos, void* gdata, void(*g)(size_t, size_t, void*))
