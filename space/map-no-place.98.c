@@ -27,7 +27,7 @@ static bool get_next_in(
    void*, void(*g)(size_t, size_t, void*));
 
 static void get_next_in1(
-   mushucell, const mushbounds*, mushcell, size_t, mushcoords, size_t,
+   mushdim, const mushbounds*, mushcell, size_t, mushcoords, size_t,
    mushcell_idx*, mushcell_idx*);
 
 void mushspace_map_no_place(
@@ -502,7 +502,7 @@ restart:
 }
 
 static void get_next_in1(
-   mushucell x, const mushbounds* bounds, mushcell posx, size_t box_count,
+   mushdim x, const mushbounds* bounds, mushcell posx, size_t box_count,
    mushcoords box_beg, size_t box_idx,
    mushcell_idx* best_coord, mushcell_idx* best_wrapped)
 {
