@@ -34,13 +34,6 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
    bool changed = false;
 
    for (mushdim axis = 0; axis < MUSHSPACE_DIM; ++axis) {
-      found_nonspace |=
-         !find_beg_in(&bounds->beg, axis, &MUSHSTATICAABB_BOUNDS,
-                      mushstaticaabb_getter_no_offset, &space->static_box);
-
-      find_end_in(&bounds->end, axis, &MUSHSTATICAABB_BOUNDS,
-                  mushstaticaabb_getter_no_offset, &space->static_box);
-
       for (size_t i = 0; i < space->box_count; ++i) {
          if (find_beg_in(&bounds->beg, axis, &space->boxen[i].bounds,
                          mushaabb_getter_no_offset, &space->boxen[i]))
@@ -54,6 +47,16 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
          find_end_in(&bounds->end, axis, &space->boxen[i].bounds,
                      mushaabb_getter_no_offset, &space->boxen[i]);
       }
+
+      // The non-static boxes are more likely to give the more extreme bounds,
+      // so check the static box only afterwards, avoiding a lot of looping if
+      // it's very empty.
+      found_nonspace |=
+         !find_beg_in(&bounds->beg, axis, &MUSHSTATICAABB_BOUNDS,
+                      mushstaticaabb_getter_no_offset, &space->static_box);
+
+      find_end_in(&bounds->end, axis, &MUSHSTATICAABB_BOUNDS,
+                  mushstaticaabb_getter_no_offset, &space->static_box);
    }
 
    if (changed)
