@@ -369,8 +369,8 @@ bump_z:
 
 // The next (linewise) allocated point after *pos which is also within the
 // given bounds. Calls g with the first two arguments being the number of
-// unallocated cells skipped (equivalently to a mush_double_size_t). This may
-// require multiple calls.
+// unallocated cells within the bounds that were skipped (equivalently to a
+// mush_double_size_t). (This may require multiple calls to g.)
 //
 // Assumes that that next point, if it exists, was allocated within some box:
 // doesn't look at bakaabb at all.
@@ -409,7 +409,7 @@ restart:
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
-      // Go through every box, starting from the static one.
+      // Check every box until we find the best allocated solution.
 
       get_next_in1(i, bounds, pos->v[i], box_count,
                    MUSHSTATICAABB_BEG, box_count,
@@ -422,7 +422,7 @@ restart:
 
       if (best_coord.idx > box_count) {
          if (best_wrapped.idx > box_count) {
-            // No solution: look along the next axis.
+            // No solution along this axis: try the next one.
             continue;
          }
 
@@ -432,7 +432,12 @@ restart:
 
       const mushcoords old = *pos;
 
+      // Since we want to constrain pos to be in bounds, finding a solution
+      // along a non-X-axis implies that the lower axes get "reset" to
+      // bounds->beg. (Just like a line break brings the X position to the
+      // page's left edge.)
       memcpy(pos->v, bounds->beg.v, i * sizeof(mushcell));
+
       pos->v[i] = best_coord.cell;
 
       // Old was already a space, or we wouldn't've called this function in the
