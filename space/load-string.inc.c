@@ -311,7 +311,10 @@ static size_t get_aabbs_binary(
       (void)c;
    }
 
-   if (codepoints > (size_t)MUSHCELL_MAX) {
+   if (codepoints >
+          mush_size_t_add_clamped(
+             (size_t)MUSHCELL_MAX - (size_t)MUSHCELL_MIN, 1))
+   {
       // Oops, that's not going to fit! Bail.
       return SIZE_MAX;
    }
