@@ -280,10 +280,8 @@ static void get_aabbs(
 }
 
 static size_t get_aabbs_binary(
-   const C* str, const C* str_end, mushcoords target, mushbounds* bounds)
+   const C* str, const C* str_end, mushcoords beg, mushbounds* bounds)
 {
-   mushcoords beg = target;
-
    const C* str_trimmed_beg = str;
    for (;;) {
       if (str_trimmed_beg == str_end) {
@@ -321,7 +319,7 @@ static size_t get_aabbs_binary(
    mushcoords end = beg;
    size_t a = 0;
 
-   if (target.x > MUSHCELL_MAX - (mushcell)(codepoints - 1)) {
+   if (beg.x > MUSHCELL_MAX - (mushcell)(codepoints - 1)) {
       end.x = MUSHCELL_MAX;
       bounds[a++] = (mushbounds){beg, end};
       end.x = mushcell_sub(MUSHCELL_MIN, end.x - beg.x + 1);
