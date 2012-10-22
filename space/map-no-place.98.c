@@ -465,7 +465,8 @@ static void get_next_in1(
    mushcoords box_beg, size_t box_idx,
    mushcell_idx* best_coord, mushcell_idx* best_wrapped)
 {
-   assert (best_wrapped->cell <= best_coord->cell);
+   assert (!(best_coord->idx <= box_count && best_wrapped->idx <= box_count)
+        || best_wrapped->cell <= best_coord->cell);
 
    // If the box begins later than the best solution we've found, there's no
    // point in looking further into it.
