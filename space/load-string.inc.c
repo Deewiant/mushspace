@@ -146,7 +146,8 @@ static void get_aabbs(
          if (got_cr || c == '\n') {
             got_cr = false;
 
-            mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
+            if (found_nonspace_for == a)
+               mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
 
             pos.x = target.x;
 
@@ -227,8 +228,10 @@ static void get_aabbs(
 
       case '\f':
          #if MUSHSPACE_DIM >= 3
-            mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
-            mushcell_max_into(&bounds[a].end.y, last_nonspace.y);
+            if (found_nonspace_for == a) {
+               mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
+               mushcell_max_into(&bounds[a].end.y, last_nonspace.y);
+            }
 
             pos.x = target.x;
             pos.y = target.y;
