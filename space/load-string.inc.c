@@ -760,9 +760,8 @@ static void load_blank(mushcoords beg, mushcoords end, void* p) {
    load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
 
-   #if MUSHSPACE_DIM == 1
-   (void)str_end;
-   #endif
+   if (str == str_end)
+      return;
 
    mushcoords pos = aux->pos;
 
