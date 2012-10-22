@@ -30,6 +30,9 @@ static void get_next_in1(
    mushdim, const mushbounds*, mushcell, size_t, mushcoords, size_t,
    mushcell_idx*, mushcell_idx*);
 
+static mushcoords get_end_of_contiguous_range(
+   const mushbounds*, mushcoords*, const mushbounds*, bool*, mushcoords);
+
 void mushspace_map_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
    void(*f)(musharr_mushcell, void*), void(*g)(size_t, size_t, void*))
@@ -103,9 +106,8 @@ static bool map_in_box(
    bool hit_end;
    const size_t
       beg_idx = mushaabb_get_idx(box, *bpos.pos),
-      end_idx = mushaabb_get_idx(box, mushcoords_get_end_of_contiguous_range(
-         tes.end, bpos.pos, bpos.bounds->end,
-         bpos.bounds->beg, &hit_end, tes.beg, box->bounds.beg));
+      end_idx = mushaabb_get_idx(box, get_end_of_contiguous_range(
+         bpos.bounds, bpos.pos, &tes, &hit_end, box->bounds.beg));
 
    assert (beg_idx <= end_idx);
 
@@ -122,9 +124,9 @@ static bool map_in_static(
    bool hit_end;
    const size_t
       beg_idx = mushstaticaabb_get_idx(*bpos.pos),
-      end_idx = mushstaticaabb_get_idx(mushcoords_get_end_of_contiguous_range(
-         MUSHSTATICAABB_END, bpos.pos, bpos.bounds->end, bpos.bounds->beg,
-         &hit_end, MUSHSTATICAABB_BEG, MUSHSTATICAABB_BEG));
+      end_idx = mushstaticaabb_get_idx(get_end_of_contiguous_range(
+         bpos.bounds, bpos.pos, &MUSHSTATICAABB_BOUNDS,
+         &hit_end, MUSHSTATICAABB_BEG));
 
    assert (beg_idx <= end_idx);
 
@@ -198,7 +200,7 @@ static bool mapex_in_box(
    mushcoords       *pos    = bpos.pos;
 
    // These depend on the original pos and thus have to be initialized before
-   // the call to mushcoords_get_end_of_contiguous_range.
+   // the call to get_end_of_contiguous_range.
 
 #if MUSHSPACE_DIM >= 2
    // {box->bounds.beg.x, pos->y, pos->z}
@@ -225,9 +227,8 @@ static bool mapex_in_box(
    bool hit_end;
    const size_t
       beg_idx = mushaabb_get_idx(box, *pos),
-      end_idx = mushaabb_get_idx(box, mushcoords_get_end_of_contiguous_range(
-         tes.end, pos, bounds->end,
-         bounds->beg, &hit_end, tes.beg, box->bounds.beg));
+      end_idx = mushaabb_get_idx(box, get_end_of_contiguous_range(
+         bounds, pos, &tes, &hit_end, box->bounds.beg));
 
    assert (beg_idx <= end_idx);
 
@@ -312,9 +313,8 @@ static bool mapex_in_static(
    bool hit_end;
    size_t
       beg_idx = mushstaticaabb_get_idx(*pos),
-      end_idx = mushstaticaabb_get_idx(mushcoords_get_end_of_contiguous_range(
-         MUSHSTATICAABB_END, pos, bounds->end,
-         bounds->beg, &hit_end, MUSHSTATICAABB_BEG, MUSHSTATICAABB_BEG));
+      end_idx = mushstaticaabb_get_idx(get_end_of_contiguous_range(
+         bounds, pos, &MUSHSTATICAABB_BOUNDS, &hit_end, MUSHSTATICAABB_BEG));
 
    assert (beg_idx <= end_idx);
 
@@ -539,4 +539,111 @@ static void get_next_in1(
       best_coord->cell = box_beg.v[x];
       best_coord->idx  = box_idx;
    }
+}
+
+// Returns the end of the longest contiguous (linewise) range starting from
+// "from", in "bounds". If necessary, updates "from" to point to the start of
+// the next range after this one. When the returned value is equal to
+// bounds->end, "reached_end" is set to true.
+//
+// "tes_bounds" are the bounds in which we are allowed to be contiguous, due to
+// tessellation. They are guaranteed to be safe, unlike "bounds".
+//
+// "box_beg" is the beginning coordinate of the enclosing box.
+mushcoords get_end_of_contiguous_range(
+   const mushbounds* bounds,
+   mushcoords*       from,
+   const mushbounds* tes_bounds,
+   bool*             reached_end,
+   mushcoords        box_beg)
+{
+#if MUSHSPACE_DIM >= 2
+   mushcell orig_from[MUSHSPACE_DIM-1];
+   memcpy(orig_from, from->v + 1, sizeof orig_from);
+#else
+   (void)box_beg;
+#endif
+   *reached_end = false;
+
+   // The end point of this contiguous range, which we'll update as needed and
+   // eventually return.
+   mushcoords end = tes_bounds->end;
+
+   // Check all axes except for the last.
+   mushdim i = 0;
+   for (; i < MUSHSPACE_DIM-1; ++i) {
+      if (tes_bounds->end.v[i] == bounds->end.v[i]) {
+         // We can reach the end of "bounds" on this axis: we'll be going to
+         // the next line/page, then.
+         from->v[i] = bounds->beg.v[i];
+         continue;
+      }
+
+      const size_t remaining_bytes = (MUSHSPACE_DIM-(i+1)) * sizeof(mushcell);
+
+      // Did not reach the end point: the remaining axes won't change.
+      memcpy(end.v + i+1, from->v + i+1, remaining_bytes);
+
+      if (end.v[i] < bounds->end.v[i] || from->v[i] > bounds->end.v[i]) {
+         // Cannot reach the bounds->end on this axis: either because our
+         // tessellation limits us or because it's wrapped around with respect
+         // to "from", so it's not possible to reach it without going to
+         // another box.
+         //
+         // We can reach the end of our tessellated bounds, though. And the
+         // next point will simply follow that.
+         from->v[i] = mushcell_inc(end.v[i]);
+      } else {
+         // end.v[i] >= bounds->end.v[i] && from->v[i] <= bounds->end.v[i]
+
+         // We can reach bounds->end on this axis.
+         end.v[i] = bounds->end.v[i];
+
+         // If we happen to be at bounds->end on the remaining axes as well,
+         // then we've reached it completely.
+         if (!memcmp(end.v + i+1, bounds->end.v + i+1, remaining_bytes))
+            *reached_end = true;
+         else {
+            // We should go further on the next axis next time around, since
+            // we're done along this one.
+            from->v[i]   = bounds->beg.v[i];
+            from->v[i+1] = mushcell_inc(from->v[i+1]);
+         }
+      }
+      goto verify;
+   }
+   // All axes except the last were checked and found to be reachable. Check
+   // the last one analogously and set reached_end if we hit bounds->end.
+   if (end.v[i] == bounds->end.v[i])
+      *reached_end = true;
+   else {
+      if (end.v[i] < bounds->end.v[i] || from->v[i] > bounds->end.v[i])
+         from->v[i] = mushcell_inc(end.v[i]);
+      else {
+         end.v[i] = bounds->end.v[i];
+         *reached_end = true;
+      }
+   }
+verify:
+#if MUSHSPACE_DIM >= 2
+   for (mushdim j = 1; j < MUSHSPACE_DIM; ++j) {
+      // If we were going to cross a line/page but we're actually in a box
+      // tessellated in such a way that we can't, wibble things so that we just
+      // go to the end of the line/page.
+      if (end.v[j] > orig_from[j-1]
+       && tes_bounds->beg.v[j-1] != box_beg.v[j-1])
+      {
+         const size_t S               = sizeof(mushcell),
+                      remaining_bytes = (MUSHSPACE_DIM - j) * S;
+
+         memcpy(end.v   + j,   orig_from + j-1, remaining_bytes);
+         memcpy(from->v + j+1, orig_from + j,   remaining_bytes - S);
+         from->v[j] = mushcell_inc(orig_from[j-1]);
+
+         *reached_end = false;
+         break;
+      }
+   }
+#endif
+   return end;
 }

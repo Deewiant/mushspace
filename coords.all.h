@@ -47,8 +47,6 @@ typedef union mushcoords {
 #define mushcoords_subs_clamped MUSHSPACE_CAT(mushcoords,_subs_clamped)
 #define mushcoords_max_into     MUSHSPACE_CAT(mushcoords,_max_into)
 #define mushcoords_min_into     MUSHSPACE_CAT(mushcoords,_min_into)
-#define mushcoords_get_end_of_contiguous_range \
-   MUSHSPACE_CAT(mushcoords,_get_end_of_contiguous_range)
 
 mushcoords mushcoords_add(mushcoords, mushcoords);
 mushcoords mushcoords_sub(mushcoords, mushcoords);
@@ -67,15 +65,6 @@ mushcoords mushcoords_muls(mushcoords, mushcell);
 
 mushcoords mushcoords_adds_clamped(mushcoords, mushcell);
 mushcoords mushcoords_subs_clamped(mushcoords, mushcell);
-
-mushcoords mushcoords_get_end_of_contiguous_range(
-   mushcoords  end_pt,
-   mushcoords* from,
-   mushcoords  to,
-   mushcoords  orig_beg,
-   bool*       reached_to,
-   mushcoords  tessell_beg,
-   mushcoords  area_beg);
 #endif
 
 #endif
