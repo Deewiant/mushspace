@@ -454,57 +454,63 @@ static void load_arr(
    // But as soon as we jump into bounds we can compute the correct index based
    // on how pos differs compared to bounds->beg. This is what we do after
    // exiting this loop.
-   while (!mushbounds_safe_contains(bounds, pos)) {
-      if (str >= str_end) {
-         // All whitespace: nothing to do. Can happen if this isn't the first
-         // array into which we load.
-         return;
-      }
+   //
+   // This can only happen when this is the first call to this function, i.e.
+   // when we're loading into the first box. We shouldn't touch i otherwise.
+   size_t i = 0;
+   if (!mushbounds_safe_contains(bounds, pos)) {
+      do {
+         if (str >= str_end) {
+            // All whitespace: nothing to do. Can happen if this isn't the
+            // first array into which we load.
+            return;
+         }
 
-      const mushcell c = ASCII_READ(str);
-      (void)ASCII_NEXT(str);
-      switch (c) {
-      case ' ':
-         pos.x = mushcell_inc(pos.x);
+         const mushcell c = ASCII_READ(str);
+         (void)ASCII_NEXT(str);
+         switch (c) {
+         case ' ':
+            pos.x = mushcell_inc(pos.x);
 
-   #if MUSHSPACE_DIM < 2
-      case '\r': case '\n':
-   #endif
-   #if MUSHSPACE_DIM < 3
-      case '\f':
-   #endif
-         break;
+      #if MUSHSPACE_DIM < 2
+         case '\r': case '\n':
+      #endif
+      #if MUSHSPACE_DIM < 3
+         case '\f':
+      #endif
+            break;
 
-   #if MUSHSPACE_DIM >= 2
-      case '\r':
-         if (ASCII_READ(str) == '\n')
-            (void)ASCII_NEXT(str);
-      case '\n':
-         pos.x = target_x;
-         pos.y = mushcell_inc(pos.y);
-         break;
-   #endif
+      #if MUSHSPACE_DIM >= 2
+         case '\r':
+            if (ASCII_READ(str) == '\n')
+               (void)ASCII_NEXT(str);
+         case '\n':
+            pos.x = target_x;
+            pos.y = mushcell_inc(pos.y);
+            break;
+      #endif
 
-   #if MUSHSPACE_DIM >= 3
-      case '\f':
-         pos.x = target_x;
-         pos.y = target_y;
-         pos.z = mushcell_inc(pos.z);
-         break;
-   #endif
+      #if MUSHSPACE_DIM >= 3
+         case '\f':
+            pos.x = target_x;
+            pos.y = target_y;
+            pos.z = mushcell_inc(pos.z);
+            break;
+      #endif
 
-      default: assert (false);
-      }
+         default: assert (false);
+         }
+      } while (!mushbounds_safe_contains(bounds, pos));
+
+      #if MUSHSPACE_DIM >= 3
+         i = line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
+      #endif
+      #if MUSHSPACE_DIM >= 2
+         i = line_start              += (size_t)(pos.y - bounds->beg.y) *width;
+      #endif
+         i                           += (size_t)(pos.x - bounds->beg.x);
    }
 
-   size_t i = 0;
-   #if MUSHSPACE_DIM >= 3
-      i  = line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
-   #endif
-   #if MUSHSPACE_DIM >= 2
-      i  = line_start              += (size_t)(pos.y - bounds->beg.y) * width;
-   #endif
-      i                            += (size_t)(pos.x - bounds->beg.x);
    while (i < arr.len && str < str_end) {
       mushcell c;
       NEXT(str, str_end, c);
