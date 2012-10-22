@@ -592,14 +592,16 @@ mushcoords get_end_of_contiguous_range(
 #if MUSHSPACE_DIM >= 2
 verify:
    for (mushdim j = 1; j < MUSHSPACE_DIM; ++j) {
+      const size_t S = sizeof(mushcell);
+
       // If we were going to cross a line/page but we're actually in a box
-      // tessellated in such a way that we can't, wibble things so that we just
-      // go to the end of the line/page.
+      // tessellated in such a way that we can't (x and/or y don't match in the
+      // tessellation and the encompassing bounds), wibble things so that we
+      // just go to the end of the line/page.
       if (end.v[j] > orig_from[j-1]
-       && tes_bounds->beg.v[j-1] != bounds->beg.v[j-1])
+       && memcmp(tes_bounds->beg.v, bounds->beg.v, j * S))
       {
-         const size_t S               = sizeof(mushcell),
-                      remaining_bytes = (MUSHSPACE_DIM - j) * S;
+         const size_t remaining_bytes = (MUSHSPACE_DIM - j) * S;
 
          memcpy(end.v   + j,   orig_from + j-1, remaining_bytes);
          memcpy(from->v + j+1, orig_from + j,   remaining_bytes - S);
