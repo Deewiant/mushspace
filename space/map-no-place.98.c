@@ -573,6 +573,7 @@ mushcoords get_end_of_contiguous_range(
 
    // Check all axes except for the last.
    mushdim i = 0;
+#if MUSHSPACE_DIM >= 2
    for (; i < MUSHSPACE_DIM-1; ++i) {
       if (tes_bounds->end.v[i] == bounds->end.v[i]) {
          // We can reach the end of "bounds" on this axis: we'll be going to
@@ -614,6 +615,7 @@ mushcoords get_end_of_contiguous_range(
       }
       goto verify;
    }
+#endif
    // All axes except the last were checked and found to be reachable. Check
    // the last one analogously and set reached_end if we hit bounds->end.
    if (end.v[i] == bounds->end.v[i])
@@ -626,8 +628,8 @@ mushcoords get_end_of_contiguous_range(
          *reached_end = true;
       }
    }
-verify:
 #if MUSHSPACE_DIM >= 2
+verify:
    for (mushdim j = 1; j < MUSHSPACE_DIM; ++j) {
       // If we were going to cross a line/page but we're actually in a box
       // tessellated in such a way that we can't, wibble things so that we just
