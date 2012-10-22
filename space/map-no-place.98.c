@@ -465,9 +465,6 @@ static void get_next_in1(
    const mushbounds* box_bounds, size_t box_idx,
    mushcell_idx* best_coord, mushcell_idx* best_wrapped)
 {
-   assert (!(best_coord->idx <= box_count && best_wrapped->idx <= box_count)
-        || best_wrapped->cell <= best_coord->cell);
-
    // If the box begins later than the best solution we've found, there's no
    // point in looking further into it.
    //
@@ -487,6 +484,19 @@ static void get_next_in1(
    if (posx < bounds->beg.v[x] && box_bounds->beg.v[x] > bounds->end.v[x])
       return;
 
+   // The ordinary best solution is the minimal in-box position greater than
+   // pos.
+   if (box_bounds->end.v[x] > posx) {
+      if (box_bounds->beg.v[x] > posx)
+         best_coord->cell = box_bounds->beg.v[x];
+      else {
+         // beg <= pos < end, so pos+1 is fine. This increment can't wrap.
+         best_coord->cell = posx + 1;
+      }
+      best_coord->idx = box_idx;
+      return;
+   }
+
    // If the path from pos to bounds->end requires a wraparound, take the
    // global minimum box.beg as a last-resort option if nothing else is found,
    // so that we wrap around if there's no non-wrapping solution.
@@ -496,11 +506,6 @@ static void get_next_in1(
    {
       best_wrapped->cell = box_bounds->beg.v[x];
       best_wrapped->idx  = box_idx;
-
-   // The ordinary best solution is the minimal box.beg greater than pos.
-   } else if (box_bounds->beg.v[x] > posx) {
-      best_coord->cell = box_bounds->beg.v[x];
-      best_coord->idx  = box_idx;
    }
 }
 
