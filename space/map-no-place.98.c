@@ -28,7 +28,7 @@ static bool get_next_in(
    void*, void(*g)(mushcoords, mushcoords, void*));
 
 static void get_next_in1(
-   mushdim, const mushbounds*, mushcell, size_t, mushcoords, size_t,
+   mushdim, const mushbounds*, mushcell, size_t, const mushbounds*, size_t,
    mushcell_idx*, mushcell_idx*);
 
 static mushcoords get_end_of_contiguous_range(
@@ -413,13 +413,12 @@ restart:
       // Check every box until we find the best allocated solution.
 
       get_next_in1(i, bounds, pos->v[i], box_count,
-                   MUSHSTATICAABB_BEG, box_count,
+                   &MUSHSTATICAABB_BOUNDS, box_count,
                    &best_coord, &best_wrapped);
 
       for (mushucell b = 0; b < box_count; ++b)
          get_next_in1(i, bounds, pos->v[i], box_count,
-                      space->boxen[b].bounds.beg, b,
-                      &best_coord, &best_wrapped);
+                      &space->boxen[b].bounds, b, &best_coord, &best_wrapped);
 
       if (best_coord.idx > box_count) {
          if (best_wrapped.idx > box_count) {
@@ -462,7 +461,7 @@ restart:
 
 static void get_next_in1(
    mushdim x, const mushbounds* bounds, mushcell posx, size_t box_count,
-   mushcoords box_beg, size_t box_idx,
+   const mushbounds* box_bounds, size_t box_idx,
    mushcell_idx* best_coord, mushcell_idx* best_wrapped)
 {
    assert (!(best_coord->idx <= box_count && best_wrapped->idx <= box_count)
@@ -470,17 +469,18 @@ static void get_next_in1(
 
    // If the box begins later than the best solution we've found, there's no
    // point in looking further into it.
-   if (box_beg.v[x] >= best_coord->cell && best_coord->idx <= box_count)
+   if (box_bounds->beg.v[x] >= best_coord->cell
+    && best_coord->idx <= box_count)
       return;
 
    // If this box doesn't overlap with the AABB we're interested in, skip it.
-   if (!mushbounds_safe_contains(bounds, box_beg))
+   if (!mushbounds_safe_overlaps(bounds, box_bounds))
       return;
 
    // If pos has crossed an axis within the AABB, prevent us from grabbing a
    // new pos on the other side of the axis we're wrapped around, or we'll just
    // keep looping around that axis.
-   if (posx < bounds->beg.v[x] && box_beg.v[x] > bounds->end.v[x])
+   if (posx < bounds->beg.v[x] && box_bounds->beg.v[x] > bounds->end.v[x])
       return;
 
    // If the path from pos to bounds->end requires a wraparound, take the
@@ -490,14 +490,15 @@ static void get_next_in1(
    // Note that best_wrapped->cell <= best_coord->cell so we can safely test
    // this after the first best_coord->cell check.
    if (posx > bounds->end.v[x]
-    && (box_beg.v[x] < best_wrapped->cell || best_wrapped->idx > box_count))
+    && (box_bounds->beg.v[x] < best_wrapped->cell
+     || best_wrapped->idx > box_count))
    {
-      best_wrapped->cell = box_beg.v[x];
+      best_wrapped->cell = box_bounds->beg.v[x];
       best_wrapped->idx  = box_idx;
 
    // The ordinary best solution is the minimal box.beg greater than pos.
-   } else if (box_beg.v[x] > posx) {
-      best_coord->cell = box_beg.v[x];
+   } else if (box_bounds->beg.v[x] > posx) {
+      best_coord->cell = box_bounds->beg.v[x];
       best_coord->idx  = box_idx;
    }
 }
