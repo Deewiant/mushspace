@@ -697,15 +697,23 @@ static void load_arr(
              && ((c = ASCII_NEXT(str)) == ' '
               || (MUSHSPACE_DIM < 3 && c == '\f')));
 
-         if (str < str_end) {
-            assert (c == '\r' || c == '\n'
-                 || (MUSHSPACE_DIM == 3 && c == '\f'));
-
-            if (c == '\r' && str < str_end && ASCII_READ(str) == '\n')
-               (void)ASCII_NEXT(str);
-
-            pos.x = target_x;
-            pos.y = mushcell_inc(pos.y);
+         if (str < str_end) switch (c) {
+            case '\r':
+               if (str < str_end && ASCII_READ(str) == '\n')
+                  (void)ASCII_NEXT(str);
+            case '\n':
+               pos.x = target_x;
+               pos.y = mushcell_inc(pos.y);
+               break;
+         #if MUSHSPACE_DIM >= 3
+            case '\f':
+               *hit = 1 << 1;
+               pos.x = target_x;
+               pos.y = target_y;
+               pos.z = mushcell_inc(pos.z);
+               break;
+         #endif
+            default: assert (false);
          }
          goto end;
       }
