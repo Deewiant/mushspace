@@ -490,7 +490,7 @@ static void get_next_in1(
    // Note that best_wrapped->cell <= best_coord->cell so we can safely test
    // this after the first best_coord->cell check.
    if (posx > bounds->end.v[x]
-    && (box_beg.v[x] < best_wrapped->cell || best_wrapped->idx == box_count+1))
+    && (box_beg.v[x] < best_wrapped->cell || best_wrapped->idx > box_count))
    {
       best_wrapped->cell = box_beg.v[x];
       best_wrapped->idx  = box_idx;
