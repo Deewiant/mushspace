@@ -778,25 +778,27 @@ static void load_blank(mushcoords beg, mushcoords end, void* p) {
    {
       switch (ASCII_READ(str)) {
       case ' ':
-         if (pos.x == end.x)
-            break;
+         // The reason to abort here would be if pos == end, but that would've
+         // ended the loop already, so never abort here.
          pos.x = mushcell_inc(pos.x);
          continue;
 
    #if MUSHSPACE_DIM >= 2
+      #define Y_ONWARDS ((MUSHSPACE_DIM-1) * sizeof(mushcell))
       case '\r':
-         if (pos.y == end.y)
+         if (!memcmp(pos.v + 1, end.v + 1, Y_ONWARDS))
             break;
          if (str+1 < str_end && ASCII_READ(str+1) == '\n')
             (void)ASCII_NEXT(str);
          if (false) {
       case '\n':
-            if (pos.y == end.y)
+            if (!memcmp(pos.v + 1, end.v + 1, Y_ONWARDS))
                break;
          }
          pos.x = target_x;
          pos.y = mushcell_inc(pos.y);
          continue;
+      #undef Y_ONWARDS
    #else
       case '\r': case '\n': continue;
    #endif

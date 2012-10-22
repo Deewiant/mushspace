@@ -3,6 +3,7 @@
 #include "space/load-string.all.h"
 
 #include <assert.h>
+#include <string.h>
 
 #include "space/map-no-place.98.h"
 #include "space/place-box.98.h"
