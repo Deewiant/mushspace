@@ -33,7 +33,7 @@ static void get_next_in1(
    mushcell_idx*, mushcell_idx*);
 
 static mushcoords get_end_of_contiguous_range(
-   const mushbounds*, mushcoords*, const mushbounds*, bool*, mushcoords);
+   const mushbounds*, mushcoords*, const mushbounds*, bool*);
 
 void mushspace_map_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
@@ -108,8 +108,8 @@ static bool map_in_box(
    bool hit_end;
    const size_t
       beg_idx = mushaabb_get_idx(box, *bpos.pos),
-      end_idx = mushaabb_get_idx(box, get_end_of_contiguous_range(
-         bpos.bounds, bpos.pos, &tes, &hit_end, box->bounds.beg));
+      end_idx = mushaabb_get_idx(box,
+         get_end_of_contiguous_range(bpos.bounds, bpos.pos, &tes, &hit_end));
 
    assert (beg_idx <= end_idx);
 
@@ -127,8 +127,7 @@ static bool map_in_static(
    const size_t
       beg_idx = mushstaticaabb_get_idx(*bpos.pos),
       end_idx = mushstaticaabb_get_idx(get_end_of_contiguous_range(
-         bpos.bounds, bpos.pos, &MUSHSTATICAABB_BOUNDS,
-         &hit_end, MUSHSTATICAABB_BEG));
+         bpos.bounds, bpos.pos, &MUSHSTATICAABB_BOUNDS, &hit_end));
 
    assert (beg_idx <= end_idx);
 
@@ -233,8 +232,8 @@ static bool mapex_in_box(
    bool hit_end;
    const size_t
       beg_idx = mushaabb_get_idx(box, *pos),
-      end_idx = mushaabb_get_idx(box, get_end_of_contiguous_range(
-         bounds, pos, &tes, &hit_end, box->bounds.beg));
+      end_idx = mushaabb_get_idx(box,
+         get_end_of_contiguous_range(bounds, pos, &tes, &hit_end));
 
    assert (beg_idx <= end_idx);
 
@@ -321,7 +320,7 @@ static bool mapex_in_static(
    size_t
       beg_idx = mushstaticaabb_get_idx(*pos),
       end_idx = mushstaticaabb_get_idx(get_end_of_contiguous_range(
-         bounds, pos, &MUSHSTATICAABB_BOUNDS, &hit_end, MUSHSTATICAABB_BEG));
+         bounds, pos, &MUSHSTATICAABB_BOUNDS, &hit_end));
 
    assert (beg_idx <= end_idx);
 
@@ -556,20 +555,15 @@ static void get_next_in1(
 //
 // "tes_bounds" are the bounds in which we are allowed to be contiguous, due to
 // tessellation. They are guaranteed to be safe, unlike "bounds".
-//
-// "box_beg" is the beginning coordinate of the enclosing box.
 mushcoords get_end_of_contiguous_range(
    const mushbounds* bounds,
    mushcoords*       from,
    const mushbounds* tes_bounds,
-   bool*             reached_end,
-   mushcoords        box_beg)
+   bool*             reached_end)
 {
 #if MUSHSPACE_DIM >= 2
    mushcell orig_from[MUSHSPACE_DIM-1];
    memcpy(orig_from, from->v + 1, sizeof orig_from);
-#else
-   (void)box_beg;
 #endif
    *reached_end = false;
 
