@@ -669,12 +669,14 @@ static void load_arr(
    #if MUSHSPACE_DIM == 3
       if (*hit & 1 << 1) {
          C c;
-         while ((c = ASCII_READ(str)) == '\r' || c == '\n' || c == ' ')
-            (void)ASCII_NEXT(str);
+         while (str < str_end
+             && ((c = ASCII_NEXT(str)) == '\r' || c == '\n' || c == ' '));
 
          if (str < str_end) {
             assert (c == '\f');
-            (void)ASCII_NEXT(str);
+            pos.x = target_x;
+            pos.y = target_y;
+            pos.z = mushcell_inc(pos.z);
          }
          goto end;
       }
@@ -682,19 +684,19 @@ static void load_arr(
    #if MUSHSPACE_DIM >= 2
       if (*hit & 1 << 0) {
          C c;
-         while ((c = ASCII_READ(str)) == ' '
-             || (MUSHSPACE_DIM < 3 && c == '\f'))
-         {
-            (void)ASCII_NEXT(str);
-         }
+         while (str < str_end
+             && ((c = ASCII_NEXT(str)) == ' '
+              || (MUSHSPACE_DIM < 3 && c == '\f')));
 
          if (str < str_end) {
-            assert (c == '\r' || c == '\n');
-            if (ASCII_NEXT(str) == '\r' && str < str_end
-             && ASCII_READ(str) == '\n')
-            {
+            assert (c == '\r' || c == '\n'
+                 || (MUSHSPACE_DIM == 3 && c == '\f'));
+
+            if (c == '\r' && str < str_end && ASCII_READ(str) == '\n')
                (void)ASCII_NEXT(str);
-            }
+
+            pos.x = target_x;
+            pos.y = mushcell_inc(pos.y);
          }
          goto end;
       }
@@ -707,17 +709,27 @@ static void load_arr(
       if (ASCII_READ(str) == '\f') {
          (void)ASCII_NEXT(str);
          *hit = 1 << 1;
+         pos.x = target_x;
+         pos.y = target_y;
+         pos.z = mushcell_inc(pos.z);
          goto end;
       }
    #endif
    #if MUSHSPACE_DIM >= 2
+      bool newline = false;
       if (ASCII_READ(str) == '\r') {
          (void)ASCII_NEXT(str);
-         *hit = 1 << 0;
-      }
-      if (str < str_end && ASCII_READ(str) == '\n') {
+         if (str < str_end && ASCII_READ(str) == '\n')
+            (void)ASCII_NEXT(str);
+         newline = true;
+      } else if (ASCII_READ(str) == '\n') {
          (void)ASCII_NEXT(str);
+         newline = true;
+      }
+      if (newline) {
          *hit = 1 << 0;
+         pos.x = target_x;
+         pos.y = mushcell_inc(pos.y);
       }
    #endif
    #if MUSHSPACE_DIM >= 2
