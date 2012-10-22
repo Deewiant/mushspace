@@ -639,7 +639,7 @@ verify:
       // tessellated in such a way that we can't, wibble things so that we just
       // go to the end of the line/page.
       if (end.v[j] > orig_from[j-1]
-       && tes_bounds->beg.v[j-1] != box_beg.v[j-1])
+       && tes_bounds->beg.v[j-1] != bounds->beg.v[j-1])
       {
          const size_t S               = sizeof(mushcell),
                       remaining_bytes = (MUSHSPACE_DIM - j) * S;
