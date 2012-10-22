@@ -470,7 +470,7 @@ static void get_next_in1(
 
    // If the box begins later than the best solution we've found, there's no
    // point in looking further into it.
-   if (box_beg.v[x] >= best_coord->cell && best_coord->idx == box_count+1)
+   if (box_beg.v[x] >= best_coord->cell && best_coord->idx <= box_count)
       return;
 
    // If this box doesn't overlap with the AABB we're interested in, skip it.
