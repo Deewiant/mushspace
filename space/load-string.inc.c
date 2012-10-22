@@ -130,8 +130,8 @@ static void get_aabbs(
       bool got_cr = false;
    #endif
 
-   mushcell c;
    while (str < str_end) {
+      mushcell c;
       NEXT(str, str_end, c);
 
       #if MUSHSPACE_DIM >= 2
