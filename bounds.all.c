@@ -12,18 +12,6 @@ size_t mushbounds_clamped_size(const mushbounds* bounds) {
    return sz;
 }
 
-#if !MUSHSPACE_93
-mush_double_size_t mushbounds_volume_on(const mushbounds* bounds, mushdim axis)
-{
-   assert (axis < MUSHSPACE_DIM);
-   mush_double_size_t sz = {0,1};
-   for (mushdim i = 0; i < axis; ++i)
-      mush_double_size_t_mul1_into(
-         &sz, mushcell_inc(mushcell_sub(bounds->end.v[i], bounds->beg.v[i])));
-   return sz;
-}
-#endif
-
 bool mushbounds_contains(const mushbounds* bounds, mushcoords pos) {
    if (pos.x < bounds->beg.x || pos.x > bounds->end.x) return false;
 #if MUSHSPACE_DIM >= 2
