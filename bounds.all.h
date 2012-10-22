@@ -20,6 +20,7 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 #define mushbounds_safe_contains   MUSHSPACE_CAT(mushbounds,_safe_contains)
 #define mushbounds_contains_bounds MUSHSPACE_CAT(mushbounds,_contains_bounds)
 #define mushbounds_overlaps        MUSHSPACE_CAT(mushbounds,_overlaps)
+#define mushbounds_safe_overlaps   MUSHSPACE_CAT(mushbounds,_safe_overlaps)
 #define mushbounds_get_overlap     MUSHSPACE_CAT(mushbounds,_get_overlap)
 #define mushbounds_on_same_axis    MUSHSPACE_CAT(mushbounds,_on_same_axis)
 #define mushbounds_can_fuse        MUSHSPACE_CAT(mushbounds,_can_fuse)
@@ -36,6 +37,7 @@ bool mushbounds_safe_contains(const mushbounds*, mushcoords);
 
 bool mushbounds_contains_bounds(const mushbounds*, const mushbounds*);
 bool mushbounds_overlaps       (const mushbounds*, const mushbounds*);
+bool mushbounds_safe_overlaps  (const mushbounds*, const mushbounds*);
 
 #if !MUSHSPACE_93
 bool mushbounds_get_overlap(const mushbounds*, const mushbounds*, mushbounds*);

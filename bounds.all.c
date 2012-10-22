@@ -44,6 +44,18 @@ bool mushbounds_overlaps(const mushbounds* a, const mushbounds* b) {
          return false;
    return true;
 }
+bool mushbounds_safe_overlaps(const mushbounds* a, const mushbounds* b) {
+   for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
+      if (a->beg.v[i] > a->end.v[i]) {
+         if (a->beg.v[i] > b->end.v[i] && b->beg.v[i] > a->end.v[i])
+            return false;
+      } else {
+         if (a->beg.v[i] > b->end.v[i] || b->beg.v[i] > a->end.v[i])
+            return false;
+      }
+   }
+   return true;
+}
 
 #if !MUSHSPACE_93
 bool mushbounds_get_overlap(
