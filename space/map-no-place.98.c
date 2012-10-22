@@ -16,11 +16,13 @@ static bool map_in_static(mushspace*, mushbounded_pos,
 
 static bool mapex_in_box(
    mushspace*, mushbounded_pos, mushcaabb_idx, void*,
-   void(*)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*));
+   void(*)(musharr_mushcell, void*, const mushbounds*,
+           size_t, size_t, size_t, size_t, uint8_t*));
 
 static bool mapex_in_static(
    mushspace*, mushbounded_pos, void*,
-   void(*)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*));
+   void(*)(musharr_mushcell, void*, const mushbounds*,
+           size_t, size_t, size_t, size_t, uint8_t*));
 
 static bool get_next_in(
    const mushspace*, const mushbounds*, mushcoords*,
@@ -141,6 +143,8 @@ static bool map_in_static(
 // calculations with the location of the mushcell* (probably quite specific to
 // file loading, where this is used):
 //
+// - The bounds of the enclosing box.
+//
 // - The width and area of the enclosing box.
 //
 // - The indices in the mushcell* of the previous line and page (note: always
@@ -154,7 +158,8 @@ static bool map_in_static(
 // sense with it.
 void mushspace_mapex_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
-   void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*),
+   void(*f)(musharr_mushcell, void*, const mushbounds*,
+            size_t, size_t, size_t, size_t, uint8_t*),
    void(*g)(size_t, size_t, void*))
 {
    mushcoords       pos = bounds->beg;
@@ -191,7 +196,8 @@ static bool mapex_in_box(
    mushspace* space, mushbounded_pos bpos,
    mushcaabb_idx cai,
    void* caller_data,
-   void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*))
+   void(*f)(musharr_mushcell, void*, const mushbounds*,
+            size_t, size_t, size_t, size_t, uint8_t*))
 {
    size_t width, area, line_start, page_start;
 
@@ -256,7 +262,7 @@ static bool mapex_in_box(
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
    f((musharr_mushcell){box->data + beg_idx, length},
-     caller_data, width, area, line_start, page_start, &hit);
+     caller_data, &box->bounds, width, area, line_start, page_start, &hit);
 #pragma GCC diagnostic pop
 
 #if MUSHSPACE_DIM >= 2
@@ -288,7 +294,8 @@ bump_z:
 static bool mapex_in_static(
    mushspace* space, mushbounded_pos bpos,
    void* caller_data,
-   void(*f)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*))
+   void(*f)(musharr_mushcell, void*, const mushbounds*,
+            size_t, size_t, size_t, size_t, uint8_t*))
 {
    size_t width, area, line_start, page_start;
 
@@ -340,7 +347,8 @@ static bool mapex_in_static(
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
    f((musharr_mushcell){space->static_box.array + beg_idx, length},
-     caller_data, width, area, line_start, page_start, &hit);
+     caller_data, &MUSHSTATICAABB_BOUNDS, width, area,
+     line_start, page_start, &hit);
 #pragma GCC diagnostic pop
 
 #if MUSHSPACE_DIM >= 2

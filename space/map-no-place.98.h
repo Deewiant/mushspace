@@ -19,7 +19,8 @@ void mushspace_map_no_place(
 
 void mushspace_mapex_no_place(
    mushspace*, const mushbounds*, void*,
-   void(*)(musharr_mushcell, void*, size_t, size_t, size_t, size_t, uint8_t*),
+   void(*)(musharr_mushcell, void*, const mushbounds*,
+           size_t, size_t, size_t, size_t, uint8_t*),
    void(*)(size_t, size_t, void*));
 
 #endif

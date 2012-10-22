@@ -26,7 +26,7 @@ static size_t get_aabbs_binary(const C*, const C*, mushcoords, mushbounds*);
 
 static void binary_load_arr(musharr_mushcell, void*);
 static void binary_load_blank(size_t, size_t, void*);
-static void load_arr(musharr_mushcell, void*,
+static void load_arr(musharr_mushcell, void*, const mushbounds*,
                      size_t, size_t, size_t, size_t, uint8_t*);
 static void load_blank(size_t, size_t, void*);
 
@@ -404,12 +404,13 @@ static void binary_load_blank(size_t blanks_size_max, size_t blanks, void* p) {
 }
 
 static void load_arr(
-   musharr_mushcell arr, void* p,
+   musharr_mushcell arr, void* p, const mushbounds* box_bounds,
    size_t width, size_t area, size_t line_start, size_t page_start,
    uint8_t* hit)
 {
    #if MUSHSPACE_DIM == 1
-   (void)width; (void)area; (void)line_start; (void)page_start; (void)hit;
+   (void)box_bounds; (void)width; (void)line_start;
+   (void)area; (void)page_start; (void)hit;
    #elif MUSHSPACE_DIM == 2
    (void)area; (void)page_start;
    #endif
@@ -595,11 +596,10 @@ static void load_arr(
             default: assert (false);
             }
          }
-         if (i >= arr.len) {
-            // The next cell we would want to load falls on the next line:
-            // report that.
+         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
+            // The next cell we would want to load falls on the next line,
+            // which is in another box: report that.
             *hit = 1 << 0;
-
             aux->str = str;
             aux->pos = pos;
             return;
@@ -648,9 +648,8 @@ static void load_arr(
             default: assert (false);
             }
          }
-         if (i >= arr.len) {
+         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
             *hit = 1 << 1;
-
             aux->str = str;
             aux->pos = pos;
             return;
