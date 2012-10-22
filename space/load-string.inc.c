@@ -144,9 +144,6 @@ static void get_aabbs(
          if (got_cr || c == '\n') {
             got_cr = false;
 
-            if (found_nonspace_for == a)
-               mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
-
             pos.x = target.x;
 
             if ((pos.y = mushcell_inc(pos.y)) == MUSHCELL_MIN) {
@@ -165,6 +162,8 @@ static void get_aabbs(
                return;
             } else if (a & 0x01)
                UPDATE_BOUNDS_WITH_LAST_NONSPACE;
+            else if (found_nonspace_for == a)
+               mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
 
             a &= ~0x01;
 
@@ -226,10 +225,6 @@ static void get_aabbs(
 
       case '\f':
          #if MUSHSPACE_DIM >= 3
-            if (found_nonspace_for == a) {
-               mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
-               mushcell_max_into(&bounds[a].end.y, last_nonspace.y);
-            }
 
             pos.x = target.x;
             pos.y = target.y;
@@ -249,6 +244,10 @@ static void get_aabbs(
                return;
             } else if (a & 0x03)
                UPDATE_BOUNDS_WITH_LAST_NONSPACE;
+            else if (found_nonspace_for == a) {
+               mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
+               mushcell_max_into(&bounds[a].end.y, last_nonspace.y);
+            }
 
             a &= ~0x03;
             get_beg = found_nonspace_for == a ? 0x03 : DimensionBits;
