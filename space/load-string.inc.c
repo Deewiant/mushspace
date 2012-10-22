@@ -132,10 +132,8 @@ static void get_aabbs(
 
    // A helper we'll be using a number of times.
    #define UPDATE_BOUNDS_WITH_LAST_NONSPACE do { \
-      if (found_nonspace_for != MUSH_ARRAY_LEN(bounds)) { \
-         assert (found_nonspace_for == a); \
+      if (found_nonspace_for == a) \
          mushcoords_max_into(&bounds[a].end, last_nonspace); \
-      } \
    } while (0)
 
    while (str < str_end) {
