@@ -453,7 +453,8 @@ restart:
          return true;
       }
 
-      // Otherwise, go again with the new *pos.
+      // Otherwise, go again with the new *pos. Akin to continuing along on the
+      // next line/page.
       goto restart;
    }
    return false;
@@ -469,6 +470,9 @@ static void get_next_in1(
 
    // If the box begins later than the best solution we've found, there's no
    // point in looking further into it.
+   //
+   // This seems somewhat nontrivial in the presence of wraparound but I've
+   // convinced myself that it's true.
    if (box_bounds->beg.v[x] >= best_coord->cell
     && best_coord->idx <= box_count)
       return;
@@ -477,7 +481,7 @@ static void get_next_in1(
    if (!mushbounds_safe_overlaps(bounds, box_bounds))
       return;
 
-   // If pos has crossed an axis within the AABB, prevent us from grabbing a
+   // If pos has crossed an axis within the bounds, prevent us from grabbing a
    // new pos on the other side of the axis we're wrapped around, or we'll just
    // keep looping around that axis.
    if (posx < bounds->beg.v[x] && box_bounds->beg.v[x] > bounds->end.v[x])
@@ -486,9 +490,6 @@ static void get_next_in1(
    // If the path from pos to bounds->end requires a wraparound, take the
    // global minimum box.beg as a last-resort option if nothing else is found,
    // so that we wrap around if there's no non-wrapping solution.
-   //
-   // Note that best_wrapped->cell <= best_coord->cell so we can safely test
-   // this after the first best_coord->cell check.
    if (posx > bounds->end.v[x]
     && (box_bounds->beg.v[x] < best_wrapped->cell
      || best_wrapped->idx > box_count))
