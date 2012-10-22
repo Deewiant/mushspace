@@ -268,13 +268,14 @@ static bool mapex_in_box(
    if (hit == 0x01 && pos->y == prev_y) {
       // f hit an EOL and pos->y hasn't been bumped, so bump it.
       pos->x = bounds->beg.x;
-      if ((pos->y = mushcell_inc(pos->y)) > bounds->end.y) {
+      if (pos->y == bounds->end.y) {
          #if MUSHSPACE_DIM >= 3
             goto bump_z;
          #else
             hit_end = true;
          #endif
-      }
+      } else
+         pos->y = mushcell_inc(pos->y);
    }
 #endif
 #if MUSHSPACE_DIM >= 3
@@ -283,8 +284,10 @@ static bool mapex_in_box(
       pos->x = bounds->beg.x;
 bump_z:
       pos->y = bounds->beg.y;
-      if ((pos->z = mushcell_inc(pos->z)) > bounds->end.z)
+      if (pos->z == bounds->end.z)
          hit_end = true;
+      else
+         pos->z = mushcell_inc(pos->z);
    }
 #endif
    return hit_end;
@@ -353,13 +356,14 @@ static bool mapex_in_static(
 #if MUSHSPACE_DIM >= 2
    if (hit == 0x01 && pos->y == prev_y) {
       pos->x = bounds->beg.x;
-      if ((pos->y = mushcell_inc(pos->y)) > bounds->end.y) {
+      if (pos->y == bounds->end.y) {
          #if MUSHSPACE_DIM >= 3
             goto bump_z;
          #else
             hit_end = true;
          #endif
-      }
+      } else
+         pos->y = mushcell_inc(pos->y);
    }
 #endif
 #if MUSHSPACE_DIM >= 3
@@ -367,8 +371,10 @@ static bool mapex_in_static(
       pos->x = bounds->beg.x;
 bump_z:
       pos->y = bounds->beg.y;
-      if ((pos->z = mushcell_inc(pos->z)) > bounds->end.z)
+      if (pos->z == bounds->end.z)
          hit_end = true;
+      else
+         pos->z = mushcell_inc(pos->z);
    }
 #endif
    return hit_end;
