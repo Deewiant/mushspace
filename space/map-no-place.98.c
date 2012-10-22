@@ -1,6 +1,5 @@
 // File created: 2012-01-27 20:58:47
 
-#include "double-size-t.any.h"
 #include "space/map-no-place.98.h"
 
 #include <assert.h>
@@ -26,7 +25,7 @@ static bool mapex_in_static(
 
 static bool get_next_in(
    const mushspace*, const mushbounds*, mushcoords*,
-   void*, void(*g)(size_t, size_t, void*));
+   void*, void(*g)(mushcoords, mushcoords, void*));
 
 static void get_next_in1(
    mushdim, const mushbounds*, mushcell, size_t, mushcoords, size_t,
@@ -37,7 +36,7 @@ static mushcoords get_end_of_contiguous_range(
 
 void mushspace_map_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
-   void(*f)(musharr_mushcell, void*), void(*g)(size_t, size_t, void*))
+   void(*f)(musharr_mushcell, void*), void(*g)(mushcoords, mushcoords, void*))
 {
    mushcoords       pos = bounds->beg;
    mushbounded_pos bpos = {bounds, &pos};
@@ -159,7 +158,7 @@ void mushspace_mapex_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
    void(*f)(musharr_mushcell, void*, const mushbounds*,
             size_t, size_t, size_t, size_t, uint8_t*),
-   void(*g)(size_t, size_t, void*))
+   void(*g)(mushcoords, mushcoords, void*))
 {
    mushcoords       pos = bounds->beg;
    mushbounded_pos bpos = {bounds, &pos};
@@ -381,16 +380,17 @@ bump_z:
 }
 
 // The next (linewise) allocated point after *pos which is also within the
-// given bounds. Calls g with the first two arguments being the number of
-// unallocated cells within the bounds that were skipped (equivalently to a
-// mush_double_size_t). (This may require multiple calls to g.)
+// given bounds. Calls g with the first two arguments being the current point
+// and the next point respectively.
 //
 // Assumes that that next point, if it exists, was allocated within some box:
 // doesn't look at bakaabb at all.
 static bool get_next_in(
    const mushspace* space, const mushbounds* bounds,
-   mushcoords* pos, void* gdata, void(*g)(size_t, size_t, void*))
+   mushcoords* pos, void* gdata, void(*g)(mushcoords, mushcoords, void*))
 {
+   const mushcoords orig = *pos;
+
 restart:
    {
       assert (!mushstaticaabb_contains(*pos));
@@ -407,18 +407,6 @@ restart:
    mushcell_idx
       best_coord   = {.idx = box_count + 1},
       best_wrapped = {.idx = box_count + 1};
-
-   bool found = false;
-   mush_double_size_t skipped = {0,0};
-
-   // A helper to make sure that skipped doesn't overflow.
-   #define SAFE_ADD(x) do { \
-      if (skipped.hi > SIZE_MAX - (x).hi) { \
-         g(x.hi, x.lo, gdata); \
-         x = (mush_double_size_t){0,0}; \
-      } \
-      mush_double_size_t_add_into(&skipped, x); \
-   } while (0)
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
@@ -443,8 +431,6 @@ restart:
          best_coord = best_wrapped;
       }
 
-      const mushcoords old = *pos;
-
       // Since we want to constrain pos to be in bounds, finding a solution
       // along a non-X-axis implies that the lower axes get "reset" to
       // bounds->beg. (Just like a line break brings the X position to the
@@ -453,44 +439,7 @@ restart:
 
       pos->v[i] = best_coord.cell;
 
-      // Old was already a space, or we wouldn't've called this function in the
-      // first place. (See assertions.) Hence skipped is always at least one.
-      mush_double_size_t_add_into(&skipped, (mush_double_size_t){0,1});
-
-      // Add up the number of cells we skipped along the axes that got reset.
-      for (mushdim j = 0; j < i; ++j) {
-         mush_double_size_t volume = mushbounds_volume_on(bounds, j);
-         size_t volume_skips = mushcell_sub(bounds->end.v[j], old.v[j]);
-
-         // Make sure the multiplication doesn't overflow.
-         if (volume.hi)
-            while (volume_skips > SIZE_MAX / volume.hi)
-               g(volume.hi, volume.lo, gdata);
-
-         mush_double_size_t_mul1_into(&volume, volume_skips);
-         SAFE_ADD(volume);
-      }
-
-      mush_double_size_t volume = mushbounds_volume_on(bounds, i);
-      size_t volume_skips = mushcell_dec(mushcell_sub(pos->v[i], old.v[i]));
-
-      // All-zero means (SIZE_MAX+1) * (SIZE_MAX+1). This can only happen with
-      // three or more dimensions, and with three dimensions only here (on the
-      // last axis).
-      if (MUSHSPACE_DIM == 3 && volume.hi == 0 && volume.lo == 0) {
-         volume.lo = 1;
-         for (size_t i = volume_skips; i--;)
-            g(SIZE_MAX, SIZE_MAX, gdata);
-      }
-
-      if (volume.hi)
-         while (volume_skips > SIZE_MAX / volume.hi)
-            g(volume.hi, volume.lo, gdata);
-      mush_double_size_t_mul1_into(&volume, volume_skips);
-      SAFE_ADD(volume);
-
       // When memcpying pos->v above, we may not end up in any box.
-
       if (// If we didn't memcpy it's a guaranteed hit.
           !i
 
@@ -501,16 +450,14 @@ restart:
           // If we ended up in some other box, that's also fine.
        || mushstaticaabb_contains(*pos) || mushspace_find_box(space, *pos))
       {
-         found = true;
-         break;
+         g(orig, *pos, gdata);
+         return true;
       }
 
       // Otherwise, go again with the new *pos.
       goto restart;
    }
-   if (skipped.hi || skipped.lo)
-      g(skipped.hi, skipped.lo, gdata);
-   return found;
+   return false;
 }
 
 static void get_next_in1(

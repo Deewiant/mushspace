@@ -100,7 +100,8 @@ void mushspace_get_loose_bounds(const mushspace*, mushbounds*);
 
 void mushspace_map_existing(
    mushspace*, mushbounds,
-   void(*)(musharr_mushcell, void*), void(*)(size_t, size_t, void*), void*);
+   void(*)(musharr_mushcell, void*),
+   void(*)(mushcoords, mushcoords, void*), void*);
 
 #if !MUSHSPACE_93
 int mushspace_map(mushspace*, mushbounds,

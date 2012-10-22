@@ -25,10 +25,10 @@ static void get_aabbs(
 static size_t get_aabbs_binary(const C*, const C*, mushcoords, mushbounds*);
 
 static void binary_load_arr(musharr_mushcell, void*);
-static void binary_load_blank(size_t, size_t, void*);
+static void binary_load_blank(mushcoords, mushcoords, void*);
 static void load_arr(musharr_mushcell, void*, const mushbounds*,
                      size_t, size_t, size_t, size_t, uint8_t*);
-static void load_blank(size_t, size_t, void*);
+static void load_blank(mushcoords, mushcoords, void*);
 
 int MUSHSPACE_CAT(mushspace_load_string,UTF)(
    mushspace* space, const C* str, size_t len,
@@ -398,13 +398,12 @@ static void binary_load_arr(musharr_mushcell arr, void* p) {
    aux->str = str;
 }
 
-static void binary_load_blank(size_t blanks_size_max, size_t blanks, void* p) {
-   // The loaded string would've had to have been greater than SIZE_MAX in
-   // length, and that's impossible.
-   assert (blanks_size_max == 0);
-
+static void binary_load_blank(mushcoords beg, mushcoords end, void* p) {
    binary_load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
+
+   size_t blanks = (size_t)mushcell_sub(end.x, beg.x);
+
    (void)str_end;
    while (blanks) {
       assert (str < str_end);
@@ -752,22 +751,55 @@ end:
    aux->pos = pos;
 }
 
-static void load_blank(size_t blanks_size_max, size_t blanks, void* p) {
-   // As in binary_load_blank, this is impossible.
-   assert (blanks_size_max == 0);
+static void load_blank(mushcoords beg, mushcoords end, void* p) {
+   (void)beg;
 
    load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
+
+   #if MUSHSPACE_DIM == 1
    (void)str_end;
-   while (blanks) {
+   #endif
+
+   mushcoords pos = aux->pos;
+
+   #if MUSHSPACE_DIM >= 2
+      const mushcell target_x = aux->target_x;
+   #if MUSHSPACE_DIM >= 3
+      const mushcell target_y = aux->target_y;
+   #endif
+   #endif
+
+   while (!mushcoords_equal(pos, end)) {
       assert (str < str_end);
-      C c = ASCII_READ(str);
-      if (!(c == ' ' || c == '\r' || c == '\n' || c == '\f'))
+
+      switch (ASCII_NEXT(str)) {
+      case ' ': pos.x = mushcell_inc(pos.x); break;
+
+   #if MUSHSPACE_DIM >= 2
+      case '\r':
+         if (str < str_end && ASCII_READ(str) == '\n')
+            (void)ASCII_NEXT(str);
+      case '\n':
+         pos.x = target_x;
+         pos.y = mushcell_inc(pos.y);
          break;
-      --blanks;
-      (void)ASCII_NEXT(str);
+   #else
+      case '\r': case '\n': break;
+   #endif
+      case '\f':
+         #if MUSHSPACE_DIM >= 3
+            pos.x = target_x;
+            pos.y = target_y;
+            pos.z = mushcell_inc(pos.z);
+         #endif
+         break;
+
+      default: assert (false);
+      }
    }
    aux->str = str;
+   aux->pos = pos;
 }
 
 #undef get_aabbs

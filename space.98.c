@@ -175,7 +175,7 @@ int mushspace_map(mushspace* space, mushbounds bounds,
 }
 void mushspace_map_existing(
    mushspace* space, mushbounds bounds,
-   void(*f)(musharr_mushcell, void*), void(*g)(size_t, size_t, void*),
+   void(*f)(musharr_mushcell, void*), void(*g)(mushcoords, mushcoords, void*),
    void* data)
 {
    mushaabb aabb;

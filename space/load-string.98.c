@@ -37,9 +37,9 @@ static int load_string_generic(
                      musharr_mushbounds*),
    void (*load_arr)         (musharr_mushcell, void*, const mushbounds*,
                              size_t, size_t, size_t, size_t, uint8_t*),
-   void (*load_blank)       (size_t, size_t, void*),
+   void (*load_blank)       (mushcoords, mushcoords, void*),
    void (*binary_load_arr)  (musharr_mushcell, void*),
-   void (*binary_load_blank)(size_t, size_t, void*))
+   void (*binary_load_blank)(mushcoords, mushcoords, void*))
 {
    musharr_mushbounds boundses;
    get_aabbs(*str, str_end, target, binary, &boundses);
