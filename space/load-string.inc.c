@@ -769,33 +769,53 @@ static void load_blank(mushcoords beg, mushcoords end, void* p) {
    #endif
    #endif
 
-   while (!mushcoords_equal(pos, end)) {
-      assert (str < str_end);
-
-      switch (ASCII_NEXT(str)) {
-      case ' ': pos.x = mushcell_inc(pos.x); break;
+   // The purpose of this function is only to bring str in line with where
+   // loading is happening in space. It's entirely possible that we have 5
+   // blank cells in space that we're asked to skip over in one call, but we
+   // don't care because the next thing in the string is a newline. We do
+   // nothing until the space also realizes that it's supposed to be on the
+   // next line, at which point we agree to skip the newline and everything
+   // works out.
+   for (; str < str_end && !mushcoords_equal(pos, end);
+          (void)ASCII_NEXT(str))
+   {
+      switch (ASCII_READ(str)) {
+      case ' ':
+         if (pos.x == end.x)
+            break;
+         pos.x = mushcell_inc(pos.x);
+         continue;
 
    #if MUSHSPACE_DIM >= 2
       case '\r':
-         if (str < str_end && ASCII_READ(str) == '\n')
+         if (pos.y == end.y)
+            break;
+         if (str+1 < str_end && ASCII_READ(str+1) == '\n')
             (void)ASCII_NEXT(str);
+         if (false) {
       case '\n':
+            if (pos.y == end.y)
+               break;
+         }
          pos.x = target_x;
          pos.y = mushcell_inc(pos.y);
-         break;
+         continue;
    #else
-      case '\r': case '\n': break;
+      case '\r': case '\n': continue;
    #endif
       case '\f':
          #if MUSHSPACE_DIM >= 3
+            if (pos.z == end.z)
+               break;
             pos.x = target_x;
             pos.y = target_y;
             pos.z = mushcell_inc(pos.z);
          #endif
-         break;
+         continue;
 
-      default: assert (false);
+      default: break;
       }
+      break;
    }
    aux->str = str;
    aux->pos = pos;
