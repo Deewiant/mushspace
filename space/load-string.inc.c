@@ -130,6 +130,14 @@ static void get_aabbs(
       bool got_cr = false;
    #endif
 
+   // A helper we'll be using a number of times.
+   #define UPDATE_BOUNDS_WITH_LAST_NONSPACE do { \
+      if (found_nonspace_for != MUSH_ARRAY_LEN(bounds)) { \
+         assert (found_nonspace_for == a); \
+         mushcoords_max_into(&bounds[a].end, last_nonspace); \
+      } \
+   } while (0)
+
    while (str < str_end) {
       mushcell c;
       NEXT(str, str_end, c);
@@ -143,8 +151,7 @@ static void get_aabbs(
             pos.x = target.x;
 
             if ((pos.y = mushcell_inc(pos.y)) == MUSHCELL_MIN) {
-               if (found_nonspace_for == a)
-                  mushcoords_max_into(&bounds[a].end, last_nonspace);
+               UPDATE_BOUNDS_WITH_LAST_NONSPACE;
 
                found_nonspace_for = MUSH_ARRAY_LEN(bounds);
 
@@ -157,7 +164,8 @@ static void get_aabbs(
             } else if (pos.y == target.y) {
                *bounds_out = (musharr_mushbounds){NULL, MUSHERR_NO_ROOM};
                return;
-            }
+            } else if (a & 0x01)
+               UPDATE_BOUNDS_WITH_LAST_NONSPACE;
 
             a &= ~0x01;
 
@@ -193,8 +201,7 @@ static void get_aabbs(
          }
       case ' ':
          if ((pos.x = mushcell_inc(pos.x)) == MUSHCELL_MIN) {
-            if (found_nonspace_for == a)
-               mushcoords_max_into(&bounds[a].end, last_nonspace);
+            UPDATE_BOUNDS_WITH_LAST_NONSPACE;
 
             found_nonspace_for = MUSH_ARRAY_LEN(bounds);
             #if MUSHSPACE_DIM >= 3
@@ -227,8 +234,7 @@ static void get_aabbs(
             pos.y = target.y;
 
             if ((pos.z = mushcell_inc(pos.z)) == MUSHCELL_MIN) {
-               if (found_nonspace_for == a)
-                  mushcoords_max_into(&bounds[a].end, last_nonspace);
+               UPDATE_BOUNDS_WITH_LAST_NONSPACE;
 
                found_nonspace_for = MUSH_ARRAY_LEN(bounds);
                #if MUSHSPACE_DIM >= 3
@@ -240,7 +246,9 @@ static void get_aabbs(
             } else if (pos.z == target.z) {
                *bounds_out = (musharr_mushbounds){NULL, MUSHERR_NO_ROOM};
                return;
-            }
+            } else if (a & 0x03)
+               UPDATE_BOUNDS_WITH_LAST_NONSPACE;
+
             a &= ~0x03;
             get_beg = found_nonspace_for == a ? 0x03 : DimensionBits;
             found_nonspace_on_page = MUSH_ARRAY_LEN(bounds);
@@ -255,8 +263,9 @@ static void get_aabbs(
       return;
    }
 
-   if (found_nonspace_for < MUSH_ARRAY_LEN(bounds))
-      mushcoords_max_into(&bounds[found_nonspace_for].end, last_nonspace);
+   UPDATE_BOUNDS_WITH_LAST_NONSPACE;
+
+   #undef UPDATE_BOUNDS_WITH_LAST_NONSPACE
 
    // Since a is a bitmask, the AABBs that we used aren't necessarily in order.
    // Fix that.
