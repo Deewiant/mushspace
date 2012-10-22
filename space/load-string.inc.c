@@ -267,8 +267,8 @@ static void get_aabbs(
 
    #undef UPDATE_BOUNDS_WITH_LAST_NONSPACE
 
-   // Since a is a bitmask, the AABBs that we used aren't necessarily in order.
-   // Fix that.
+   // Since a is a bitmask, the bounds that we used aren't necessarily in
+   // order. Fix that.
    size_t n = 1;
    for (size_t i = 1; i <= max_a; ++i) {
       const mushbounds *box = &bounds[i];
@@ -286,6 +286,10 @@ static void get_aabbs(
       }
    }
    bounds_out->len = n;
+
+   // Make sure that the first box is valid as well.
+   for (mushdim j = 0; j < MUSHSPACE_DIM; ++j)
+      assert (bounds[0].beg.v[j] <= bounds[0].end.v[j]);
 }
 
 static size_t get_aabbs_binary(
