@@ -266,8 +266,8 @@ static bool mapex_in_box(
 
    const size_t length = end_idx - beg_idx + 1;
 
-   // Depending on MUSHSPACE_DIM all of width, area, and page_start can be used
-   // uninitialized here, but that's fine.
+   // Depending on MUSHSPACE_DIM all of width, area, line_start, and page_start
+   // can be used uninitialized here, but that's fine.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
    f((musharr_mushcell){box->data + beg_idx, length}, beg, end, caller_data,
