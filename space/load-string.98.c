@@ -29,6 +29,8 @@ typedef struct {
       mushcell target_y;
    #endif
    #endif
+
+   bool first;
 } load_arr_auxdata;
 
 static int load_string_generic(
@@ -148,6 +150,7 @@ static int load_string_generic(
       #if MUSHSPACE_DIM >= 3
          , target.y
       #endif
+         , true
       };
 
       mushspace_mapex_no_place(space, bounds, &aux, load_arr, load_blank);

@@ -467,6 +467,11 @@ static void load_arr(
    //
    // This can only happen when this is the first call to this function, i.e.
    // when we're loading into the first box. We shouldn't touch i otherwise.
+   //
+   // HACK HACK HACK: evidently it does happen at other times as well, so
+   // instead we only modify i when this is the first call, and never
+   // otherwise. Should figure out either a proper justification or a better
+   // solution.
    size_t i = 0;
    if (!mushbounds_safe_contains(bounds, pos)) {
       do {
@@ -512,6 +517,7 @@ static void load_arr(
          }
       } while (!mushbounds_safe_contains(bounds, pos));
 
+      if (aux->first) {
       #if MUSHSPACE_DIM >= 3
          i = line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
       #endif
@@ -519,7 +525,9 @@ static void load_arr(
          i = line_start              += (size_t)(pos.y - bounds->beg.y) *width;
       #endif
          i                           += (size_t)(pos.x - bounds->beg.x);
+      }
    }
+   aux->first = false;
 
    while (i < arr.len && str < str_end) {
       mushcell c;
