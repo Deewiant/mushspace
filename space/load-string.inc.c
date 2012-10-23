@@ -449,8 +449,9 @@ static void load_arr(
    #endif
    #endif
 
-   // Eat whitespace without affecting the array index until we enter the
-   // bounds. At that point, the array index does start to matter.
+   // If we're not in bounds, eat whitespace without affecting the array index
+   // until we hit the array. At that point, the array index does start to
+   // matter. (We should hit the array correctly at all other times.)
    //
    // Two examples. Consider the target position as (1000,1000,1000) in each.
    //
@@ -469,8 +470,7 @@ static void load_arr(
    // advance, if that's even possible.
    //
    // But as soon as we jump into bounds we can compute the correct index based
-   // on how pos differs compared to bounds->beg. This is what we do after
-   // exiting this loop.
+   // on how pos differs compared to bounds->beg. This is what we do here.
    //
    // This can only happen when this is the first call to this function, i.e.
    // when we're loading into the first box. We shouldn't touch i otherwise.
@@ -481,48 +481,16 @@ static void load_arr(
    // solution.
    size_t i = 0;
    if (!mushbounds_safe_contains(bounds, pos)) {
-      do {
-         if (str >= str_end) {
-            // All whitespace: nothing to do. Can happen if this isn't the
-            // first array into which we load.
-            return;
-         }
+      assert (mushbounds_safe_contains(bounds, arr_beg));
 
-         const mushcell c = ASCII_READ(str);
-         (void)ASCII_NEXT(str);
-         switch (c) {
-         case ' ':
-            pos.x = mushcell_inc(pos.x);
+      // Use load_blank, as it's smart enough to not eat whitespace that
+      // shouldn't be eaten yet.
+      load_blank(arr_beg, arr_beg, aux);
+      if (!mushcoords_equal(aux->pos, arr_beg))
+         return;
 
-      #if MUSHSPACE_DIM < 2
-         case '\r': case '\n':
-      #endif
-      #if MUSHSPACE_DIM < 3
-         case '\f':
-      #endif
-            break;
-
-      #if MUSHSPACE_DIM >= 2
-         case '\r':
-            if (ASCII_READ(str) == '\n')
-               (void)ASCII_NEXT(str);
-         case '\n':
-            pos.x = target_x;
-            pos.y = mushcell_inc(pos.y);
-            break;
-      #endif
-
-      #if MUSHSPACE_DIM >= 3
-         case '\f':
-            pos.x = target_x;
-            pos.y = target_y;
-            pos.z = mushcell_inc(pos.z);
-            break;
-      #endif
-
-         default: assert (false);
-         }
-      } while (!mushbounds_safe_contains(bounds, pos));
+      pos = aux->pos;
+      str = aux->str;
 
       if (aux->first) {
       #if MUSHSPACE_DIM >= 3
