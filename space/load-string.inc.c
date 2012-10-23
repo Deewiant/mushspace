@@ -561,7 +561,7 @@ static void load_arr(
          pos.x = target_x;
          pos.y = mushcell_inc(pos.y);
 
-         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
+         if (i >= arr.len || !mushbounds_contains(box_bounds, pos)) {
             // The next cell we would want to load falls on the next line,
             // which is in another box: report that.
             *hit = 1 << 0;
@@ -606,7 +606,7 @@ static void load_arr(
          pos.y = target_y;
          pos.z = mushcell_inc(pos.z);
 
-         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
+         if (i >= arr.len || !mushbounds_contains(box_bounds, pos)) {
             *hit = 1 << 1;
             aux->str = str;
             aux->pos = pos;
