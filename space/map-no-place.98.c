@@ -28,8 +28,8 @@ static bool get_next_in(
    void*, void(*g)(mushcoords, mushcoords, void*));
 
 static void get_next_in1(
-   mushdim, const mushbounds*, mushcell, size_t, const mushbounds*, size_t,
-   mushcell_idx*, mushcell_idx*);
+   mushdim, const mushbounds*, mushcoords, size_t, const mushbounds*, size_t,
+   mushcell_idx*, mushcell_idx*, mushcell_idx*);
 
 static mushcoords get_end_of_contiguous_range(
    const mushbounds*, mushcoords*, const mushbounds*, bool*);
@@ -399,66 +399,90 @@ restart:
 
    const size_t box_count = space->box_count;
 
-   // A value of box_count here refers to the static box.
-   //
-   // Separate solutions for the best non-wrapping and the best wrapping
-   // coordinate, with the wrapping coordinate used only if a non-wrapping
-   // solution is not found.
-   mushcell_idx
-      best_coord   = {.idx = box_count + 1},
-      best_wrapped = {.idx = box_count + 1};
-
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
       // Check every box until we find the best allocated solution.
 
-      get_next_in1(i, bounds, pos->v[i], box_count,
+      // A value of box_count here refers to the static box.
+      //
+      // Separate solutions for being able to increment the coordinate, jumping
+      // to the next box without wrapping, and jumping to the next box with
+      // wrapping.
+      mushcell_idx
+         increment        = {.idx = box_count + 1},
+         best_beg         = {.idx = box_count + 1},
+         best_wrapped_beg = {.idx = box_count + 1};
+
+      get_next_in1(i, bounds, *pos, box_count,
                    &MUSHSTATICAABB_BOUNDS, box_count,
-                   &best_coord, &best_wrapped);
+                   &increment, &best_beg, &best_wrapped_beg);
 
       for (mushucell b = 0; b < box_count; ++b)
-         get_next_in1(i, bounds, pos->v[i], box_count,
-                      &space->boxen[b].bounds, b, &best_coord, &best_wrapped);
+         get_next_in1(i, bounds, *pos, box_count, &space->boxen[b].bounds, b,
+                      &increment, &best_beg, &best_wrapped_beg);
 
-      if (best_coord.idx > box_count) {
-         if (best_wrapped.idx > box_count) {
+      #define TEST_COORD(p, cell_idx) do { \
+         /* Since we want to constrain pos to be in bounds, finding a solution
+          * along a non-X-axis implies that the lower axes get "reset" to
+          * bounds->beg. (Just like a line break brings the X position to the
+          * page's left edge.) */ \
+         memcpy((p)->v, bounds->beg.v, i * sizeof(mushcell)); \
+         \
+         (p)->v[i] = (cell_idx).cell; \
+         \
+         /* We may not end up in any box: check for it. */ \
+         if ((   (cell_idx).idx < box_count \
+              && mushbounds_contains( \
+                    &space->boxen[(cell_idx).idx].bounds, *(p))) \
+         \
+             /* If we ended up in some other box, that's fine as well. */ \
+          || mushstaticaabb_contains(*(p)) || mushspace_find_box(space, *(p)))\
+         { \
+            *pos = *(p); \
+            g(orig, *(p), gdata); \
+            return true; \
+         } \
+      } while (0)
+
+      if (increment.idx <= box_count) {
+         if (i) {
+            // This is not the X-axis. If an increment here fails, we might
+            // still be able to hit something post-increment on a previous
+            // axis. So simply use this as the solution candidate.
+            best_beg = increment;
+         } else {
+            // This is the X-axis. If an increment here fails, we can simply
+            // jump into the best box: clearly we'll never end up in this box,
+            // or the increment would've succeeded. So try the increment but
+            // then fall back to best_beg as usual.
+            mushcoords p = *pos;
+            TEST_COORD(&p, increment);
+         }
+      }
+
+      if (best_beg.idx > box_count) {
+         if (best_wrapped_beg.idx > box_count) {
             // No solution along this axis: try the next one.
             continue;
          }
 
          // Take the wrapping solution as it's the only one available.
-         best_coord = best_wrapped;
+         best_beg = best_wrapped_beg;
       }
 
-      // Since we want to constrain pos to be in bounds, finding a solution
-      // along a non-X-axis implies that the lower axes get "reset" to
-      // bounds->beg. (Just like a line break brings the X position to the
-      // page's left edge.)
-      memcpy(pos->v, bounds->beg.v, i * sizeof(mushcell));
+      TEST_COORD(pos, best_beg);
 
-      pos->v[i] = best_coord.cell;
-
-      // We may not end up in any box: check for it.
-      if ((   best_coord.idx < box_count
-           && mushbounds_contains(&space->boxen[best_coord.idx].bounds, *pos))
-
-          // If we ended up in some other box due to the memcpy, that's fine.
-       || mushstaticaabb_contains(*pos) || mushspace_find_box(space, *pos))
-      {
-         g(orig, *pos, gdata);
-         return true;
-      }
-
-      // Otherwise, go again with the new *pos. Akin to continuing along on the
-      // next line/page.
+      // If we didn't hit any box, go again with the new *pos. Akin to
+      // continuing along on the next line/page.
       goto restart;
    }
    return false;
 }
 
 static void get_next_in1(
-   mushdim x, const mushbounds* bounds, mushcell posx, size_t box_count,
+   mushdim x, const mushbounds* bounds, mushcoords pos, size_t box_count,
    const mushbounds* box_bounds, size_t box_idx,
+   mushcell_idx* increment,
    mushcell_idx* best_coord, mushcell_idx* best_wrapped)
 {
    // If the box begins later than the best solution we've found, there's no
@@ -477,26 +501,31 @@ static void get_next_in1(
    // If pos has crossed an axis within the bounds, prevent us from grabbing a
    // new pos on the other side of the axis we're wrapped around, or we'll just
    // keep looping around that axis.
-   if (posx < bounds->beg.v[x] && box_bounds->beg.v[x] > bounds->end.v[x])
+   if (pos.v[x] < bounds->beg.v[x] && box_bounds->beg.v[x] > bounds->end.v[x])
       return;
 
-   // The ordinary best solution is the minimal in-box position greater than
-   // pos.
-   if (box_bounds->end.v[x] > posx) {
-      if (box_bounds->beg.v[x] > posx)
-         best_coord->cell = box_bounds->beg.v[x];
-      else {
-         // beg <= pos < end, so pos+1 is fine. This increment can't wrap.
-         best_coord->cell = posx + 1;
-      }
+   // The ordinary best solution that skips to another box is the minimal
+   // box.beg greater than pos.
+   if (box_bounds->beg.v[x] > pos.v[x]) {
+      best_coord->cell = box_bounds->beg.v[x];
       best_coord->idx = box_idx;
+      return;
+   }
+
+   // Alternatively, we have the solution of simply moving forward by one pos:
+   // this is okay if we're in the box.
+   //
+   // As far as we can tell here, we are: beg <= pos < end, so pos+1 is fine.
+   if (box_bounds->end.v[x] > pos.v[x]) {
+      increment->cell = pos.v[x] + 1;
+      increment->idx  = box_idx;
       return;
    }
 
    // If the path from pos to bounds->end requires a wraparound, take the
    // global minimum box.beg as a last-resort option if nothing else is found,
    // so that we wrap around if there's no non-wrapping solution.
-   if (posx > bounds->end.v[x]
+   if (pos.v[x] > bounds->end.v[x]
     && (box_bounds->beg.v[x] < best_wrapped->cell
      || best_wrapped->idx > box_count))
    {
