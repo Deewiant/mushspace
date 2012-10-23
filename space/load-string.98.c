@@ -141,6 +141,10 @@ static int load_string_generic(
                              binary_load_arr, binary_load_blank);
       *str = aux.str;
    } else {
+      // TODO: consider giving the bounds ranging from target to the
+      // non-whitespace-stripped maximum (or even only starting from target but
+      // with the current bounds->end), to reduce the complexity and number of
+      // hacks in load_arr.
       load_arr_auxdata aux =
          { *str, str_end
          , bounds
