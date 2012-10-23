@@ -438,8 +438,6 @@ static void load_arr(
    // thus may have wrapped along any number of axes.
    const mushbounds *bounds = aux->bounds;
 
-   // pos is not kept completely up to date with regard to the cursor position:
-   // whitespace past bounds->end is not kept track of.
    mushcoords pos = aux->pos;
 
    #if MUSHSPACE_DIM >= 2
