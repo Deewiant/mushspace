@@ -1,0 +1,21 @@
+#!/bin/bash
+n0=$1
+n=$2
+shift 2
+[[ -x $1 ]] || exit 1
+rm -f $1.{error,sum}s.txt
+touch $1.sums.txt
+i=$((n0-1))
+ok=true
+while [[ $((++i)) -le $n ]]; do
+   x=$({ $1 $i; } 2>&1)
+   [[ $? -ne 0 ]] || grep -q -e 'Assertion' -e '^not ok ' <<<"$x" || continue
+   sum=$(sha512sum <<<"$x")
+   fgrep -qx "$sum" $1.sums.txt && continue
+   echo "$sum" >> $1.sums.txt
+   echo $i >> $1.errors.txt
+   $ok || echo -n ' '
+   echo -n "$i"
+   ok=false
+done
+$ok || echo

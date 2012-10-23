@@ -64,7 +64,7 @@ EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.3d.so
 EXTRAOBJS = $(UTIL) $(ROOT)/libmushspace.3d.a
 : foreach *.3d.o | $(EXTRAOBJS) |> !ccexe |> %B.static.t
 
-# Convenience: make sure the running script ends up in the build directory.
-: runme.sh.in |> cp %f %o |> runme.sh
+# Convenience: make sure the running scripts end up in the build directory.
+: foreach *.sh.in |> cp %f %o |> %B
 
 .gitignore
