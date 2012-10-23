@@ -163,7 +163,8 @@ void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
 }
 
 int mushspace_map(mushspace* space, mushbounds bounds,
-                   void(*f)(musharr_mushcell, void*), void* data)
+                  void(*f)(musharr_mushcell, mushcoords, mushcoords, void*),
+                  void* data)
 {
    mushaabb aabb;
    mushaabb_make(&aabb, &bounds);
@@ -175,7 +176,8 @@ int mushspace_map(mushspace* space, mushbounds bounds,
 }
 void mushspace_map_existing(
    mushspace* space, mushbounds bounds,
-   void(*f)(musharr_mushcell, void*), void(*g)(mushcoords, mushcoords, void*),
+   void(*f)(musharr_mushcell, mushcoords, mushcoords, void*),
+   void(*g)(                  mushcoords, mushcoords, void*),
    void* data)
 {
    mushaabb aabb;

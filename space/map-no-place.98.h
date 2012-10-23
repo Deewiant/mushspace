@@ -15,12 +15,13 @@ typedef struct mushbounded_pos {
 
 void mushspace_map_no_place(
    mushspace*, const mushbounds*, void*,
-   void(*)(musharr_mushcell, void*), void(*)(mushcoords, mushcoords, void*));
+   void(*)(musharr_mushcell, mushcoords, mushcoords, void*),
+   void(*)(mushcoords, mushcoords, void*));
 
 void mushspace_mapex_no_place(
    mushspace*, const mushbounds*, void*,
-   void(*)(musharr_mushcell, void*, const mushbounds*,
-           size_t, size_t, size_t, size_t, uint8_t*),
+   void(*)(musharr_mushcell, mushcoords, mushcoords, void*,
+           const mushbounds*, size_t, size_t, size_t, size_t, uint8_t*),
    void(*)(mushcoords, mushcoords, void*));
 
 #endif

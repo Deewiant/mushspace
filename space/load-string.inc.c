@@ -24,10 +24,11 @@ static void get_aabbs(
 
 static size_t get_aabbs_binary(const C*, const C*, mushcoords, mushbounds*);
 
-static void binary_load_arr(musharr_mushcell, void*);
+static void binary_load_arr(musharr_mushcell, mushcoords, mushcoords, void*);
 static void binary_load_blank(mushcoords, mushcoords, void*);
-static void load_arr(musharr_mushcell, void*, const mushbounds*,
-                     size_t, size_t, size_t, size_t, uint8_t*);
+static void load_arr(musharr_mushcell, mushcoords, mushcoords, void*,
+                     const mushbounds*, size_t, size_t, size_t, size_t,
+                     uint8_t*);
 static void load_blank(mushcoords, mushcoords, void*);
 
 int MUSHSPACE_CAT(mushspace_load_string,UTF)(
@@ -378,7 +379,11 @@ static size_t get_aabbs_binary(
    return a;
 }
 
-static void binary_load_arr(musharr_mushcell arr, void* p) {
+static void binary_load_arr(
+   musharr_mushcell arr, mushcoords beg, mushcoords end, void* p)
+{
+   (void)beg; (void)end;
+
    binary_load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
 
@@ -413,7 +418,8 @@ static void binary_load_blank(mushcoords beg, mushcoords end, void* p) {
 }
 
 static void load_arr(
-   musharr_mushcell arr, void* p, const mushbounds* box_bounds,
+   musharr_mushcell arr, mushcoords arr_beg, mushcoords arr_end, void* p,
+   const mushbounds* box_bounds,
    size_t width, size_t area, size_t line_start, size_t page_start,
    uint8_t* hit)
 {
@@ -423,6 +429,7 @@ static void load_arr(
    #elif MUSHSPACE_DIM == 2
    (void)area; (void)page_start;
    #endif
+   (void)arr_end;
 
    load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;

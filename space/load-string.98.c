@@ -38,10 +38,11 @@ static int load_string_generic(
    mushcoords* end, mushcoords target, bool binary,
    void (*get_aabbs)(const void*, const void*, mushcoords, bool,
                      musharr_mushbounds*),
-   void (*load_arr)         (musharr_mushcell, void*, const mushbounds*,
-                             size_t, size_t, size_t, size_t, uint8_t*),
+   void (*load_arr)         (musharr_mushcell, mushcoords, mushcoords, void*,
+                             const mushbounds*, size_t, size_t, size_t, size_t,
+                             uint8_t*),
    void (*load_blank)       (mushcoords, mushcoords, void*),
-   void (*binary_load_arr)  (musharr_mushcell, void*),
+   void (*binary_load_arr)  (musharr_mushcell, mushcoords, mushcoords, void*),
    void (*binary_load_blank)(mushcoords, mushcoords, void*))
 {
    musharr_mushbounds boundses;
