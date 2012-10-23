@@ -438,15 +438,11 @@ restart:
 
       pos->v[i] = best_coord.cell;
 
-      // When memcpying pos->v above, we may not end up in any box.
-      if (// If we didn't memcpy it's a guaranteed hit.
-          !i
-
-          // If we ended up in the box, that's fine too.
-       || (   best_coord.idx < box_count
+      // We may not end up in any box: check for it.
+      if ((   best_coord.idx < box_count
            && mushbounds_contains(&space->boxen[best_coord.idx].bounds, *pos))
 
-          // If we ended up in some other box, that's also fine.
+          // If we ended up in some other box due to the memcpy, that's fine.
        || mushstaticaabb_contains(*pos) || mushspace_find_box(space, *pos))
       {
          g(orig, *pos, gdata);
