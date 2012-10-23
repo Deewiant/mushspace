@@ -561,6 +561,15 @@ static void load_arr(
          pos.x = target_x;
          pos.y = mushcell_inc(pos.y);
 
+         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
+            // The next cell we would want to load falls on the next line,
+            // which is in another box: report that.
+            *hit = 1 << 0;
+            aux->str = str;
+            aux->pos = pos;
+            return;
+         }
+
          // There may be leading spaces on the next line. Eat them.
          while (pos.x != bounds->beg.x && str < str_end) {
             // The aabb in aabb_beg is specifically the one containing str, so
@@ -586,14 +595,6 @@ static void load_arr(
             default: assert (false);
             }
          }
-         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
-            // The next cell we would want to load falls on the next line,
-            // which is in another box: report that.
-            *hit = 1 << 0;
-            aux->str = str;
-            aux->pos = pos;
-            return;
-         }
          break;
       }
    #endif
@@ -604,6 +605,13 @@ static void load_arr(
          pos.x = target_x;
          pos.y = target_y;
          pos.z = mushcell_inc(pos.z);
+
+         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
+            *hit = 1 << 1;
+            aux->str = str;
+            aux->pos = pos;
+            return;
+         }
 
          // There may be leading spaces and/or line breaks on the next page.
          // Eat them.
@@ -637,12 +645,6 @@ static void load_arr(
 
             default: assert (false);
             }
-         }
-         if (!mushbounds_contains(box_bounds, pos) || i >= arr.len) {
-            *hit = 1 << 1;
-            aux->str = str;
-            aux->pos = pos;
-            return;
          }
          break;
    #endif
