@@ -192,6 +192,7 @@ int main(int argc, char **argv) {
    if (!space) { \
       tap_not_ok("init returned null"); \
       tap_skip_remaining("init failed"); \
+      free(saved_pos); \
       return 1; \
    } \
    tap_ok("init succeeded"); \
@@ -215,6 +216,7 @@ int main(int argc, char **argv) {
       printf(" )\n" \
              "  ...\n"); \
       tap_skip_remaining("put failed"); \
+      free(saved_pos); \
       return 1; \
    } \
    tap_ok("every put succeeded" S); \
