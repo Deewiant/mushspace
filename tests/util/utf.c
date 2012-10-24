@@ -10,6 +10,7 @@ codepoint_reader make_codepoint_reader(const void *data, size_t codepoints) {
    codepoint_reader reader;
    reader.data = data;
    reader.codepoints = codepoints;
+   reader.last_octet = 0;
    reader.unused_bits = 0;
    return reader;
 }

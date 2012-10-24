@@ -234,9 +234,6 @@ static void get_aabbs(
                UPDATE_BOUNDS_WITH_LAST_NONSPACE;
 
                found_nonspace_for = MUSH_ARRAY_LEN(bounds);
-               #if MUSHSPACE_DIM >= 3
-                  found_nonspace_on_page = found_nonspace_for;
-               #endif
 
                max_a = mush_size_t_max(max_a, a |= 0x04);
 
@@ -492,7 +489,7 @@ static void load_arr(
 
       if (aux->first) {
       #if MUSHSPACE_DIM >= 3
-         i = line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
+             line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
       #endif
       #if MUSHSPACE_DIM >= 2
          i = line_start              += (size_t)(pos.y - bounds->beg.y) *width;
@@ -660,7 +657,7 @@ static void load_arr(
    // trailing whitespace until we hit it in the file as well.
    #if MUSHSPACE_DIM == 3
       if (*hit & 1 << 1) {
-         C c;
+         C c = 0;
          while (str < str_end
              && ((c = ASCII_NEXT(str)) == '\r' || c == '\n' || c == ' '));
 
