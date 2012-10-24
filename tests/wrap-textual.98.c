@@ -158,9 +158,9 @@ int main(int argc, char **argv) {
              "  got: %" MUSHCELL_PRIx "\n" \
              "  failed index: %zu\n", \
              cp##suf, gc, ii##suf); \
-      printf("  failed pos: ("); \
+      printf("  failed pos relative to min: ("); \
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i) \
-         printf(" %" MUSHCELL_PRId, pos.v[i]); \
+         printf(" %" MUSHCELL_PRId, mushcell_sub(pos.v[i], MUSHCELL_MIN)); \
       printf(" )\n" \
              "  ...\n"); \
       break; \
@@ -214,9 +214,9 @@ int main(int argc, char **argv) {
              "  error code: %d\n" \
              "  failed index: %zu\n", \
              err, i); \
-      printf("  failed pos: ("); \
+      printf("  failed pos relative to min: ("); \
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i) \
-         printf(" %" MUSHCELL_PRId, pos.v[i]); \
+         printf(" %" MUSHCELL_PRId, mushcell_sub(pos.v[i], MUSHCELL_MIN)); \
       printf(" )\n" \
              "  ...\n"); \
       tap_skip_remaining("put failed"); \
@@ -239,9 +239,9 @@ int main(int argc, char **argv) {
              "  expected: %" MUSHCELL_PRIx "\n" \
              "  got: %" MUSHCELL_PRIx "\n", \
              i, dc, gc); \
-      printf("  failed pos: ("); \
+      printf("  failed pos relative to min: ("); \
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i) \
-         printf(" %" MUSHCELL_PRId, pos.v[i]); \
+         printf(" %" MUSHCELL_PRId, mushcell_sub(pos.v[i], MUSHCELL_MIN)); \
       printf(" )\n" \
              "  ...\n"); \
       break; \
@@ -294,9 +294,9 @@ int main(int argc, char **argv) {
              "  expected: %" MUSHCELL_PRIx "\n"
              "  got: %" MUSHCELL_PRIx "\n",
              i, dc, gc);
-      printf("  failed pos: (");
+      printf("  failed pos relative to min: (");
       for (uint8_t i = 0; i < MUSHSPACE_DIM; ++i)
-         printf(" %" MUSHCELL_PRId, pos.v[i]);
+         printf(" %" MUSHCELL_PRId, mushcell_sub(pos.v[i], MUSHCELL_MIN)); \
       printf(" )\n"
              "  ...\n");
       break;
