@@ -65,7 +65,7 @@ void mushcursor_free(mushcursor* cursor) {
 int mushcursor_copy(
    void** vp, const mushcursor* cursor, mushspace* space
 #if !MUSHSPACE_93
-   , const mushcoords* delta
+   , mushcoords delta
 #endif
 ) {
    mushcursor *copy = *vp ? *vp : (*vp = malloc(sizeof *copy));
@@ -90,7 +90,7 @@ int mushcursor_copy(
 #if MUSHSPACE_93
    return MUSHERR_NONE;
 #else
-   return initial_position_fixup(copy, mushcursor_get_pos(copy), *delta);
+   return initial_position_fixup(copy, mushcursor_get_pos(copy), delta);
 #endif
 }
 

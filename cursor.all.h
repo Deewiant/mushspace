@@ -71,7 +71,7 @@ int mushcursor_init(void**, mushspace*, mushcoords
                    );
 int mushcursor_copy(void**, const mushcursor*, mushspace*
 #if !MUSHSPACE_93
-                   , const mushcoords*
+                   , mushcoords
 #endif
                    );
 void mushcursor_free(mushcursor*);
