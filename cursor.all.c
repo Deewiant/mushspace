@@ -286,12 +286,9 @@ void mushcursor_retreat(mushcursor* cursor, mushcoords delta) {
 #if !MUSHSPACE_93
 static void mushcursor_recalibrate(void* p) {
    mushcursor *cursor = p;
-   if (!mushcursor_get_box(cursor, mushcursor_get_pos(cursor))) {
-      // Just grab a box which we aren't contained in: get/set can handle it
-      // and skip_markers can sort it out. Prefer static because it's the
-      // fastest to work with.
-      cursor->mode = MushCursorMode_static;
-   }
+   mushcoords pos = mushcursor_get_pos(cursor);
+   if (!mushcursor_get_box(cursor, pos))
+      mushcursor_set_nowhere_pos(cursor, pos);
 }
 #endif
 
