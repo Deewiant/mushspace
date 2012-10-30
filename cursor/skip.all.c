@@ -19,7 +19,7 @@
       is_first_exit = false; \
       first_exit = pos; \
    } else if (mushcoords_equal(pos, first_exit)) { \
-      mushcursor_set_infloop_pos(cursor, pos); \
+      mushcursor_set_nowhere_pos(cursor, pos); \
       return MUSHERR_INFINITE_LOOP_SPACES; \
    } \
 } while (0)
@@ -54,7 +54,7 @@
    if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode, \
                               &cursor->box, &cursor->box_idx)) \
    { \
-      mushcursor_set_infloop_pos(cursor, pos); \
+      mushcursor_set_nowhere_pos(cursor, pos); \
       return error_code; \
    } \
    mushcursor_tessellate(cursor, pos); \
@@ -148,7 +148,7 @@ jump_to_box:
       if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
                                  &cursor->box, &cursor->box_idx))
       {
-         mushcursor_set_infloop_pos(cursor, pos);
+         mushcursor_set_nowhere_pos(cursor, pos);
          return MUSHERR_INFINITE_LOOP_SPACES;
       }
       mushcursor_tessellate(cursor, pos);

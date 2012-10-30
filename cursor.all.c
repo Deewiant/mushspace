@@ -102,7 +102,7 @@ static int initial_position_fixup(
       if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
                                  &cursor->box, &cursor->box_idx))
       {
-         mushcursor_set_infloop_pos(cursor, pos);
+         mushcursor_set_nowhere_pos(cursor, pos);
          return MUSHERR_INFINITE_LOOP_SPACES;
       }
       mushcursor_tessellate(cursor, pos);
@@ -352,7 +352,7 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 }
 #endif
 
-void mushcursor_set_infloop_pos(mushcursor* cursor, mushcoords pos) {
+void mushcursor_set_nowhere_pos(mushcursor* cursor, mushcoords pos) {
 #if !MUSHSPACE_93
    // Since we are "nowhere", we can set an arbitrary mode: any functionality
    // that cares about the mode handles the not-in-a-box case anyway. Prefer
