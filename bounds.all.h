@@ -18,6 +18,7 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 #define mushbounds_clamped_size    MUSHSPACE_CAT(mushbounds,_clamped_size)
 #define mushbounds_contains        MUSHSPACE_CAT(mushbounds,_contains)
 #define mushbounds_safe_contains   MUSHSPACE_CAT(mushbounds,_safe_contains)
+#define mushbounds_safe_contains1  MUSHSPACE_CAT(mushbounds,_safe_contains1)
 #define mushbounds_contains_bounds MUSHSPACE_CAT(mushbounds,_contains_bounds)
 #define mushbounds_overlaps        MUSHSPACE_CAT(mushbounds,_overlaps)
 #define mushbounds_safe_overlaps   MUSHSPACE_CAT(mushbounds,_safe_overlaps)
@@ -31,9 +32,10 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 
 size_t mushbounds_clamped_size(const mushbounds*);
 
-// The safe version works even if the bounds have beg > end.
-bool mushbounds_contains     (const mushbounds*, mushcoords);
-bool mushbounds_safe_contains(const mushbounds*, mushcoords);
+// The safe versions work even if the bounds have beg > end.
+bool mushbounds_contains      (const mushbounds*, mushcoords);
+bool mushbounds_safe_contains (const mushbounds*, mushcoords);
+bool mushbounds_safe_contains1(const mushbounds*, mushcoords, mushdim);
 
 bool mushbounds_contains_bounds(const mushbounds*, const mushbounds*);
 bool mushbounds_overlaps       (const mushbounds*, const mushbounds*);

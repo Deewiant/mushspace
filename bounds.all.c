@@ -23,16 +23,17 @@ bool mushbounds_contains(const mushbounds* bounds, mushcoords pos) {
    return true;
 }
 bool mushbounds_safe_contains(const mushbounds* bounds, mushcoords pos) {
-   for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-      if (bounds->beg.v[i] > bounds->end.v[i]) {
-         if (!(pos.v[i] >= bounds->beg.v[i] || pos.v[i] <= bounds->end.v[i]))
-            return false;
-      } else {
-         if (!(pos.v[i] >= bounds->beg.v[i] && pos.v[i] <= bounds->end.v[i]))
-            return false;
-      }
-   }
+   for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+      if (!mushbounds_safe_contains1(bounds, pos, i))
+         return false;
    return true;
+}
+bool mushbounds_safe_contains1(
+   const mushbounds* bounds, mushcoords pos, mushdim i)
+{
+   return bounds->beg.v[i] > bounds->end.v[i]
+      ? pos.v[i] >= bounds->beg.v[i] || pos.v[i] <= bounds->end.v[i]
+      : pos.v[i] >= bounds->beg.v[i] && pos.v[i] <= bounds->end.v[i];
 }
 
 bool mushbounds_contains_bounds(const mushbounds* a, const mushbounds* b) {
