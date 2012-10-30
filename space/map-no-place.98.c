@@ -45,6 +45,8 @@ void mushspace_map_no_place(
    mushbounded_pos bpos = {bounds, &pos};
 
    for (;;) next_pos: {
+      assert (mushbounds_safe_contains(bounds, pos));
+
       if (mushstaticaabb_contains(pos)) {
          if (map_in_static(space, bpos, fg, f))
             return;
@@ -173,6 +175,8 @@ void mushspace_mapex_no_place(
    mushbounded_pos bpos = {bounds, &pos};
 
    for (;;) next_pos: {
+      assert (mushbounds_safe_contains(bounds, pos));
+
       if (mushstaticaabb_contains(pos)) {
          if (mapex_in_static(space, bpos, fg, f))
             return;
