@@ -355,10 +355,9 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 void mushcursor_set_infloop_pos(mushcursor* cursor, mushcoords pos) {
 #if !MUSHSPACE_93
    // Since we are "nowhere", we can set an arbitrary mode: any functionality
-   // that cares about the mode handles the not-in-a-box case anyway. To save
-   // simply the position as-is (no need to mess with relative coordinates),
-   // use the bak mode.
-   cursor->mode = MushCursorMode_bak;
+   // that cares about the mode handles the not-in-a-box case anyway. Prefer
+   // static because it's the fastest to work with.
+   cursor->mode = MushCursorMode_static;
 #endif
    mushcursor_set_pos(cursor, pos);
 }
