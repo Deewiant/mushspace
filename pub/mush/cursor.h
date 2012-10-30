@@ -48,9 +48,9 @@ mushcell mushcursor2_get(mushcursor2*);
 mushcell mushcursor3_get(mushcursor3*);
 mushcell93 mushcursor93_get(mushcursor93*);
 
-mushcell1 mushcursor1_get_unsafe(mushcursor1*);
-mushcell2 mushcursor2_get_unsafe(mushcursor2*);
-mushcell3 mushcursor3_get_unsafe(mushcursor3*);
+mushcell mushcursor1_get_unsafe(mushcursor1*);
+mushcell mushcursor2_get_unsafe(mushcursor2*);
+mushcell mushcursor3_get_unsafe(mushcursor3*);
 
 int mushcursor1_put(mushcursor1*, mushcell);
 int mushcursor2_put(mushcursor2*, mushcell);
