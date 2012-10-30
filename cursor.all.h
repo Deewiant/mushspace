@@ -64,12 +64,12 @@ void mushcursor93_wrap(mushcursor*);
 
 extern const size_t mushcursor_sizeof;
 
-int mushcursor_init(void**, mushspace*, mushcoords
+int mushcursor_init(mushcursor**, mushspace*, mushcoords
 #if !MUSHSPACE_93
                    , mushcoords
 #endif
                    );
-int mushcursor_copy(void**, const mushcursor*, mushspace*
+int mushcursor_copy(mushcursor**, const mushcursor*, mushspace*
 #if !MUSHSPACE_93
                    , mushcoords
 #endif

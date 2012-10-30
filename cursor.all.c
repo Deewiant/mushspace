@@ -30,12 +30,12 @@ static void mushcursor_recalibrate(void*);
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
 int mushcursor_init(
-   void** vp, mushspace* space, mushcoords pos
+   mushcursor** cp, mushspace* space, mushcoords pos
 #if !MUSHSPACE_93
    , mushcoords delta
 #endif
 ) {
-   mushcursor *cursor = *vp ? *vp : (*vp = malloc(sizeof *cursor));
+   mushcursor *cursor = *cp ? *cp : (*cp = malloc(sizeof *cursor));
    if (!cursor)
       return MUSHERR_OOM;
 
@@ -63,12 +63,12 @@ void mushcursor_free(mushcursor* cursor) {
 }
 
 int mushcursor_copy(
-   void** vp, const mushcursor* cursor, mushspace* space
+   mushcursor** cp, const mushcursor* cursor, mushspace* space
 #if !MUSHSPACE_93
    , mushcoords delta
 #endif
 ) {
-   mushcursor *copy = *vp ? *vp : (*vp = malloc(sizeof *copy));
+   mushcursor *copy = *cp ? *cp : (*cp = malloc(sizeof *copy));
    if (!copy)
       return MUSHERR_OOM;
 

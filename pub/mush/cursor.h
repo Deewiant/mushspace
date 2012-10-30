@@ -15,23 +15,23 @@ extern const size_t mushcursor2_sizeof;
 extern const size_t mushcursor3_sizeof;
 extern const size_t mushcursor93_sizeof;
 
-int mushcursor1_init(void**, mushspace1*, mushcoords1, mushcoords1);
-int mushcursor2_init(void**, mushspace2*, mushcoords2, mushcoords2);
-int mushcursor3_init(void**, mushspace3*, mushcoords3, mushcoords3);
-int mushcursor93_init(void**, mushspace93*, mushcoords93);
+int mushcursor1_init(mushcursor1**, mushspace1*, mushcoords1, mushcoords1);
+int mushcursor2_init(mushcursor2**, mushspace2*, mushcoords2, mushcoords2);
+int mushcursor3_init(mushcursor3**, mushspace3*, mushcoords3, mushcoords3);
+int mushcursor93_init(mushcursor93**, mushspace93*, mushcoords93);
 
 int mushcursor1_free(mushcursor1*);
 int mushcursor2_free(mushcursor2*);
 int mushcursor3_free(mushcursor3*);
 int mushcursor93_free(mushcursor93*);
 
-int mushcursor1_copy(void**, const mushcursor1*, mushspace1*,
+int mushcursor1_copy(mushcursor1**, const mushcursor1*, mushspace1*,
                      const mushcoords1*);
-int mushcursor2_copy(void**, const mushcursor2*, mushspace2*,
+int mushcursor2_copy(mushcursor2**, const mushcursor2*, mushspace2*,
                      const mushcoords2*);
-int mushcursor3_copy(void**, const mushcursor3*, mushspace3*,
+int mushcursor3_copy(mushcursor3**, const mushcursor3*, mushspace3*,
                      const mushcoords3*);
-int mushcursor93_copy(void**, const mushcursor93*, mushspace93*);
+int mushcursor93_copy(mushcursor93**, const mushcursor93*, mushspace93*);
 
 mushcoords1 mushcursor1_get_pos(const mushcursor1*);
 mushcoords2 mushcursor2_get_pos(const mushcursor2*);
