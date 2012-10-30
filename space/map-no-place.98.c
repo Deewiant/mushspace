@@ -541,28 +541,34 @@ static void get_next_in1(
    if (pos.v[x] < bounds->beg.v[x] && box_bounds->beg.v[x] > bounds->end.v[x])
       return;
 
+   bool beg_available = mushbounds_safe_contains1(bounds, pos, x);
+
    // The ordinary best solution that skips to another box is the minimal
    // box.beg greater than pos.
-   if (box_bounds->beg.v[x] > pos.v[x]) {
+   if (beg_available && box_bounds->beg.v[x] > pos.v[x]) {
       best_coord->cell = box_bounds->beg.v[x];
       best_coord->idx  = box_idx;
       return;
    }
 
    // Alternatively, we have the solution of simply moving forward by one pos:
-   // this is okay if we're in the box.
+   // this is okay if we're in the box and the result is in bounds.
    //
    // As far as we can tell here, we are: beg <= pos < end, so pos+1 is fine.
    if (box_bounds->end.v[x] > pos.v[x]) {
-      increment->cell = pos.v[x] + 1;
-      increment->idx  = box_idx;
+      ++pos.v[x];
+      if (!mushbounds_safe_contains1(bounds, pos, x))
+         return;
+      increment->cell = pos.v[x];
+      increment->idx = box_idx;
       return;
    }
 
    // If the path from pos to bounds->end requires a wraparound, take the
    // global minimum box.beg as a last-resort option if nothing else is found,
    // so that we wrap around if there's no non-wrapping solution.
-   if (pos.v[x] > bounds->end.v[x]
+   if (beg_available
+    && pos.v[x] > bounds->end.v[x]
     && (box_bounds->beg.v[x] < best_wrapped->cell
      || best_wrapped->idx > box_count))
    {
