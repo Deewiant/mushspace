@@ -91,9 +91,9 @@ bool mushcursor_in_box(const mushcursor*);
 
 #if !MUSHSPACE_93
 bool mushcursor_get_box(mushcursor*, mushcoords);
-#endif
 
 void mushcursor_tessellate(mushcursor*, mushcoords);
+#endif
 
 void mushcursor_set_infloop_pos(mushcursor*, mushcoords);
 
