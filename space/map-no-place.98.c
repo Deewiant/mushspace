@@ -50,8 +50,11 @@ void mushspace_map_no_place(
       if (mushstaticaabb_contains(pos)) {
          if (map_in_static(space, bpos, fg, f))
             return;
-         else
-            goto next_pos;
+
+         if (!mushbounds_safe_contains(bounds, pos))
+            goto get_next;
+
+         goto next_pos;
       }
 
       for (size_t b = 0; b < space->box_count; ++b) {
@@ -62,8 +65,11 @@ void mushspace_map_no_place(
 
          if (map_in_box(space, bpos, box, fg, f))
             return;
-         else
-            goto next_pos;
+
+         if (!mushbounds_safe_contains(bounds, pos))
+            goto get_next;
+
+         goto next_pos;
       }
 
       if (mushbounds_contains(&space->bak.bounds, pos)) {
@@ -82,6 +88,7 @@ void mushspace_map_no_place(
 
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.
+get_next:
       if (!get_next_in(space, bounds, &pos, fg, g))
          return;
    }
@@ -180,8 +187,11 @@ void mushspace_mapex_no_place(
       if (mushstaticaabb_contains(pos)) {
          if (mapex_in_static(space, bpos, fg, f))
             return;
-         else
-            goto next_pos;
+
+         if (!mushbounds_safe_contains(bounds, pos))
+            goto get_next;
+
+         goto next_pos;
       }
 
       for (size_t b = 0; b < space->box_count; ++b) {
@@ -192,12 +202,16 @@ void mushspace_mapex_no_place(
 
          if (mapex_in_box(space, bpos, box, fg, f))
             return;
-         else
-            goto next_pos;
+
+         if (!mushbounds_safe_contains(bounds, pos))
+            goto get_next;
+
+         goto next_pos;
       }
 
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.
+get_next:
       if (!get_next_in(space, bounds, &pos, fg, g))
          return;
    }
