@@ -228,9 +228,13 @@ void mushspace_remove_boxes(mushspace* space, size_t i, size_t j) {
 bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
    size_t n = 1;
    void (**is)(void*) = space->invalidatees;
-   if (is)
+   void  **id;
+   if (is) {
       while (*++is)
          ++n;
+      id = space->invalidatees_data;
+   } else
+      id = NULL;
 
    is = realloc(is, (n+1) * sizeof *is);
    if (!is)
@@ -246,7 +250,7 @@ bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
    // invalidatees as a nonnull but unterminated array.
    is[n] = NULL;
 
-   void **id = realloc(space->invalidatees_data, n * sizeof *id);
+   id = realloc(id, n * sizeof *id);
    if (!id)
       return false;
 
