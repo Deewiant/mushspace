@@ -545,7 +545,7 @@ static void get_next_in1(
    // box.beg greater than pos.
    if (box_bounds->beg.v[x] > pos.v[x]) {
       best_coord->cell = box_bounds->beg.v[x];
-      best_coord->idx = box_idx;
+      best_coord->idx  = box_idx;
       return;
    }
 
