@@ -424,7 +424,7 @@ static bool get_next_in(
    const mushcoords orig = *pos;
 
 restart:
-   {
+   if (mushbounds_safe_contains(bounds, *pos)) {
       assert (!mushstaticaabb_contains(*pos));
       assert (!mushspace_find_box(space, *pos));
    }
