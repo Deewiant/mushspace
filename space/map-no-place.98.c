@@ -472,6 +472,7 @@ restart:
          { \
             *pos = *(p); \
             g(orig, *(p), gdata); \
+            assert (mushbounds_safe_contains(bounds, *pos)); \
             return true; \
          } \
       } while (0)
