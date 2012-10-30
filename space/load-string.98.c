@@ -45,7 +45,9 @@ static int load_string_generic(
    void (*binary_load_arr)  (musharr_mushcell, mushcoords, mushcoords, void*),
    void (*binary_load_blank)(mushcoords, mushcoords, void*))
 {
+   mushbounds bounds_backing[1 << MUSHSPACE_DIM];
    musharr_mushbounds boundses;
+   boundses.ptr = bounds_backing;
    get_aabbs(*str, str_end, target, binary, &boundses);
 
    if (!boundses.ptr) {
