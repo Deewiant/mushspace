@@ -462,19 +462,23 @@ restart:
          \
          (p)->v[i] = (cell_idx).cell; \
          \
-         /* We may not end up in any box: check for it. */ \
-         if ((   (cell_idx).idx < box_count \
-              && mushbounds_contains( \
-                    &space->boxen[(cell_idx).idx].bounds, *(p))) \
+         /* We may not end up in bounds, or in any box: check for both. */ \
+         if (!mushbounds_safe_contains(bounds, *(p))) \
+            break; \
+         if (!((   (cell_idx).idx < box_count \
+                && mushbounds_contains( \
+                      &space->boxen[(cell_idx).idx].bounds, *(p))) \
          \
-             /* If we ended up in some other box, that's fine as well. */ \
-          || mushstaticaabb_contains(*(p)) || mushspace_find_box(space, *(p)))\
+            /* If we ended up in some other box, that's fine as well. */ \
+            || mushstaticaabb_contains(*(p)) \
+            || mushspace_find_box(space, *(p)))) \
          { \
-            *pos = *(p); \
-            g(orig, *(p), gdata); \
-            assert (mushbounds_safe_contains(bounds, *pos)); \
-            return true; \
+            break; \
          } \
+         *pos = *(p); \
+         g(orig, *(p), gdata); \
+         assert (mushbounds_safe_contains(bounds, *pos)); \
+         return true; \
       } while (0)
 
       if (increment.idx <= box_count) {
