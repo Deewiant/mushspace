@@ -330,7 +330,7 @@ static bool mapex_in_static(
    size_t width, area, line_start, page_start;
 
    const mushbounds *bounds = bpos.bounds;
-   mushcoords        *pos    = bpos.pos;
+   mushcoords       *pos    = bpos.pos;
 
 #if MUSHSPACE_DIM >= 2
    mushcoords ls = *pos;
