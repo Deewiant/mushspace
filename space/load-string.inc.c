@@ -488,13 +488,21 @@ static void load_arr(
       str = aux->str;
 
       if (aux->first) {
+      #if MUSHSPACE_DIM >= 2
+         const size_t old_line_start = line_start;
+      #endif
       #if MUSHSPACE_DIM >= 3
-             line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
+         line_start = page_start += (size_t)(pos.z - bounds->beg.z) * area;
       #endif
       #if MUSHSPACE_DIM >= 2
-         i = line_start              += (size_t)(pos.y - bounds->beg.y) *width;
+         line_start              += (size_t)(pos.y - bounds->beg.y) * width;
+
+         // Only set i to line_start if there were any lines. Otherwise
+         // line_start may refer to an out-of-bounds location.
+         if (line_start != old_line_start)
+            i = line_start;
       #endif
-         i                           += (size_t)(pos.x - bounds->beg.x);
+         i                       += (size_t)(pos.x - bounds->beg.x);
       }
    }
    aux->first = false;
