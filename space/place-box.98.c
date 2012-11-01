@@ -542,10 +542,6 @@ static bool consume_and_subsume(
    // top-boxes' data. However, irrelevize_subsumption_order copies the data so
    // that the order is, in fact, irrelevant.
    //
-   // I think that consumee would also have to be simply
-   // subsumees.ptr[subsumees.len-1] after sorting, but I haven't thought this
-   // completely through so I'm not sure.
-   //
    // In debug mode, do exactly the "wrong" thing (subsume top-down), in the
    // hopes of catching a bug in irrelevize_subsumption_order.
 
