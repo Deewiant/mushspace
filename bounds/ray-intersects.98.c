@@ -233,12 +233,15 @@ static void check_one_axis(
 {
    const mushcoords *beg = &bounds->beg, *end = &bounds->end;
 
+   // Initialize to 0 only to placate valgrind...
+   mushucell increment = 0;
+
    // For each coordinate that we might hit (being careful in case b ==
    // MUSHCELL_MAX)...
    for (mushcell p = a; p <= b && p >= a; p = mushcell_inc(p)) {
       // ... figure out the move counts that hit it which would also be
       // improvements to best_move_count.
-      mushucell moves, increment;
+      mushucell moves;
 
       const mushucell n = get_move_count(
          o.v[axis], p, delta.v[axis],
