@@ -230,7 +230,7 @@ bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
    void (**is)(void*) = space->invalidatees;
    void  **id;
    if (is) {
-      while (*++is)
+      while (*is++)
          ++n;
       id = space->invalidatees_data;
    } else
