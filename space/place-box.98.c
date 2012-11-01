@@ -534,6 +534,9 @@ static bool consume_and_subsume(
       return false;
    }
 
+   for (size_t i = 0; i < space->box_count; ++i)
+      removed_offsets[i] = 0;
+
    // So that remove_boxes doesn't try to free it: it's already been realloced.
    space->boxen[consumee].data = NULL;
 
