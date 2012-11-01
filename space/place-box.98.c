@@ -559,7 +559,6 @@ static bool consume_and_subsume(
          continue;
 
       mushaabb_subsume(consumer, &space->boxen[s]);
-      free(space->boxen[s].data);
    }
 
    const size_t orig_box_count = space->box_count;
