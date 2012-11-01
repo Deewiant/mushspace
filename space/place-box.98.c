@@ -570,7 +570,7 @@ static bool consume_and_subsume(
 
       // s is an index into the original space->boxen, so after we've removed
       // some boxes it's no longer valid and needs to be offset.
-      const size_t b = s - removed_offsets[s];
+      size_t b = s - removed_offsets[s];
 
       if (b == range_beg - 1) { range_beg = b; continue; }
       if (b == range_end + 1) { range_end = b; continue; }
@@ -579,9 +579,15 @@ static bool consume_and_subsume(
 
       // Any future subsumees after the end of the removed range need to be
       // offset backward by the number of boxes we just removed.
-      size_t later = range_end + 1;
+      const size_t removed = range_end - range_beg + 1;
+
+      const size_t later = range_end + 1;
       for (size_t r = later + removed_offsets[later]; r < orig_box_count; ++r)
-         removed_offsets[r] += range_end - range_beg + 1;
+         removed_offsets[r] += removed;
+
+      // Including b itself, of course.
+      if (b > range_end)
+         b -= removed;
 
       range_beg = range_end = b;
    }
