@@ -329,18 +329,18 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
       // depend on the bounds matching the data and the width/height being
       // sensible.
 
-      mushbounds *bounds = &cursor->box->bounds;
-      cursor->obeg = bounds->beg;
+      mushbounds bounds = cursor->box->bounds;
+      cursor->obeg = bounds.beg;
 
       // Here we need to tessellate only with the boxes above cursor->box.
-      mushbounds_tessellate(bounds, pos, &MUSHSTATICAABB_BOUNDS);
+      mushbounds_tessellate(&bounds, pos, &MUSHSTATICAABB_BOUNDS);
       for (size_t i = 0; i < cursor->box_idx; ++i)
-         mushbounds_tessellate(bounds, pos, &sp->boxen[i].bounds);
+         mushbounds_tessellate(&bounds, pos, &sp->boxen[i].bounds);
 
       cursor->rel_pos    = mushcoords_sub(pos, cursor->obeg);
       cursor->rel_bounds =
-         (mushbounds){mushcoords_sub(bounds->beg, cursor->obeg),
-                      mushcoords_sub(bounds->end, cursor->obeg)};
+         (mushbounds){mushcoords_sub(bounds.beg, cursor->obeg),
+                      mushcoords_sub(bounds.end, cursor->obeg)};
       break;
    }
 
