@@ -194,6 +194,7 @@ void mushspace_invalidate_all(mushspace* space) {
 }
 
 mushcaabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
+   assert (i < sp->box_count);
    return (mushcaabb_idx){&sp->boxen[i], i};
 }
 
