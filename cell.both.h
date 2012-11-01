@@ -3,12 +3,12 @@
 #ifndef MUSHSPACE_CELL_H
 #define MUSHSPACE_CELL_H
 
+#include "config/config.h"
+
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#include "config/config.h"
 
 #if MUSHSPACE_93
 typedef uint8_t mushcell;

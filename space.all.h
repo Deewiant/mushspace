@@ -3,10 +3,11 @@
 #ifndef MUSHSPACE_H
 #define MUSHSPACE_H
 
+#include "config/config.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "config/config.h"
 #include "coords.all.h"
 #include "errors.any.h"
 #include "staticaabb.all.h"
