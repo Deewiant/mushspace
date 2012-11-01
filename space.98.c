@@ -236,7 +236,7 @@ bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
    } else
       id = NULL;
 
-   is = realloc(is, (n+1) * sizeof *is);
+   is = realloc(space->invalidatees, (n+1) * sizeof *is);
    if (!is)
       return false;
 
