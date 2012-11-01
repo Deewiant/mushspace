@@ -366,22 +366,13 @@ static bool subsume_fusables(
 
    assert (subsumees->len > s0);
 
-   // Sort them so that we can find the correct offset to apply to the array
-   // index (since we're removing these from candidates as we go): if the
-   // lowest index is always next, the following ones' indices are reduced by
-   // one.
-   qsort(subsumees->ptr + s0, subsumees->len - s0,
-         sizeof *subsumees->ptr, mush_size_t_qsort_cmp);
-
-   size_t offset = 0;
    for (size_t i = s0; i < subsumees->len; ++i) {
-      size_t corrected = subsumees->ptr[i] - offset++;
-      subsumees->ptr[i] = candidates[corrected];
+      const size_t c = candidates[subsumees->ptr[i]];
 
       min_max_size(consumer, consumee, used_cells,
-                   mushspace_get_caabb_idx(space, subsumees->ptr[i]));
+                   mushspace_get_caabb_idx(space, c));
 
-      candidates[corrected] = space->box_count;
+      candidates[subsumees->ptr[i]] = space->box_count;
 
       mushstats_add(space->stats, MushStat_subsumed_fusables, 1);
    }
