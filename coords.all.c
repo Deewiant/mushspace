@@ -46,8 +46,6 @@ DEFINE_CLAMPED_OP(add)
 DEFINE_CLAMPED_OP(sub)
 #endif
 
-#if !MUSHSPACE_93 || defined(MUSH_ENABLE_INFINITE_LOOP_DETECTION)
-
 bool mushcoords_equal(mushcoords a, mushcoords b) {
    // Yes, peeling the loop is worth it.
    return a.v[0] == b.v[0]
@@ -59,5 +57,3 @@ bool mushcoords_equal(mushcoords a, mushcoords b) {
 #endif
    ;
 }
-
-#endif
