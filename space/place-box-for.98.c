@@ -106,6 +106,24 @@ static bool get_box_along_recent_line_for(
    if (axis == MUSHSPACE_DIM)
       return false;
 
+   // Check that c itself is on the same line.
+   {
+      for (mushdim d = 0; d < axis; ++d)
+         if (c.v[d] != recents[MUSH_ARRAY_LEN(recents)-1].c.v[d])
+            return false;
+      for (mushdim d = axis+1; d < MUSHSPACE_DIM; ++d)
+         if (c.v[d] != recents[MUSH_ARRAY_LEN(recents)-1].c.v[d])
+            return false;
+
+      mushcell diff =
+         mushcell_sub(c.v[axis], recents[MUSH_ARRAY_LEN(recents)-1].c.v[axis]);
+      if (!positive)
+         diff *= -1;
+
+      if (diff <= NEWBOX_PAD || diff > NEWBOX_PAD + BIG_SEQ_MAX_SPACING)
+         return false;
+   }
+
    // Check that the other recents are aligned on the same line.
    for (size_t i = 1; i < MUSH_ARRAY_LEN(recents) - 1; ++i) {
 
