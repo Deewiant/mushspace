@@ -112,10 +112,10 @@ static bool get_box_along_recent_line_for(
       const mushcell *a = recents[i].c.v, *b = recents[i+1].c.v;
 
       for (mushdim d = 0; d < axis; ++d)
-         if (mushcell_sub(b[d], a[d]))
+         if (a[d] != b[d])
             return false;
       for (mushdim d = axis+1; d < MUSHSPACE_DIM; ++d)
-         if (mushcell_sub(b[d], a[d]))
+         if (a[d] != b[d])
             return false;
 
       mushcell diff = mushcell_sub(b[axis], a[axis]);
