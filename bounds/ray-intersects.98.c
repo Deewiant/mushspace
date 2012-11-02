@@ -233,7 +233,9 @@ static void check_one_axis(
 {
    const mushcoords *beg = &bounds->beg, *end = &bounds->end;
 
-   // Initialize to 0 only to placate valgrind...
+   // Initialize to avoid undefined behaviour: using an uninitialized value is
+   // undefined, even if we do something like multiplying it by zero. After
+   // all, our processor might have trap representations for integers.
    mushucell increment = 0;
 
    // For each coordinate that we might hit (being careful in case b ==
