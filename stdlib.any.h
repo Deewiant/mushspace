@@ -5,6 +5,18 @@
 
 #include <stdlib.h>
 
+#ifdef NDEBUG
+   #if defined(__clang__) \
+    || (defined(__GNUC__) && (__GNUC__ > 4 \
+                           || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)))
+      #define MUSH_UNREACHABLE(msg) __builtin_unreachable()
+   #else
+      #define MUSH_UNREACHABLE(msg) abort()
+   #endif
+#else
+   #define MUSH_UNREACHABLE(msg) assert(0 && msg)
+#endif
+
 #define MUSH_ARRAY_LEN(X) (sizeof(X) / sizeof((X)[0]))
 
 #define MUSH_DECL_DYN_ARRAY(T) \
