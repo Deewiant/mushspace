@@ -15,7 +15,7 @@
 #define STATIC_BOX(sp) (&(sp)->static_box)
 #endif
 
-#ifdef MUSH_ENABLE_EXPENSIVE_CURSOR_DEBUGGING
+#ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
 #define DEBUG_CHECK(cursor, c) \
    assert (mushspace_get(cursor->space, mushcursor_get_pos(cursor)) == c)
 #else
