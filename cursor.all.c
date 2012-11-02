@@ -22,6 +22,8 @@
 #define DEBUG_CHECK(cursor, c)
 #endif
 
+#define BAD_CURSOR_MODE MUSH_UNREACHABLE("invalid cursor mode")
+
 #if !MUSHSPACE_93
 static int  initial_position_fixup(mushcursor*, mushcoords, mushcoords);
 static void mushcursor_recalibrate(void*);
@@ -122,7 +124,7 @@ mushcoords mushcursor_get_pos(const mushcursor* cursor) {
       return cursor->actual_pos;
 #endif
    }
-   assert (false);
+   BAD_CURSOR_MODE;
 }
 
 void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
@@ -139,7 +141,7 @@ void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
       return;
 #endif
    }
-   assert (false);
+   BAD_CURSOR_MODE;
 }
 
 bool mushcursor_in_box(const mushcursor* cursor) {
@@ -155,7 +157,7 @@ bool mushcursor_in_box(const mushcursor* cursor) {
       return mushbounds_contains(&cursor->actual_bounds, cursor->actual_pos);
 #endif
    }
-   assert (false);
+   BAD_CURSOR_MODE;
 }
 
 #if !MUSHSPACE_93
@@ -215,7 +217,7 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
       break;
 #endif
 
-   default: assert (false);
+   default: BAD_CURSOR_MODE;
    }
    DEBUG_CHECK(cursor, c);
    return c;
@@ -259,7 +261,7 @@ int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
       break;
 #endif
 
-   default: assert (false);
+   default: BAD_CURSOR_MODE;
    }
    DEBUG_CHECK(cursor, c);
    return ret;
@@ -344,7 +346,7 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
       break;
    }
 
-   default: assert (false);
+   default: BAD_CURSOR_MODE;
    }
 }
 #endif

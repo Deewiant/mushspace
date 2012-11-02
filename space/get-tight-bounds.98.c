@@ -173,7 +173,7 @@ static bool find_beg_in(
       break;
 #endif
 
-   default: assert (false);
+   default: MUSH_UNREACHABLE("axis not supported by dimensionality");
    #undef CHECK
    }
    return empty_box;
@@ -245,7 +245,7 @@ static void find_end_in(
       break;
 #endif
 
-   default: assert (false);
+   default: MUSH_UNREACHABLE("axis not supported by dimensionality");
    #undef CHECK
    }
 }

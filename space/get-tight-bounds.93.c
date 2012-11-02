@@ -64,5 +64,5 @@ bool mushspace_get_tight_bounds(const mushspace* space, mushbounds* bounds) {
          }
       }
    }
-   assert (false);
+   MUSH_UNREACHABLE("found nonspace in x- but not y-direction");
 }

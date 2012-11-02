@@ -597,7 +597,7 @@ static void load_arr(
             case '\f': break;
             #endif
 
-            default: assert (false);
+            default: MUSH_UNREACHABLE("nonspace out of bounds on new line");
             }
          }
          break;
@@ -648,7 +648,7 @@ static void load_arr(
             // that's fine.
             case '\f': goto CASE_FF;
 
-            default: assert (false);
+            default: MUSH_UNREACHABLE("nonspace out of bounds on new page");
             }
          }
          break;
@@ -701,7 +701,7 @@ static void load_arr(
                pos.z = mushcell_inc(pos.z);
                break;
          #endif
-            default: assert (false);
+            default: MUSH_UNREACHABLE("expected line break in string");
          }
          goto end;
       }
