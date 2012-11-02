@@ -13,6 +13,11 @@
 
 #if '@EXPENSIVE_DEBUGGING@' == 'y'
 #define MUSH_ENABLE_EXPENSIVE_DEBUGGING
+#if '@DISABLE_ALL_ASSERTIONS@' == 'y'
+#error EXPENSIVE_DEBUGGING conflicts with DISABLE_ALL_ASSERTIONS!
+#elif defined(NDEBUG)
+#error EXPENSIVE_DEBUGGING conflicts with NDEBUG!
+#endif
 #endif
 
 #if @CELL_SIZE@ == 0
