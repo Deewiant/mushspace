@@ -40,16 +40,16 @@ mushcell mushcell_add_clamped(mushcell a, mushcell b) {
 
 #if GNU_X86_ASM && MUSHCELL_MAX < 0xffffffff
 
-   __asm(  "addl %2,%1; movl %3,%0; cmovnol %1,%0"
-         : "=&r"(result), "+&r"(a)
-         : "r"(b), "n"(MUSHCELL_MAX)
+   __asm(  "addl %2,%1; movl %1,%0; cmovol %3,%0"
+         : "=&r"(result), "+&%r"(a)
+         : "r"(b), "r"(MUSHCELL_MAX)
          : "cc");
 
 #elif GNU_X86_ASM && MUSHCELL_MAX < 0xffffffffffffffff
 
-   __asm(  "addq %2,%1; movq %3,%0; cmovnoq %1,%0"
-         : "=&r"(result), "+&r"(a)
-         : "r"(b), "n"(MUSHCELL_MAX)
+   __asm(  "addq %2,%1; movq %1,%0; cmovoq %3,%0"
+         : "=&r"(result), "+&%r"(a)
+         : "r"(b), "r"(MUSHCELL_MAX)
          : "cc");
 
 #else
@@ -62,16 +62,16 @@ mushcell mushcell_sub_clamped(mushcell a, mushcell b) {
 
 #if GNU_X86_ASM && MUSHCELL_MAX < 0xffffffff
 
-   __asm(  "subl %2,%1; movl %3,%0; cmovnol %1,%0"
-         : "=&r"(result), "+&r"(a)
-         : "r"(b), "n"(MUSHCELL_MIN)
+   __asm(  "subl %2,%1; movl %1,%0; cmovol %3,%0"
+         : "=&r"(result), "+&%r"(a)
+         : "r"(b), "r"(MUSHCELL_MIN)
          : "cc");
 
 #elif GNU_X86_ASM && MUSHCELL_MAX < 0xffffffffffffffff
 
-   __asm(  "subq %2,%1; movq %3,%0; cmovnoq %1,%0"
-         : "=&r"(result), "+&r"(a)
-         : "r"(b), "n"(MUSHCELL_MIN)
+   __asm(  "subq %2,%1; movq %1,%0; cmovoq %3,%0"
+         : "=&r"(result), "+&%r"(a)
+         : "r"(b), "r"(MUSHCELL_MIN)
          : "cc");
 
 #else
