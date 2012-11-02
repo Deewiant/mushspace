@@ -5,8 +5,8 @@
 #include <assert.h>
 
 size_t mushbounds_clamped_size(const mushbounds* bounds) {
-   size_t sz = 1;
-   for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
+   size_t sz = mush_size_t_add_clamped(bounds->end.v[0] - bounds->beg.v[0], 1);
+   for (mushdim i = 1; i < MUSHSPACE_DIM; ++i)
       sz = mush_size_t_mul_clamped(
          sz, mush_size_t_add_clamped(bounds->end.v[i] - bounds->beg.v[i], 1));
    return sz;
