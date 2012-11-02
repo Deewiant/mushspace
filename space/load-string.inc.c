@@ -45,11 +45,19 @@ int MUSHSPACE_CAT(mushspace_load_string,UTF)(
    if (ret == MUSHERR_NONE) {
       str = p;
       assert (str <= str_end);
+#ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
       while (str < str_end) {
          C c = ASCII_NEXT(str);
          assert (c == ' ' || c == '\r' || c == '\n' || c == '\f');
       }
       assert (str == str_end);
+#elif !defined(NDEBUG)
+      // Just check one character: O(1) instead of O(n).
+      if (str < str_end) {
+         C c = ASCII_NEXT(str);
+         assert (c == ' ' || c == '\r' || c == '\n' || c == '\f');
+      }
+#endif
    }
    return ret;
 }
