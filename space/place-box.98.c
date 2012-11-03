@@ -631,10 +631,6 @@ static void irrelevize_subsumption_order(
       for (size_t t = s+1; t < space->box_count; ++t) {
          mushaabb* lower = &space->boxen[t];
 
-         if (mushbounds_contains_bounds(&higher->bounds, &lower->bounds)
-          || mushbounds_contains_bounds(&lower->bounds, &higher->bounds))
-            continue;
-
          mushaabb overlap;
 
          // If they overlap, copy the overlap area to the lower box.
