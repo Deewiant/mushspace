@@ -548,7 +548,7 @@ static bool consume_and_subsume(
    // In debug mode, do exactly the "wrong" thing (subsume top-down), in the
    // hopes of catching a bug in irrelevize_subsumption_order.
 
-#ifndef NDEBUG
+#ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
    qsort(subsumees.ptr, subsumees.len,
          sizeof *subsumees.ptr, mush_size_t_qsort_cmp);
 #endif
