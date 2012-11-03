@@ -55,6 +55,9 @@ bool mushbakaabb_put(mushbakaabb* bak, mushcoords p, mushcell c) {
    if (status == -1)
       return false;
    kh_value(hash, i) = c;
+
+   mushcoords_min_into(&bak->bounds.beg, p);
+   mushcoords_max_into(&bak->bounds.end, p);
    return true;
 }
 
