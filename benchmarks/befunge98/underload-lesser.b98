@@ -1,0 +1,56 @@
+"NRTS"4($$v@_,#! #:<"Want STRN"a
+ v0       <
+ >:~:a-#v_$0\0p v   input prog
+ ^+1 p0\<       $
+v               <
+
+  interpreter uses the following things...
+
+  top of stack: input prog pointer (x, y=0)
+  y=1 is used for the stack
+  y=2 is used for temp. data storage,
+  y=3 is used for variables:
+   0,3: underload stack top
+   a/b/c,3: temp
+
+  underload stack goes to negative fungespace
+  the stack pointer starts at 0 meaning empty stack,
+  and there must always be a 0 at x=0/1,y=1 for string term.
+
+
+  initialize: empty stack, beginning of prog, etc. etc.
+> 0 001p011p    'T5*v <-- iteration limit, tune at will
+v       p300     p18<
+v                 <
+# interpreter main loop
+>1+81g1-:!#v_81p  ^
+> :0g :#v_ 0a".enod lla"a>:#,_@                   _,#! #:<a"stack underflow."a0<
+#v      <  >a"..tuoemit"a^
+ >:'~-#v_$ 03g:1G Na3p 02P a3g1++1G N :03ga3g2+++0`!#v_                        ^
+ v     < v                  P1++1g3bg30G20 P1g30 p3b <
+^        <
+ >:':-#v_$ 03g1G N :03g1++0`!#v_                                               ^
+ v     <                      > 1+03g\-:03p1P v
+^                                             <
+ >:'!-#v_$ 03g1G N 03g1++ :0`!#v_                                              ^
+ v     < v             P20 p30 <
+^        <
+ >:'*-#v_$ 03g1G N03g1++1G N03g2++0`!#v_                                       ^
+ v     < v              P1p30:+1g30 A <
+^        <
+ >:'(-#v_$ :1\1+>:0g :#v_ 0a".( detanimretnu"a>:#,_@
+ v     <               >:'(-!#v_')-#v_\1-:#v_v
+                ^  +1< \+1\$  <              $
+                     ^              <     \<
+^          g3a P1p30:-\g30+1N G0+1 p0\0 p3a: <
+
+ >:'a-#v_$ 0') 03g1G N03g1++0`!#v_                                             ^
+ v     < v    P1p30:-2g30AA ('0 <
+^        <
+ >:'^-#v_$ 03g1G N:a3p 03g1++ :0`!#v_                                          ^
+ v     <                           >03p 02P :1+0gb3p v
+^                 -1 p0\g3b+1\ P0g3aG20 p3a: --1g3a: <
+
+ >:'S-!#v_ 0" nsni dab"a>:#,_.a,@
+        >$03g1G N 03g1++ :0`!#v_                                               ^
+^                       D p30 <
