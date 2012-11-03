@@ -615,17 +615,16 @@ static bool consume_and_subsume(
 // Where X is the final box placed. Note that * is now found in B, not in X,
 // but its data was in C (now X)! Oops!
 //
-// So, we do the following, which in the above case would copy the data from C
-// to B.
+// So, we do this, which in the above case would copy the data from C to B.
 //
 // Since mushspace_get_tight_bounds checks all boxes without considering
 // overlappingness, we also space the overlapped area in C to prevent mishaps
 // there.
 //
-// Caveat: this assumes that the final box will always be placed bottom-most.
-// This does not really matter, it's just extra work if it's not; but in any
-// case, if not, the relevant overlapping boxes would be those which would end
-// up above the final box.
+// Note: this assumes that the final box will always be placed bottom-most.
+// This does not really matter, as it's just extra work if it's not. But if
+// not, we only need to consider, of the boxes that overlap with the subsumees,
+// those which would end up above the final box.
 static void irrelevize_subsumption_order(
    mushspace* space, musharr_size_t subsumees)
 {
