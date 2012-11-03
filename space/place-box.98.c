@@ -617,10 +617,6 @@ static bool consume_and_subsume(
 //
 // So, we do this, which in the above case would copy the data from C to B.
 //
-// Since mushspace_get_tight_bounds checks all boxes without considering
-// overlappingness, we also space the overlapped area in C to prevent mishaps
-// there.
-//
 // Note: this assumes that the final box will always be placed bottom-most.
 // This does not really matter, as it's just extra work if it's not. But if
 // not, we only need to consider, of the boxes that overlap with the subsumees,
@@ -630,7 +626,7 @@ static void irrelevize_subsumption_order(
 {
    for (size_t i = 0; i < subsumees.len; ++i) {
       size_t s = subsumees.ptr[i];
-      mushaabb* higher = &space->boxen[s];
+      const mushaabb* higher = &space->boxen[s];
 
       for (size_t t = s+1; t < space->box_count; ++t) {
          mushaabb* lower = &space->boxen[t];
@@ -641,14 +637,12 @@ static void irrelevize_subsumption_order(
 
          mushaabb overlap;
 
-         // If they overlap, copy the overlap area to the lower box and space
-         // that area in the higher one.
+         // If they overlap, copy the overlap area to the lower box.
          if (mushbounds_get_overlap(&higher->bounds, &lower->bounds,
                                     &overlap.bounds))
          {
             mushaabb_finalize(&overlap);
             mushaabb_subsume_area(lower, higher, &overlap);
-            mushaabb_space_area(higher, &overlap);
          }
       }
    }
