@@ -11,24 +11,14 @@
 
 typedef struct consumee { size_t idx; size_t size; } consumee;
 
-MUSH_DECL_DYN_ARRAY(size_t)
-
 static mushaabb* really_place_box(mushspace*, mushaabb*);
 
-static void subsume_contains(
-   mushspace*, musharr_size_t*, const mushbounds*, consumee*, size_t*);
-
-static bool subsume_fusables(
-   mushspace*, musharr_size_t*, mushbounds*, consumee*, size_t*);
-
-static bool subsume_disjoint(
-   mushspace*, musharr_size_t*, mushbounds*, consumee*, size_t*);
+static bool subsume_fusables(mushspace*, mushbounds*, consumee*, size_t*);
+static bool subsume_disjoint(mushspace*, mushbounds*, consumee*, size_t*);
+static bool subsume_overlaps(mushspace*, mushbounds*, consumee*, size_t*);
 
 static bool disjoint_mms_validator(
    const mushbounds*, const mushaabb*, size_t, void*);
-
-static bool subsume_overlaps(
-   mushspace*, musharr_size_t*, mushbounds*, consumee*, size_t*);
 
 static bool overlaps_mms_validator(
    const mushbounds*, const mushaabb*, size_t, void*);
@@ -41,7 +31,7 @@ static bool valid_min_max_size(
 
 static bool cheaper_to_alloc(size_t, size_t);
 
-static bool consume_and_subsume(mushspace*, musharr_size_t, size_t, mushaabb*);
+static bool consume_and_subsume(mushspace*, size_t, mushaabb*);
 
 bool mushspace_place_box(
    mushspace* space, mushaabb* aabb, mushcoords* reason, mushaabb** reason_box)
@@ -149,23 +139,13 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
       assert (!mushbounds_contains_bounds(
          &space->boxen[i].bounds, &aabb->bounds));
 
-   musharr_size_t subsumees;
-
-   subsumees.ptr = malloc(space->box_count * sizeof *subsumees.ptr);
-
-   // If space->box_count is zero, malloc can validly return NULL.
-   if (!subsumees.ptr && space->box_count != 0) {
-      free(subsumees.ptr);
-      return NULL;
-   }
-
    consumee consumee = {.size = 0};
    size_t used_cells = aabb->size;
 
    mushaabb consumer;
    mushaabb_make_unsafe(&consumer, &aabb->bounds);
 
-   subsumees.len = 0;
+   bool any_subsumees = false;
 
    for (;;) {
       // Disjoint assumes that it comes after fusables. Some reasoning for why
@@ -179,21 +159,31 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
       // disjoints before fusables, we might subsume D, leaving us worse off
       // than if we'd subsumed F.
 
-      #define PARAMS space,            \
-                     &subsumees,       \
-                     &consumer.bounds, \
-                     &consumee, &used_cells
+      #define PARAMS space, &consumer.bounds, &consumee, &used_cells
 
-          subsume_contains(PARAMS);
-      if (subsume_fusables(PARAMS)) continue;
-      if (subsume_disjoint(PARAMS)) continue;
-      if (subsume_overlaps(PARAMS)) continue;
+      if (subsume_fusables(PARAMS)) { any_subsumees = true; }
+      if (subsume_disjoint(PARAMS)) { any_subsumees = true; continue; }
+      if (subsume_overlaps(PARAMS)) { any_subsumees = true; continue; }
       break;
 
       #undef PARAMS
    }
 
-   if (subsumees.len) {
+   // Look for contained boxes in case any_subsumees in false. Do it in any
+   // case since we might improve consumee.
+   //
+   // Disjoints and overlaps can bring in new contained boxes that weren't
+   // handled at all before this, so we do need to do this here.
+   for (size_t i = 0; i < space->box_count; ++i) {
+      const mushaabb *box = &space->boxen[i];
+      if (!mushbounds_contains_bounds(&consumer.bounds, &box->bounds))
+         continue;
+      any_subsumees = true;
+      if (box->size > consumee.size)
+         consumee = (struct consumee){.size = box->size, .idx = i};
+   }
+
+   if (any_subsumees) {
       // Even though consume_and_subsume might reduce the box count and
       // generally free some memory (by defragmentation if nothing else), that
       // doesn't necessarily happen. (Due to other programs if nothing else.)
@@ -206,15 +196,11 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
       size_t max_needed_boxen = space->box_count + 1;
       mushaabb *boxen =
          realloc(space->boxen, max_needed_boxen * sizeof *boxen);
-      if (!boxen) {
-         free(subsumees.ptr);
+      if (!boxen)
          return NULL;
-      }
       space->boxen = boxen;
 
-      const bool ok =
-         consume_and_subsume(space, subsumees, consumee.idx, &consumer);
-      free(subsumees.ptr);
+      const bool ok = consume_and_subsume(space, consumee.idx, &consumer);
 
       // Try to reduce size of space->boxen if possible.
       //
@@ -238,8 +224,6 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
       // When we have nothing to consume, things are simpler: just allocate the
       // given AABB, make room for it, and add it.
 
-      free(subsumees.ptr);
-
       if (!mushaabb_alloc(aabb))
          return NULL;
 
@@ -262,59 +246,26 @@ static mushaabb* really_place_box(mushspace* space, mushaabb* aabb) {
    return &space->boxen[space->box_count-1];
 }
 
-static inline bool is_subsumee(
-   size_t candidate, const size_t* subsumees, size_t len)
-{
-   for (size_t i = 0; i < len; ++i)
-      if (candidate == subsumees[i])
-         return true;
-   return false;
-}
-
-// Doesn't return bool like the others because it doesn't change consumer.
-static void subsume_contains(
-   mushspace* space, musharr_size_t* subsumees, const mushbounds* consumer,
-   consumee* consumee, size_t* used_cells)
-{
-   const size_t s0 = subsumees->len;
-
-   for (size_t c = 0; c < space->box_count; ++c) {
-      if (is_subsumee(c, subsumees->ptr, s0))
-         continue;
-
-      mushcaabb_idx box = mushspace_get_caabb_idx(space, c);
-
-      if (!mushbounds_contains_bounds(consumer, &box.aabb->bounds))
-         continue;
-
-      subsumees->ptr[subsumees->len++] = c;
-      min_max_size(NULL, consumee, used_cells, box);
-
-      mushstats_add(space->stats, MushStat_subsumed_contains, 1);
-   }
-}
-
 static bool subsume_fusables(
-   mushspace* space, musharr_size_t* subsumees, mushbounds* consumer,
+   mushspace* space, mushbounds* consumer,
    consumee* consumee, size_t* used_cells)
 {
-   const size_t s0 = subsumees->len;
-
 #if MUSHSPACE_DIM == 1
    // The one-dimensional case is simple, as we don't have to worry about axes.
 
+   bool any = false;
    for (size_t c = 0; c < space->box_count; ++c) {
-      if (is_subsumee(c, subsumees->ptr, s0))
-         continue;
-
       const mushbounds *bounds = &space->boxen[c].bounds;
-      if (!mushbounds_can_fuse(consumer, bounds))
+      if (!mushbounds_can_fuse(consumer, bounds)
+       || mushbounds_contains_bounds(consumer, bounds))
          continue;
 
       min_max_size(consumer, consumee, used_cells,
                    mushspace_get_caabb_idx(space, c));
-      subsumees->ptr[subsumees->len++] = c;
+      mushstats_add(space->stats, MushStat_subsumed_fusables, 1);
+      any = true;
    }
+   return any;
 #else
    // We need to ensure that all the ones we fuse with are along the same axis.
    // For instance, A can't fuse with both X and Y in the following:
@@ -332,12 +283,12 @@ static bool subsume_fusables(
    struct consumee tentative_consumee   = *consumee;
    size_t          tentative_used_cells = *used_cells;
 
-   for (size_t c = 0; c < space->box_count; ++c) {
-      if (is_subsumee(c, subsumees->ptr, s0))
-         continue;
+   size_t n = 0;
 
+   for (size_t c = 0; c < space->box_count; ++c) {
       const mushbounds *bounds = &space->boxen[c].bounds;
-      if (!mushbounds_can_fuse(&tentative_consumer, bounds))
+      if (!mushbounds_can_fuse(&tentative_consumer, bounds)
+        || mushbounds_contains_bounds(&tentative_consumer, bounds))
          continue;
 
       if (axis != MUSHSPACE_DIM) {
@@ -351,7 +302,7 @@ static bool subsume_fusables(
             tentative_consumer   = *consumer;
             tentative_consumee   = *consumee;
             tentative_used_cells = *used_cells;
-            subsumees->len       = s0;
+            n = 0;
          } else if (!mushbounds_on_same_axis(
                         &tentative_consumer, bounds, axis))
             continue;
@@ -359,7 +310,7 @@ static bool subsume_fusables(
          min_max_size(
             &tentative_consumer, &tentative_consumee, &tentative_used_cells,
             mushspace_get_caabb_idx(space, c));
-         subsumees->ptr[subsumees->len++] = c;
+         ++n;
          continue;
       }
 
@@ -371,50 +322,43 @@ static bool subsume_fusables(
          min_max_size(
             &tentative_consumer, &tentative_consumee, &tentative_used_cells,
             mushspace_get_caabb_idx(space, c));
-         subsumees->ptr[subsumees->len++] = c;
-
+         ++n;
          axis = x;
          break;
       }
    }
-   if (subsumees->len != s0) {
+   if (n) {
       *consumer   = tentative_consumer;
       *consumee   = tentative_consumee;
       *used_cells = tentative_used_cells;
+      mushstats_add(space->stats, MushStat_subsumed_fusables, n);
    }
+   return n;
 #endif
-   assert (subsumees->len >= s0);
-   mushstats_add(
-      space->stats, MushStat_subsumed_fusables, subsumees->len - s0);
-   return subsumees->len != s0;
 }
 
 static bool subsume_disjoint(
-   mushspace* space, musharr_size_t* subsumees, mushbounds* consumer,
+   mushspace* space, mushbounds* consumer,
    consumee* consumee, size_t* used_cells)
 {
-   const size_t s0 = subsumees->len;
+   bool any = false;
    for (size_t c = 0; c < space->box_count; ++c) {
-      if (is_subsumee(c, subsumees->ptr, s0))
-         continue;
-
       mushcaabb_idx box = mushspace_get_caabb_idx(space, c);
 
       // All fusables have been removed, so a sufficient condition for
-      // disjointness is non-overlappingness.
+      // disjointness is non-overlappingness. This also takes care of excluding
+      // the subsumees, which are contained and hence overlapping.
       if (mushbounds_overlaps(consumer, &box.aabb->bounds))
          continue;
 
       if (valid_min_max_size(disjoint_mms_validator, NULL, consumer, consumee,
                              used_cells, box))
       {
-         subsumees->ptr[subsumees->len++] = c;
-
          mushstats_add(space->stats, MushStat_subsumed_disjoint, 1);
+         any = true;
       }
    }
-   assert (subsumees->len >= s0);
-   return subsumees->len > s0;
+   return any;
 }
 
 static bool disjoint_mms_validator(
@@ -426,29 +370,26 @@ static bool disjoint_mms_validator(
 }
 
 static bool subsume_overlaps(
-   mushspace* space, musharr_size_t* subsumees, mushbounds* consumer,
+   mushspace* space, mushbounds* consumer,
    consumee* consumee, size_t* used_cells)
 {
-   const size_t s0 = subsumees->len;
+   bool any = false;
    for (size_t c = 0; c < space->box_count; ++c) {
-      if (is_subsumee(c, subsumees->ptr, s0))
-         continue;
-
       mushcaabb_idx box = mushspace_get_caabb_idx(space, c);
 
-      if (!mushbounds_overlaps(consumer, &box.aabb->bounds))
+      const mushbounds *bounds = &box.aabb->bounds;
+      if (mushbounds_contains_bounds(consumer, bounds)
+       || !mushbounds_overlaps(consumer, bounds))
          continue;
 
       if (valid_min_max_size(overlaps_mms_validator, consumer, consumer,
                              consumee, used_cells, box))
       {
-         subsumees->ptr[subsumees->len++] = c;
-
          mushstats_add(space->stats, MushStat_subsumed_overlaps, 1);
+         any = true;
       }
    }
-   assert (subsumees->len >= s0);
-   return subsumees->len > s0;
+   return any;
 }
 
 static bool overlaps_mms_validator(
@@ -465,19 +406,17 @@ static bool overlaps_mms_validator(
 }
 
 static void min_max_size(
-   mushbounds* bounds,
-   consumee* max, size_t* total_size, mushcaabb_idx box)
+   mushbounds* bounds, consumee* max, size_t* total_size, mushcaabb_idx box)
 {
+   assert (!mushbounds_contains_bounds(bounds, &box.aabb->bounds));
+
    *total_size += box.aabb->size;
    if (box.aabb->size > max->size) {
       max->size = box.aabb->size;
       max->idx  = box.idx;
    }
-   if (bounds) {
-      assert (!mushbounds_contains_bounds(bounds, &box.aabb->bounds));
-      mushcoords_min_into(&bounds->beg, box.aabb->bounds.beg);
-      mushcoords_max_into(&bounds->end, box.aabb->bounds.end);
-   }
+   mushcoords_min_into(&bounds->beg, box.aabb->bounds.beg);
+   mushcoords_max_into(&bounds->end, box.aabb->bounds.end);
 }
 
 // Fills in the input values with the min_max_size data, returning what the
@@ -518,19 +457,8 @@ static bool cheaper_to_alloc(size_t together, size_t separate) {
 }
 
 static bool consume_and_subsume(
-   mushspace* space,
-   musharr_size_t subsumees, size_t consumee, mushaabb* consumer)
+   mushspace* space, size_t consumee, mushaabb* consumer)
 {
-   assert (subsumees.len > 0);
-
-   // This allocation needs to be up here: anything below the consumption has
-   // to succeed unconditionally lest we leave the mushspace in a corrupted
-   // state.
-   size_t *removed_offsets =
-      malloc(space->box_count * sizeof *removed_offsets);
-   if (!removed_offsets)
-      return false;
-
    // Consider the following:
    //
    // +-----++---+
@@ -554,12 +482,21 @@ static bool consume_and_subsume(
    //
    // We need to copy data from each subsumee S to all boxes that are currently
    // below S and which will end up above the consumer.
-   for (size_t i = 0; i < subsumees.len; ++i) {
-      size_t s = subsumees.ptr[i];
+   for (size_t s = 0; s < space->box_count; ++s) {
       const mushaabb* higher = &space->boxen[s];
+      if (!mushbounds_contains_bounds(&consumer->bounds, &higher->bounds))
+         continue;
 
       for (size_t t = s+1; t < space->box_count; ++t) {
          mushaabb* lower = &space->boxen[t];
+
+         // We will subsume bottom-up, so if the lower box is a subsumee no
+         // copying is necessary — unless the higher box is the consumee. The
+         // consumee is taken care of out of order, so it always needs to be
+         // handled here as well.
+         if (s != consumee
+          && mushbounds_contains_bounds(&consumer->bounds, &lower->bounds))
+            continue;
 
          mushaabb overlap;
 
@@ -574,69 +511,40 @@ static bool consume_and_subsume(
    }
 
    mushaabb_finalize(consumer);
-   if (!mushaabb_consume(consumer, &space->boxen[consumee])) {
-      free(removed_offsets);
+   if (!mushaabb_consume(consumer, &space->boxen[consumee]))
       return false;
-   }
-
-   for (size_t i = 0; i < space->box_count; ++i)
-      removed_offsets[i] = 0;
 
    // So that remove_boxes doesn't try to free it: it's already been realloced.
    space->boxen[consumee].data = NULL;
 
-   // NOTE: strictly speaking we should sort subsumees and go from
-   // subsumees.len down to 0, since we don't want below-boxes to overwrite
-   // top-boxes' data. However, above we copy the data so that the order is, in
-   // fact, irrelevant.
-   //
-   // In debug mode, do exactly the "wrong" thing (subsume top-down), in the
-   // hopes of catching a bug.
+   size_t range_beg = consumee, range_end = range_beg;
 
-#ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
-   qsort(subsumees.ptr, subsumees.len,
-         sizeof *subsumees.ptr, mush_size_t_qsort_cmp);
-#endif
-
-   for (size_t i = 0; i < subsumees.len; ++i) {
-      size_t s = subsumees.ptr[i];
-      if (s == consumee)
+   // Subsume lower boxes first: we want higher boxes to overwrite lower ones,
+   // not the other way around.
+   for (size_t b = space->box_count; b--;) {
+      if (b == consumee)
          continue;
 
-      mushaabb_subsume(consumer, &space->boxen[s]);
-   }
+      mushaabb *box = &space->boxen[b];
+      if (!mushbounds_contains_bounds(&consumer->bounds, &box->bounds))
+         continue;
 
-   const size_t orig_box_count = space->box_count;
-
-   size_t range_beg = subsumees.ptr[0], range_end = subsumees.ptr[0];
-
-   for (size_t i = 1; i < subsumees.len; ++i) {
-      const size_t s = subsumees.ptr[i];
-
-      // s is an index into the original space->boxen, so after we've removed
-      // some boxes it's no longer valid and needs to be offset.
-      size_t b = s - removed_offsets[s];
+      mushaabb_subsume(consumer, box);
 
       if (b == range_beg - 1) { range_beg = b; continue; }
       if (b == range_end + 1) { range_end = b; continue; }
 
       mushspace_remove_boxes(space, range_beg, range_end);
 
-      // Any future subsumees after the end of the removed range need to be
-      // offset backward by the number of boxes we just removed.
-      const size_t removed = range_end - range_beg + 1;
-
-      const size_t later = range_end + 1;
-      for (size_t r = later + removed_offsets[later]; r < orig_box_count; ++r)
-         removed_offsets[r] += removed;
-
-      // Including b itself, of course.
-      if (b > range_end)
-         b -= removed;
+      if (range_end < b) {
+         // This should only happen when the consumee was off to the left.
+         assert (range_beg == consumee);
+         assert (range_end == consumee);
+         --b;
+      }
 
       range_beg = range_end = b;
    }
-   free(removed_offsets);
    mushspace_remove_boxes(space, range_beg, range_end);
    return true;
 }
