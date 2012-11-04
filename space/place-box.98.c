@@ -476,6 +476,7 @@ static void min_max_size(
       max->idx  = box.idx;
    }
    if (bounds) {
+      assert (!mushbounds_contains_bounds(bounds, &box.aabb->bounds));
       mushcoords_min_into(&bounds->beg, box.aabb->bounds.beg);
       mushcoords_max_into(&bounds->end, box.aabb->bounds.end);
    }
