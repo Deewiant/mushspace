@@ -302,68 +302,93 @@ static bool subsume_fusables(
 {
    const size_t s0 = subsumees->len;
 
-   // First, get all the fusables.
+#if MUSHSPACE_DIM == 1
+   // The one-dimensional case is simple, as we don't have to worry about axes.
+
    for (size_t c = 0; c < space->box_count; ++c) {
       if (is_subsumee(c, subsumees->ptr, s0))
          continue;
-      if (mushbounds_can_fuse(consumer, &space->boxen[c].bounds))
-         subsumees->ptr[subsumees->len++] = c;
-   }
 
-   // Now, grab those that we can actually fuse with.
-   //
-   // We prefer those along the primary axis (y for 2D, z for 3D) because then
-   // we have less memcpying/memmoving to do.
-   //
-   // This ensures that all the ones we fuse with are along the same axis. For
-   // instance, A can't fuse with both X and Y in the following:
+      const mushbounds *bounds = &space->boxen[c].bounds;
+      if (!mushbounds_can_fuse(consumer, bounds))
+         continue;
+
+      min_max_size(consumer, consumee, used_cells,
+                   mushspace_get_caabb_idx(space, c));
+      subsumees->ptr[subsumees->len++] = c;
+   }
+#else
+   // We need to ensure that all the ones we fuse with are along the same axis.
+   // For instance, A can't fuse with both X and Y in the following:
    //
    // X
    // AY
    //
-   // This is not needed in one dimension because then they're all trivially
-   // along the same axis.
-#if MUSHSPACE_DIM > 1
-   if (subsumees->len - s0 > 1) {
-      size_t j = s0;
-      for (size_t i = s0; i < subsumees->len; ++i) {
-         size_t s = subsumees->ptr[i];
-         const mushbounds *bounds = &space->boxen[s].bounds;
-         if (mushbounds_on_same_primary_axis(consumer, bounds))
-            subsumees->ptr[j++] = s;
+   // We prefer those along the primary axis (y for 2D, z for 3D) because then
+   // we have less memcpying/memmoving to do.
+
+   static const mushdim PRIMARY_AXIS = MUSHSPACE_DIM - 1;
+   mushdim axis = MUSHSPACE_DIM;
+
+   mushbounds      tentative_consumer   = *consumer;
+   struct consumee tentative_consumee   = *consumee;
+   size_t          tentative_used_cells = *used_cells;
+
+   for (size_t c = 0; c < space->box_count; ++c) {
+      if (is_subsumee(c, subsumees->ptr, s0))
+         continue;
+
+      const mushbounds *bounds = &space->boxen[c].bounds;
+      if (!mushbounds_can_fuse(&tentative_consumer, bounds))
+         continue;
+
+      if (axis != MUSHSPACE_DIM) {
+         if (axis != PRIMARY_AXIS
+          && mushbounds_on_same_axis(
+                &tentative_consumer, bounds, PRIMARY_AXIS))
+         {
+            axis = PRIMARY_AXIS;
+
+            // We've tentatively fused with some non-primary bounds: reset.
+            tentative_consumer   = *consumer;
+            tentative_consumee   = *consumee;
+            tentative_used_cells = *used_cells;
+            subsumees->len       = s0;
+         } else if (!mushbounds_on_same_axis(
+                        &tentative_consumer, bounds, axis))
+            continue;
+
+         min_max_size(
+            &tentative_consumer, &tentative_consumee, &tentative_used_cells,
+            mushspace_get_caabb_idx(space, c));
+         subsumees->ptr[subsumees->len++] = c;
+         continue;
       }
 
-      if (j == s0) {
-         // Just grab the first one instead of being smart about it.
-         const mushbounds *bounds = &space->boxen[subsumees->ptr[s0]].bounds;
+      // Try all axes starting from the primary one.
+      for (mushdim x = MUSHSPACE_DIM; x--;) {
+         if (!mushbounds_on_same_axis(&tentative_consumer, bounds, x))
+            continue;
 
-         j = s0 + 1;
+         min_max_size(
+            &tentative_consumer, &tentative_consumee, &tentative_used_cells,
+            mushspace_get_caabb_idx(space, c));
+         subsumees->ptr[subsumees->len++] = c;
 
-         for (size_t i = j; i < subsumees->len; ++i) {
-            size_t s = subsumees->ptr[i];
-            const mushbounds *sbounds = &space->boxen[s].bounds;
-            if (mushbounds_on_same_axis(bounds, sbounds))
-               subsumees->ptr[j++] = s;
-         }
+         axis = x;
+         break;
       }
-      subsumees->len = j;
+   }
+   if (subsumees->len != s0) {
+      *consumer   = tentative_consumer;
+      *consumee   = tentative_consumee;
+      *used_cells = tentative_used_cells;
    }
 #endif
-
-   if (subsumees->len == s0)
-      return false;
-
-   assert (subsumees->len > s0);
-
-   for (size_t i = s0; i < subsumees->len; ++i) {
-      const size_t c = subsumees->ptr[i];
-
-      min_max_size(consumer, consumee, used_cells,
-                   mushspace_get_caabb_idx(space, c));
-
-      mushstats_add(space->stats, MushStat_subsumed_fusables, 1);
-   }
-   return true;
+   assert (subsumees->len >= s0);
+   mushstats_add(
+      space->stats, MushStat_subsumed_fusables, subsumees->len - s0);
+   return subsumees->len != s0;
 }
 
 static bool subsume_disjoint(

@@ -74,16 +74,10 @@ bool mushbounds_get_overlap(
 }
 
 #if MUSHSPACE_DIM > 1
-bool mushbounds_on_same_axis(const mushbounds* a, const mushbounds* b) {
-   for (mushdim i = 0; i < MUSHSPACE_DIM; ++i)
-      if (a->beg.v[i] == b->beg.v[i] && a->end.v[i] == b->end.v[i])
-         return true;
-   return false;
-}
-bool mushbounds_on_same_primary_axis(const mushbounds* a, const mushbounds* b)
+bool mushbounds_on_same_axis(
+   const mushbounds* a, const mushbounds* b, mushdim x)
 {
-   const mushdim I = MUSHSPACE_DIM-1;
-   return a->beg.v[I] == b->beg.v[I] && a->end.v[I] == b->end.v[I];
+   return a->beg.v[x] == b->beg.v[x] && a->end.v[x] == b->end.v[x];
 }
 #endif
 
@@ -103,8 +97,11 @@ bool mushbounds_can_fuse(const mushbounds* a, const mushbounds* b) {
          if (a->beg.v[j] != b->beg.v[j] || a->end.v[j] != b->end.v[j])
             return false;
 
-      #if MUSHSPACE_DIM > 1
-         assert (mushbounds_on_same_axis(a, b));
+      #if MUSHSPACE_DIM > 1 && !defined(NDEBUG)
+         bool on_same_axis = false;
+         for (mushdim d = 0; d < MUSHSPACE_DIM; ++d)
+            on_same_axis = on_same_axis || mushbounds_on_same_axis(a, b, d);
+         assert (on_same_axis);
       #endif
       return true;
    }
