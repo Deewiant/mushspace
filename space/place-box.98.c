@@ -43,8 +43,6 @@ static bool cheaper_to_alloc(size_t, size_t);
 
 static bool consume_and_subsume(mushspace*, musharr_size_t, size_t, mushaabb*);
 
-static void irrelevize_subsumption_order(mushspace*, musharr_size_t);
-
 bool mushspace_place_box(
    mushspace* space, mushaabb* aabb, mushcoords* reason, mushaabb** reason_box)
 {
@@ -533,7 +531,47 @@ static bool consume_and_subsume(
    if (!removed_offsets)
       return false;
 
-   irrelevize_subsumption_order(space, subsumees);
+   // Consider the following:
+   //
+   // +-----++---+
+   // | A +--| C |
+   // +---|B +*--+
+   //     +----+
+   //
+   // Here, A is the one being placed and C is a fusable. * is a point whose
+   // data is in C but which is contained in both B and C. Since consumer is
+   // going to end up below all existing boxes, we'll be left with:
+   //
+   // +----------+
+   // | X +----+ |
+   // +---|B  *|-+
+   //     +----+
+   //
+   // Where X is the consumer. Note that * is now found in B, not in X, but its
+   // data was in C (now X)! Oops!
+   //
+   // So, we do this, which in the above case would copy the data from C to B.
+   //
+   // We need to copy data from each subsumee S to all boxes that are currently
+   // below S and which will end up above the consumer.
+   for (size_t i = 0; i < subsumees.len; ++i) {
+      size_t s = subsumees.ptr[i];
+      const mushaabb* higher = &space->boxen[s];
+
+      for (size_t t = s+1; t < space->box_count; ++t) {
+         mushaabb* lower = &space->boxen[t];
+
+         mushaabb overlap;
+
+         // If they overlap, copy the overlap area to the lower box.
+         if (mushbounds_get_overlap(&higher->bounds, &lower->bounds,
+                                    &overlap.bounds))
+         {
+            mushaabb_finalize(&overlap);
+            mushaabb_subsume_area(lower, higher, &overlap);
+         }
+      }
+   }
 
    mushaabb_finalize(consumer);
    if (!mushaabb_consume(consumer, &space->boxen[consumee])) {
@@ -549,11 +587,11 @@ static bool consume_and_subsume(
 
    // NOTE: strictly speaking we should sort subsumees and go from
    // subsumees.len down to 0, since we don't want below-boxes to overwrite
-   // top-boxes' data. However, irrelevize_subsumption_order copies the data so
-   // that the order is, in fact, irrelevant.
+   // top-boxes' data. However, above we copy the data so that the order is, in
+   // fact, irrelevant.
    //
    // In debug mode, do exactly the "wrong" thing (subsume top-down), in the
-   // hopes of catching a bug in irrelevize_subsumption_order.
+   // hopes of catching a bug.
 
 #ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
    qsort(subsumees.ptr, subsumees.len,
@@ -601,52 +639,4 @@ static bool consume_and_subsume(
    free(removed_offsets);
    mushspace_remove_boxes(space, range_beg, range_end);
    return true;
-}
-
-// Consider the following:
-//
-// +-----++---+
-// | A +--| C |
-// +---|B +*--+
-//     +----+
-//
-// Here, A is the one being placed and C is a fusable. * is a point whose data
-// is in C but which is contained in both B and C. Since the final subsumer-box
-// is going to be below all existing boxes, we'll end up with:
-//
-// +----------+
-// | X +----+ |
-// +---|B  *|-+
-//     +----+
-//
-// Where X is the final box placed. Note that * is now found in B, not in X,
-// but its data was in C (now X)! Oops!
-//
-// So, we do this, which in the above case would copy the data from C to B.
-//
-// Note: this assumes that the final box will always be placed bottom-most.
-// This does not really matter, as it's just extra work if it's not. But if
-// not, we only need to consider, of the boxes that overlap with the subsumees,
-// those which would end up above the final box.
-static void irrelevize_subsumption_order(
-   mushspace* space, musharr_size_t subsumees)
-{
-   for (size_t i = 0; i < subsumees.len; ++i) {
-      size_t s = subsumees.ptr[i];
-      const mushaabb* higher = &space->boxen[s];
-
-      for (size_t t = s+1; t < space->box_count; ++t) {
-         mushaabb* lower = &space->boxen[t];
-
-         mushaabb overlap;
-
-         // If they overlap, copy the overlap area to the lower box.
-         if (mushbounds_get_overlap(&higher->bounds, &lower->bounds,
-                                    &overlap.bounds))
-         {
-            mushaabb_finalize(&overlap);
-            mushaabb_subsume_area(lower, higher, &overlap);
-         }
-      }
-   }
 }
