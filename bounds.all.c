@@ -111,10 +111,16 @@ bool mushbounds_can_fuse(const mushbounds* a, const mushbounds* b) {
 void mushbounds_tessellate(
    mushbounds* bounds, mushcoords pos, const mushbounds* avoid)
 {
-   assert (mushbounds_contains(bounds, pos));
-
    if (!mushbounds_overlaps(bounds, avoid))
       return;
+
+   mushbounds_tessellate_unsafe(bounds, pos, avoid);
+}
+
+void mushbounds_tessellate_unsafe(
+   mushbounds* bounds, mushcoords pos, const mushbounds* avoid)
+{
+   assert (mushbounds_contains(bounds, pos));
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
       // This could be improved, consider for instance the bottommost box in
