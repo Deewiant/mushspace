@@ -23,8 +23,10 @@ static bool extend_first_placed_big_for(
 bool mushspace_place_box_for(
    mushspace* space, mushcoords c, mushaabb** placed)
 {
+#if USE_BAKAABB
    if (mushboxen_count(&space->boxen) >= MAX_PLACED_BOXEN)
       return false;
+#endif
 
    mushaabb aabb;
    get_box_for(space, c, &aabb);

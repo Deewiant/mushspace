@@ -31,7 +31,7 @@ typedef struct mushcursor {
          mushboxen_iter box_iter;
 #endif
       };
-#if !MUSHSPACE_93
+#if USE_BAKAABB
       // For bak mode.
       struct {
          mushcoords actual_pos;

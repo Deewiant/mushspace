@@ -72,6 +72,7 @@ void mushspace_map_no_place(
          goto next_pos;
       }
 
+#if USE_BAKAABB
       if (space->bak.data && mushbounds_contains(&space->bak.bounds, pos)) {
          mushcell *p = mushbakaabb_get_ptr_unsafe(&space->bak, pos);
          f((musharr_mushcell){p,1}, pos, pos, fg);
@@ -85,6 +86,7 @@ void mushspace_map_no_place(
          }
          return;
       }
+#endif
 
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.

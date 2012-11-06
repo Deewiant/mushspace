@@ -93,6 +93,7 @@ bool mushspace_place_box(
          reason = NULL;
       }
 
+#if USE_BAKAABB
       // If it crossed bak, we need to fix things up and move any occupied
       // cells from bak (which is below all boxen) to the appropriate box.
       // (which may not be *box, if there are any boxes above it).
@@ -126,6 +127,7 @@ bool mushspace_place_box(
             mushaabb_put(box, c, v);
       }
       mushbakaabb_it_stop(it);
+#endif
    }
    return true;
 }

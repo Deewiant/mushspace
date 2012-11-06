@@ -66,6 +66,7 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
    if (changed)
       mushspace_invalidate_all(space);
 
+#if USE_BAKAABB
    if (space->bak.data && mushbakaabb_size(&space->bak) > 0) {
       found_nonspace = true;
 
@@ -92,6 +93,7 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
       mushcoords_min_into(&bounds->beg, bak_bounds.beg);
       mushcoords_max_into(&bounds->end, bak_bounds.end);
    }
+#endif
    space->last_beg = bounds->beg;
    space->last_end = bounds->end;
    return found_nonspace;

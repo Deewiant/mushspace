@@ -41,7 +41,9 @@ typedef struct mushspace {
 
    mushboxen boxen;
 
+#if USE_BAKAABB
    mushbakaabb bak;
+#endif
 
    mushstaticaabb static_box;
 #endif
@@ -53,7 +55,9 @@ typedef enum MushCursorMode {
    MushCursorMode_static,
 #if !MUSHSPACE_93
    MushCursorMode_dynamic,
+#if USE_BAKAABB
    MushCursorMode_bak,
+#endif
 #endif
 } MushCursorMode;
 

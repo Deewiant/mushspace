@@ -3,9 +3,11 @@
 #ifndef MUSHSPACE_SPACE_HEURISTIC_CONSTANTS_H
 #define MUSHSPACE_SPACE_HEURISTIC_CONSTANTS_H
 
+#if USE_BAKAABB
 // Threshold for switching to mushbakaabb. Only limits mushspace_put, not
 // mushspace_load_string.
 #define MAX_PLACED_BOXEN 64
+#endif
 
 // Padding of box created by default when mushspace_putting to an unallocated
 // area. The size of the resulting box will be NEWBOX_PAD+1 along each axis.

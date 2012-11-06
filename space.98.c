@@ -39,7 +39,9 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
 
    mushboxen_init(&space->boxen);
 
+#if USE_BAKAABB
    space->bak.data = NULL;
+#endif
 
    // Placate valgrind and such: it's not necessary to define these before the
    // first use.
@@ -54,7 +56,9 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
 
 void mushspace_free(mushspace* space) {
    mushboxen_free(&space->boxen);
+#if USE_BAKAABB
    mushbakaabb_free(&space->bak);
+#endif
    if (space->invalidatees) {
       free(space->invalidatees);
       free(space->invalidatees_data);
@@ -68,12 +72,14 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
    if (!copy)
       return NULL;
 
+#if USE_BAKAABB
    // Easiest to do here, so we don't have to worry about whether we need to
    // free copy->stats or not.
    if (space->bak.data && !mushbakaabb_copy(&copy->bak, &space->bak)) {
       free(copy);
       return NULL;
    }
+#endif
 
    memcpy(copy, space, sizeof *copy);
 
@@ -109,8 +115,10 @@ mushcell mushspace_get(const mushspace* space, mushcoords c) {
    if ((box = mushboxen_get(&space->boxen, c)))
       return mushaabb_get(box, c);
 
+#if USE_BAKAABB
    if (space->bak.data)
       return mushbakaabb_get(&space->bak, c);
+#endif
 
    return ' ';
 }
@@ -129,11 +137,13 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
       return MUSHERR_NONE;
    }
 
+#if USE_BAKAABB
    if (!space->bak.data && !mushbakaabb_init(&space->bak, p))
       return MUSHERR_OOM;
 
    if (!mushbakaabb_put(&space->bak, p, c))
       return MUSHERR_OOM;
+#endif
 
    return MUSHERR_NONE;
 }
@@ -142,10 +152,12 @@ void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
    bounds->beg = MUSHSTATICAABB_BEG;
    bounds->end = MUSHSTATICAABB_END;
    mushboxen_loosen_bounds(&space->boxen, bounds);
+#if USE_BAKAABB
    if (space->bak.data) {
       mushcoords_min_into(&bounds->beg, space->bak.bounds.beg);
       mushcoords_max_into(&bounds->end, space->bak.bounds.end);
    }
+#endif
 }
 
 int mushspace_map(mushspace* space, mushbounds bounds,
