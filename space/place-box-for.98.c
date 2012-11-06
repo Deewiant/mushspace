@@ -32,6 +32,9 @@ bool mushspace_place_box_for(
    if (!mushspace_place_box(space, &aabb, &c, placed))
       return false;
 
+   if (!*placed)
+      *placed = mushspace_find_box(space, c);
+
    mushmemorybuf_push(
       &space->recent_buf, (mushmemory){.placed = (*placed)->bounds, c});
 

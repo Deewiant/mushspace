@@ -83,7 +83,15 @@ incorporated:
       bounds = &box->bounds;
 
       if (reason && mushbounds_contains(bounds, *reason)) {
-         *reason_box = box;
+         if (b == a-1) {
+            // We won't be calling really_place_box any more so we can safely
+            // return the reason box.
+            *reason_box = box;
+         } else {
+            // Later calls to really_place_box may invalidate the reason box,
+            // so we can't return it.
+            *reason_box = NULL;
+         }
 
          // This can only happen once.
          reason = NULL;
