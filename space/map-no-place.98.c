@@ -72,7 +72,7 @@ void mushspace_map_no_place(
          goto next_pos;
       }
 
-      if (mushbounds_contains(&space->bak.bounds, pos)) {
+      if (space->bak.data && mushbounds_contains(&space->bak.bounds, pos)) {
          mushcell *p = mushbakaabb_get_ptr_unsafe(&space->bak, pos);
          f((musharr_mushcell){p,1}, pos, pos, fg);
 
