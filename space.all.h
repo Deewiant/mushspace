@@ -17,6 +17,7 @@
 #if !MUSHSPACE_93
 #include "aabb.98.h"
 #include "bakaabb.98.h"
+#include "boxen.98.h"
 #include "memory.98.h"
 #endif
 
@@ -38,9 +39,8 @@ typedef struct mushspace {
    mushstats *stats;
    bool private_stats;
 
-   size_t box_count;
+   mushboxen boxen;
 
-   mushaabb   *boxen;
    mushbakaabb bak;
 
    mushstaticaabb static_box;
@@ -71,14 +71,6 @@ MUSH_DECL_DYN_ARRAY(mushcell)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_del_invalidatee  MUSHSPACE_CAT(mushspace,_del_invalidatee)
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
-#define mushspace_find_box         MUSHSPACE_CAT(mushspace,_find_box)
-#define mushspace_find_box_and_idx MUSHSPACE_CAT(mushspace,_find_box_and_idx)
-#define mushspace_remove_boxes     MUSHSPACE_CAT(mushspace,_remove_boxes)
-#define mushspace_get_caabb_idx    MUSHSPACE_CAT(mushspace,_get_caabb_idx)
-
-#if !MUSHSPACE_93
-typedef struct { const mushaabb *aabb; size_t idx; } mushcaabb_idx;
-#endif
 
 extern const size_t mushspace_sizeof;
 
@@ -112,14 +104,6 @@ int mushspace_map(
 bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
 void mushspace_del_invalidatee(mushspace*, void*);
 void mushspace_invalidate_all (mushspace*);
-
-mushaabb* mushspace_find_box        (const mushspace*, mushcoords);
-mushaabb* mushspace_find_box_and_idx(const mushspace*, mushcoords, size_t*);
-
-// Removes the given range of boxes, inclusive.
-void mushspace_remove_boxes(mushspace*, size_t, size_t);
-
-mushcaabb_idx mushspace_get_caabb_idx(const mushspace*, size_t);
 #endif
 
 #endif

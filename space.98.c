@@ -37,9 +37,9 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
 
    space->invalidatees = NULL;
 
-   space->box_count = 0;
-   space->boxen     = NULL;
-   space->bak.data  = NULL;
+   mushboxen_init(&space->boxen);
+
+   space->bak.data = NULL;
 
    // Placate valgrind and such: it's not necessary to define these before the
    // first use.
@@ -53,9 +53,7 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
 }
 
 void mushspace_free(mushspace* space) {
-   for (size_t i = space->box_count; i--;)
-      free(space->boxen[i].data);
-   free(space->boxen);
+   mushboxen_free(&space->boxen);
    mushbakaabb_free(&space->bak);
    if (space->invalidatees) {
       free(space->invalidatees);
@@ -95,15 +93,7 @@ mushspace* mushspace_copy(void* vp, const mushspace* space, mushstats* stats) {
 #pragma clang diagnostic pop
    }
 
-   copy->boxen = malloc(copy->box_count * sizeof *copy->boxen);
-   memcpy(copy->boxen, space->boxen, copy->box_count * sizeof *copy->boxen);
-
-   for (size_t i = 0; i < copy->box_count; ++i) {
-      mushaabb *box = &copy->boxen[i];
-      const mushcell *orig = box->data;
-      box->data = malloc(box->size * sizeof *box->data);
-      memcpy(box->data, orig, box->size * sizeof *box->data);
-   }
+   mushboxen_copy(&copy->boxen, &space->boxen);
 
    // Invalidatees refer to the original space, not the copy.
    copy->invalidatees = NULL;
@@ -116,7 +106,7 @@ mushcell mushspace_get(const mushspace* space, mushcoords c) {
       return mushstaticaabb_get(&space->static_box, c);
 
    const mushaabb* box;
-   if ((box = mushspace_find_box(space, c)))
+   if ((box = mushboxen_get(&space->boxen, c)))
       return mushaabb_get(box, c);
 
    if (space->bak.data)
@@ -132,8 +122,8 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
    }
 
    mushaabb* box;
-   if ((box = mushspace_find_box(space, p))
-    || mushspace_place_box_for  (space, p, &box))
+   if ((box = mushboxen_get(&space->boxen, p))
+    || mushspace_place_box_for(space, p, &box))
    {
       mushaabb_put(box, p, c);
       return MUSHERR_NONE;
@@ -151,11 +141,7 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
 void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
    bounds->beg = MUSHSTATICAABB_BEG;
    bounds->end = MUSHSTATICAABB_END;
-
-   for (size_t i = 0; i < space->box_count; ++i) {
-      mushcoords_min_into(&bounds->beg, space->boxen[i].bounds.beg);
-      mushcoords_max_into(&bounds->end, space->boxen[i].bounds.end);
-   }
+   mushboxen_loosen_bounds(&space->boxen, bounds);
    if (space->bak.data) {
       mushcoords_min_into(&bounds->beg, space->bak.bounds.beg);
       mushcoords_max_into(&bounds->end, space->bak.bounds.end);
@@ -191,39 +177,6 @@ void mushspace_invalidate_all(mushspace* space) {
    if (i)
       while (*i)
          (*i++)(*d++);
-}
-
-mushcaabb_idx mushspace_get_caabb_idx(const mushspace* sp, size_t i) {
-   assert (i < sp->box_count);
-   return (mushcaabb_idx){&sp->boxen[i], i};
-}
-
-mushaabb* mushspace_find_box(const mushspace* space, mushcoords c) {
-   size_t i;
-   return mushspace_find_box_and_idx(space, c, &i);
-}
-
-mushaabb* mushspace_find_box_and_idx(
-   const mushspace* space, mushcoords c, size_t* pi)
-{
-   for (size_t i = 0; i < space->box_count; ++i)
-      if (mushbounds_contains(&space->boxen[i].bounds, c))
-         return &space->boxen[*pi = i];
-   return NULL;
-}
-
-void mushspace_remove_boxes(mushspace* space, size_t i, size_t j) {
-   assert (i <= j);
-   assert (j < space->box_count);
-
-   for (size_t k = i; k <= j; ++k)
-      free(space->boxen[k].data);
-
-   size_t new_len = space->box_count -= j - i + 1;
-   if (i < new_len) {
-      mushaabb *arr = space->boxen;
-      memmove(arr + i, arr + j + 1, (new_len - i) * sizeof *arr);
-   }
 }
 
 bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {

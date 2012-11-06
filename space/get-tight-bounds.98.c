@@ -34,18 +34,22 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
    bool changed = false;
 
    for (mushdim axis = 0; axis < MUSHSPACE_DIM; ++axis) {
-      for (size_t i = 0; i < space->box_count; ++i) {
-         if (find_beg_in(&bounds->beg, axis, &space->boxen[i].bounds,
-                         mushaabb_getter_no_offset, &space->boxen[i]))
+      for (mushboxen_iter it = mushboxen_iter_init(&space->boxen);
+           !mushboxen_iter_done( it, &space->boxen);)
+      {
+         mushaabb *box = mushboxen_iter_box(it);
+         if (find_beg_in(&bounds->beg, axis, &box->bounds,
+                         mushaabb_getter_no_offset, box))
          {
-            mushspace_remove_boxes(space, i, i);
+            mushboxen_iter_remove(&it, &space->boxen);
             mushstats_add(space->stats, MushStat_empty_boxes_dropped, 1);
             changed = true;
             continue;
          }
          found_nonspace = true;
-         find_end_in(&bounds->end, axis, &space->boxen[i].bounds,
-                     mushaabb_getter_no_offset, &space->boxen[i]);
+         find_end_in(&bounds->end, axis, &box->bounds,
+                     mushaabb_getter_no_offset, box);
+         mushboxen_iter_next(&it, &space->boxen);
       }
 
       // The non-static boxes are more likely to give the more extreme bounds,

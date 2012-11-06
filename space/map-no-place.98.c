@@ -5,10 +5,14 @@
 #include <assert.h>
 #include <string.h>
 
-typedef struct { mushcell cell; size_t idx; } mushcell_idx;
+typedef struct {
+   mushcell cell;
+   mushboxen_iter iter;
+   bool static_box;
+} mushcell_loc;
 
 static bool map_in_box(
-   mushspace*, mushbounded_pos, mushcaabb_idx,
+   mushspace*, mushbounded_pos, mushboxen_iter,
    void*, void(*f)(musharr_mushcell, mushcoords, mushcoords, void*));
 
 static bool map_in_static(
@@ -16,7 +20,7 @@ static bool map_in_static(
    void*, void(*f)(musharr_mushcell, mushcoords, mushcoords, void*));
 
 static bool mapex_in_box(
-   mushspace*, mushbounded_pos, mushcaabb_idx, void*,
+   mushspace*, mushbounded_pos, mushboxen_iter, void*,
    void(*)(musharr_mushcell, mushcoords, mushcoords, void*,
            const mushbounds*, size_t, size_t, size_t, size_t, uint8_t*));
 
@@ -30,8 +34,8 @@ static bool get_next_in(
    void*, void(*g)(mushcoords, mushcoords, void*));
 
 static void get_next_in1(
-   mushdim, const mushbounds*, mushcoords, size_t, const mushbounds*, size_t,
-   mushcell_idx*, mushcell_idx*, mushcell_idx*);
+   mushdim, const mushbounds*, mushcoords, const mushbounds*, mushboxen_iter,
+   mushcell_loc*, mushcell_loc*, mushcell_loc*);
 
 static mushcoords get_end_of_contiguous_range(
    const mushbounds*, mushcoords*, const mushbounds*, bool*);
@@ -57,13 +61,9 @@ void mushspace_map_no_place(
          goto next_pos;
       }
 
-      for (size_t b = 0; b < space->box_count; ++b) {
-         mushcaabb_idx box = mushspace_get_caabb_idx(space, b);
-
-         if (!mushbounds_contains(&box.aabb->bounds, pos))
-            continue;
-
-         if (map_in_box(space, bpos, box, fg, f))
+      mushboxen_iter iter = mushboxen_get_iter(&space->boxen, pos);
+      if (!mushboxen_iter_is_null(iter)) {
+         if (map_in_box(space, bpos, iter, fg, f))
             return;
 
          if (!mushbounds_safe_contains(bounds, pos))
@@ -95,7 +95,7 @@ get_next:
 }
 
 static bool map_in_box(
-   mushspace* space, mushbounded_pos bpos, mushcaabb_idx cai,
+   mushspace* space, mushbounded_pos bpos, mushboxen_iter iter,
    void* fdata, void(*f)(musharr_mushcell, mushcoords, mushcoords, void*))
 {
    // Consider:
@@ -109,12 +109,19 @@ static bool map_in_box(
    // We want to map the range from x to y (shaded). Unless we tessellate,
    // we'll get the whole thing from box B straight away.
 
-   const mushaabb *box = cai.aabb;
+   const mushaabb *box = mushboxen_iter_box(iter);
 
    mushbounds tes = box->bounds;
    mushbounds_tessellate(&tes, *bpos.pos, &MUSHSTATICAABB_BOUNDS);
-   for (size_t i = 0; i < cai.idx; ++i)
-      mushbounds_tessellate(&tes, *bpos.pos, &space->boxen[i].bounds);
+
+   for (mushboxen_iter_above it =
+           mushboxen_iter_above_init(&space->boxen, iter);
+        !mushboxen_iter_above_done( it, &space->boxen);
+         mushboxen_iter_above_next(&it, &space->boxen))
+   {
+      mushbounds_tessellate_unsafe(
+         &tes, *bpos.pos, &mushboxen_iter_above_box(it)->bounds);
+   }
 
    bool hit_end;
    const mushcoords
@@ -194,13 +201,9 @@ void mushspace_mapex_no_place(
          goto next_pos;
       }
 
-      for (size_t b = 0; b < space->box_count; ++b) {
-         mushcaabb_idx box = mushspace_get_caabb_idx(space, b);
-
-         if (!mushbounds_contains(&box.aabb->bounds, pos))
-            continue;
-
-         if (mapex_in_box(space, bpos, box, fg, f))
+      mushboxen_iter iter = mushboxen_get_iter(&space->boxen, pos);
+      if (!mushboxen_iter_is_null(iter)) {
+         if (mapex_in_box(space, bpos, iter, fg, f))
             return;
 
          if (!mushbounds_safe_contains(bounds, pos))
@@ -218,15 +221,14 @@ get_next:
 }
 
 static bool mapex_in_box(
-   mushspace* space, mushbounded_pos bpos,
-   mushcaabb_idx cai,
+   mushspace* space, mushbounded_pos bpos, mushboxen_iter iter,
    void* caller_data,
    void(*f)(musharr_mushcell, mushcoords, mushcoords, void*,
             const mushbounds*, size_t, size_t, size_t, size_t, uint8_t*))
 {
    size_t width, area, line_start, page_start;
 
-   const mushaabb   *box    = cai.aabb;
+   const mushaabb   *box    = mushboxen_iter_box(iter);
    const mushbounds *bounds = bpos.bounds;
    mushcoords       *pos    = bpos.pos;
 
@@ -252,8 +254,15 @@ static bool mapex_in_box(
 
    mushbounds tes = box->bounds;
    mushbounds_tessellate(&tes, *pos, &MUSHSTATICAABB_BOUNDS);
-   for (size_t i = 0; i < cai.idx; ++i)
-      mushbounds_tessellate(&tes, *pos, &space->boxen[i].bounds);
+
+   for (mushboxen_iter_above it =
+           mushboxen_iter_above_init(&space->boxen, iter);
+        !mushboxen_iter_above_done( it, &space->boxen);
+         mushboxen_iter_above_next(&it, &space->boxen))
+   {
+      mushbounds_tessellate_unsafe(
+         &tes, *pos, &mushboxen_iter_above_box(it)->bounds);
+   }
 
    bool hit_end;
    const mushcoords
@@ -426,52 +435,53 @@ static bool get_next_in(
 restart:
    if (mushbounds_safe_contains(bounds, *pos)) {
       assert (!mushstaticaabb_contains(*pos));
-      assert (!mushspace_find_box(space, *pos));
+      assert (!mushboxen_get(&space->boxen, *pos));
    }
-
-   const size_t box_count = space->box_count;
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
       // Check every box until we find the best allocated solution.
 
-      // A value of box_count here refers to the static box.
-      //
       // Separate solutions for being able to increment the coordinate, jumping
       // to the next box without wrapping, and jumping to the next box with
       // wrapping.
-      mushcell_idx
-         increment        = {.idx = box_count + 1},
-         best_beg         = {.idx = box_count + 1},
-         best_wrapped_beg = {.idx = box_count + 1};
+      mushcell_loc
+         increment        = {.iter = mushboxen_iter_null, .static_box = false},
+         best_beg         = {.iter = mushboxen_iter_null, .static_box = false},
+         best_wrapped_beg = {.iter = mushboxen_iter_null, .static_box = false};
 
-      get_next_in1(i, bounds, *pos, box_count,
-                   &MUSHSTATICAABB_BOUNDS, box_count,
+      get_next_in1(i, bounds, *pos, &MUSHSTATICAABB_BOUNDS,
+                   mushboxen_iter_null,
                    &increment, &best_beg, &best_wrapped_beg);
 
-      for (mushucell b = 0; b < box_count; ++b)
-         get_next_in1(i, bounds, *pos, box_count, &space->boxen[b].bounds, b,
+      for (mushboxen_iter it = mushboxen_iter_init(&space->boxen);
+           !mushboxen_iter_done( it, &space->boxen);
+            mushboxen_iter_next(&it, &space->boxen))
+      {
+         const mushaabb *box = mushboxen_iter_box(it);
+         get_next_in1(i, bounds, *pos, &box->bounds, it,
                       &increment, &best_beg, &best_wrapped_beg);
+      }
 
-      #define TEST_COORD(p, cell_idx) do { \
+      #define TEST_COORD(p, cell_loc) do { \
          /* Since we want to constrain pos to be in bounds, finding a solution
           * along a non-X-axis implies that the lower axes get "reset" to
           * bounds->beg. (Just like a line break brings the X position to the
           * page's left edge.) */ \
          memcpy((p)->v, bounds->beg.v, i * sizeof(mushcell)); \
          \
-         (p)->v[i] = (cell_idx).cell; \
+         (p)->v[i] = (cell_loc).cell; \
          \
          /* We may not end up in bounds, or in any box: check for both. */ \
          if (!mushbounds_safe_contains(bounds, *(p))) \
             break; \
-         if (!((   (cell_idx).idx < box_count \
+         if (!((   !(cell_loc).static_box \
                 && mushbounds_contains( \
-                      &space->boxen[(cell_idx).idx].bounds, *(p))) \
+                      &mushboxen_iter_box((cell_loc).iter)->bounds, *(p))) \
          \
             /* If we ended up in some other box, that's fine as well. */ \
             || mushstaticaabb_contains(*(p)) \
-            || mushspace_find_box(space, *(p)))) \
+            || mushboxen_get(&space->boxen, *(p)))) \
          { \
             break; \
          } \
@@ -481,7 +491,7 @@ restart:
          return true; \
       } while (0)
 
-      if (increment.idx <= box_count) {
+      if (increment.static_box || !mushboxen_iter_is_null(increment.iter)) {
          if (i) {
             // This is not the X-axis. If an increment here fails, we might
             // still be able to hit something post-increment on a previous
@@ -497,8 +507,10 @@ restart:
          }
       }
 
-      if (best_beg.idx > box_count) {
-         if (best_wrapped_beg.idx > box_count) {
+      if (!best_beg.static_box && mushboxen_iter_is_null(best_beg.iter)) {
+         if (!best_wrapped_beg.static_box
+          && mushboxen_iter_is_null(best_wrapped_beg.iter))
+         {
             // No solution along this axis: try the next one.
             continue;
          }
@@ -517,10 +529,10 @@ restart:
 }
 
 static void get_next_in1(
-   mushdim x, const mushbounds* bounds, mushcoords pos, size_t box_count,
-   const mushbounds* box_bounds, size_t box_idx,
-   mushcell_idx* increment,
-   mushcell_idx* best_coord, mushcell_idx* best_wrapped)
+   mushdim x, const mushbounds* bounds, mushcoords pos,
+   const mushbounds* box_bounds, mushboxen_iter it,
+   mushcell_loc* increment,
+   mushcell_loc* best_coord, mushcell_loc* best_wrapped)
 {
    // If the box begins later than the best solution we've found, there's no
    // point in looking further into it.
@@ -528,7 +540,7 @@ static void get_next_in1(
    // This seems somewhat nontrivial in the presence of wraparound but I've
    // convinced myself that it's true.
    if (box_bounds->beg.v[x] >= best_coord->cell
-    && best_coord->idx <= box_count)
+    && (best_coord->static_box || !mushboxen_iter_is_null(best_coord->iter)))
       return;
 
    // If this box doesn't overlap with the AABB we're interested in, skip it.
@@ -541,14 +553,16 @@ static void get_next_in1(
    if (pos.v[x] < bounds->beg.v[x] && box_bounds->beg.v[x] > bounds->end.v[x])
       return;
 
-   bool beg_available = mushbounds_safe_contains1(bounds, pos, x);
+   const bool beg_available = mushbounds_safe_contains1(bounds, pos, x);
+
+   mushcell_loc *finder;
 
    // The ordinary best solution that skips to another box is the minimal
    // box.beg greater than pos.
    if (beg_available && box_bounds->beg.v[x] > pos.v[x]) {
       best_coord->cell = box_bounds->beg.v[x];
-      best_coord->idx  = box_idx;
-      return;
+      finder = best_coord;
+      goto found;
    }
 
    // Alternatively, we have the solution of simply moving forward by one pos:
@@ -560,8 +574,8 @@ static void get_next_in1(
       if (!mushbounds_safe_contains1(bounds, pos, x))
          return;
       increment->cell = pos.v[x];
-      increment->idx = box_idx;
-      return;
+      finder = increment;
+      goto found;
    }
 
    // If the path from pos to bounds->end requires a wraparound, take the
@@ -570,10 +584,21 @@ static void get_next_in1(
    if (beg_available
     && pos.v[x] > bounds->end.v[x]
     && (box_bounds->beg.v[x] < best_wrapped->cell
-     || best_wrapped->idx > box_count))
+     || (!best_wrapped->static_box
+      && mushboxen_iter_is_null(best_wrapped->iter))))
    {
       best_wrapped->cell = box_bounds->beg.v[x];
-      best_wrapped->idx  = box_idx;
+      finder = best_wrapped;
+      goto found;
+   }
+   return;
+found:
+   if (mushboxen_iter_is_null(it)) {
+      finder->iter       = mushboxen_iter_null;
+      finder->static_box = true;
+   } else {
+      finder->iter       = it;
+      finder->static_box = false;
    }
 }
 

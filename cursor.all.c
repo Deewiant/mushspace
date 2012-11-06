@@ -102,7 +102,7 @@ static int initial_position_fixup(
 {
    if (!mushcursor_get_box(cursor, pos)) {
       if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
-                                 &cursor->box, &cursor->box_idx))
+                                 &cursor->box, &cursor->box_iter))
       {
          mushcursor_set_nowhere_pos(cursor, pos);
          return MUSHERR_INFINITE_LOOP_SPACES;
@@ -170,7 +170,10 @@ bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 
    mushspace *sp = cursor->space;
 
-   if ((cursor->box = mushspace_find_box_and_idx(sp, pos, &cursor->box_idx))) {
+   if (!mushboxen_iter_is_null(
+         cursor->box_iter = mushboxen_get_iter(&sp->boxen, pos)))
+   {
+      cursor->box  = mushboxen_iter_box(cursor->box_iter);
       cursor->mode = MushCursorMode_dynamic;
       mushcursor_tessellate(cursor, pos);
       return true;
@@ -315,9 +318,14 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
       // bak is the lowest, so we tessellate with all boxes.
       mushbounds_tessellate(&cursor->actual_bounds, pos,
                             &MUSHSTATICAABB_BOUNDS);
-      for (size_t i = 0; i < sp->box_count; ++i)
+
+      for (mushboxen_iter it = mushboxen_iter_init(&sp->boxen);
+           !mushboxen_iter_done( it, &sp->boxen);
+            mushboxen_iter_next(&it, &sp->boxen))
+      {
          mushbounds_tessellate(&cursor->actual_bounds, pos,
-                               &sp->boxen[i].bounds);
+                               &mushboxen_iter_box(it)->bounds);
+      }
       break;
 
    case MushCursorMode_dynamic: {
@@ -336,8 +344,14 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
 
       // Here we need to tessellate only with the boxes above cursor->box.
       mushbounds_tessellate(&bounds, pos, &MUSHSTATICAABB_BOUNDS);
-      for (size_t i = 0; i < cursor->box_idx; ++i)
-         mushbounds_tessellate(&bounds, pos, &sp->boxen[i].bounds);
+      for (mushboxen_iter_above it =
+              mushboxen_iter_above_init(&sp->boxen, cursor->box_iter);
+           !mushboxen_iter_above_done( it, &sp->boxen);
+            mushboxen_iter_above_next(&it, &sp->boxen))
+      {
+         mushbounds_tessellate_unsafe(&bounds, pos,
+                                      &mushboxen_iter_above_box(it)->bounds);
+      }
 
       cursor->rel_pos    = mushcoords_sub(pos, cursor->obeg);
       cursor->rel_bounds =

@@ -52,7 +52,7 @@
    INFLOOP_DETECT(pos); \
 \
    if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode, \
-                              &cursor->box, &cursor->box_idx)) \
+                              &cursor->box, &cursor->box_iter)) \
    { \
       mushcursor_set_nowhere_pos(cursor, pos); \
       return error_code; \
@@ -146,7 +146,7 @@ jump_to_box:
       INFLOOP_DETECT(pos);
 
       if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
-                                 &cursor->box, &cursor->box_idx))
+                                 &cursor->box, &cursor->box_iter))
       {
          mushcursor_set_nowhere_pos(cursor, pos);
          return MUSHERR_INFINITE_LOOP_SPACES;

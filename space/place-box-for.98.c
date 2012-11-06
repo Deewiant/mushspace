@@ -23,7 +23,7 @@ static bool extend_first_placed_big_for(
 bool mushspace_place_box_for(
    mushspace* space, mushcoords c, mushaabb** placed)
 {
-   if (space->box_count >= MAX_PLACED_BOXEN)
+   if (mushboxen_count(&space->boxen) >= MAX_PLACED_BOXEN)
       return false;
 
    mushaabb aabb;
@@ -33,7 +33,7 @@ bool mushspace_place_box_for(
       return false;
 
    if (!*placed)
-      *placed = mushspace_find_box(space, c);
+      *placed = mushboxen_get(&space->boxen, c);
 
    mushmemorybuf_push(
       &space->recent_buf, (mushmemory){.placed = (*placed)->bounds, c});
@@ -42,8 +42,14 @@ bool mushspace_place_box_for(
 }
 
 static void get_box_for(mushspace* space, mushcoords c, mushaabb* aabb) {
-   for (size_t b = 0; b < space->box_count; ++b)
-      assert (!mushbounds_contains(&space->boxen[b].bounds, c));
+#ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
+   for (mushboxen_iter it = mushboxen_iter_init(&space->boxen);
+        !mushboxen_iter_done( it, &space->boxen);
+         mushboxen_iter_next(&it, &space->boxen))
+   {
+      assert (!mushbounds_contains(&mushboxen_iter_box(it)->bounds, c));
+   }
+#endif
 
    if (space->recent_buf.full) {
       if (space->just_placed_big) {

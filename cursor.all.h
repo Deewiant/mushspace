@@ -27,8 +27,8 @@ typedef struct mushcursor {
 #if !MUSHSPACE_93
          mushbounds rel_bounds;
          mushcoords obeg;
-         mushaabb  *box;
-         size_t     box_idx;
+         mushaabb      *box;
+         mushboxen_iter box_iter;
 #endif
       };
 #if !MUSHSPACE_93
