@@ -68,36 +68,7 @@
 // Internals are visible so that we can store mushboxen directly in mushspace,
 // and for the rest, because it's convenient to not mess around with buffers.
 
-typedef struct mushboxen {
-   mushaabb *ptr;
-   size_t count;
-} mushboxen;
-
-// It should always be safe to cast any mushboxen_iter_FOO* to const
-// mushboxen_iter*.
-
-typedef struct mushboxen_iter {
-   mushaabb *ptr;
-} mushboxen_iter;
-
-typedef struct {
-   mushboxen_iter iter;
-   const mushaabb *sentinel;
-} mushboxen_iter_above, mushboxen_iter_below;
-
-typedef struct {
-   mushboxen_iter iter;
-   const mushbounds *bounds;
-} mushboxen_iter_in, mushboxen_iter_in_bottomup, mushboxen_iter_out;
-
-typedef struct {
-   mushboxen_iter iter;
-   const mushbounds *over, *out;
-} mushboxen_iter_overout;
-
-typedef struct mushboxen_reservation { char unused; } mushboxen_reservation;
-
-typedef struct mushboxen_remsched { size_t beg, end; } mushboxen_remsched;
+#include "boxen/array.h"
 
 ///// Basic API
 
@@ -125,6 +96,9 @@ mushboxen_iter mushboxen_insert_reservation(
    mushboxen*, mushboxen_reservation*, mushaabb*);
 
 ///// Iterator API
+
+// It should always be safe to cast any mushboxen_iter_FOO* to const
+// mushboxen_iter*.
 
 // Iterator creation functions
 
