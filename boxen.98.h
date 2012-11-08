@@ -74,6 +74,14 @@
 
 ///// Basic API
 
+// mushboxen obeys an invariant called /T-ordering/ (T for time). What
+// T-ordering means is that if two boxes A and B overlap, and A was inserted
+// prior to B, then mushboxen_get for any overlapping coordinate always returns
+// box A. In this case, A is /T-above/ B.
+//
+// T-ordering between nonoverlapping boxes is meaningless: if A and B do not
+// overlap, neither is T-above the other.
+
 void           mushboxen_init    (mushboxen*);
 void           mushboxen_free    (mushboxen*);
 bool           mushboxen_copy    (mushboxen*, const mushboxen*);
@@ -112,6 +120,7 @@ size_t mushboxen_iter_aux_size(const mushboxen*);
 
 mushboxen_iter mushboxen_iter_init(const mushboxen*, void* aux);
 
+// These refer to T-ordering.
 mushboxen_iter_above mushboxen_iter_above_init(
    const mushboxen*, mushboxen_iter, void* aux);
 mushboxen_iter_below mushboxen_iter_below_init(

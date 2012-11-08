@@ -1,5 +1,9 @@
 // File created: 2012-11-06 13:53:02
 
+// An array.
+//
+// T-ordering is implemented trivially: for any box A that is T-above another
+// box B, the index of A is less than the index of B.
 typedef struct mushboxen {
    mushaabb *ptr;
    size_t count;
