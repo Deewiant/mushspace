@@ -69,6 +69,11 @@ void mushbounds_get_overlap(
    assert (mushbounds_contains_bounds(b, overlap));
 }
 
+void mushbounds_expand_to_cover(mushbounds* cover, const mushbounds* b) {
+   mushcoords_min_into(&cover->beg, b->beg);
+   mushcoords_max_into(&cover->end, b->end);
+}
+
 #if MUSHSPACE_DIM > 1
 bool mushbounds_on_same_axis(
    const mushbounds* a, const mushbounds* b, mushdim x)
