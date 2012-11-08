@@ -86,15 +86,12 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
          assert (mushbakaabb_it_val(it, &space->bak) != ' ');
 
          mushcoords c = mushbakaabb_it_pos(it, &space->bak);
-         mushcoords_min_into(&bak_bounds.beg, c);
-         mushcoords_max_into(&bak_bounds.end, c);
+         mushbounds_expand_to_cover(&bak_bounds, &(mushbounds){c,c});
       }
       mushbakaabb_it_stop(it);
 
       space->bak.bounds = bak_bounds;
-
-      mushcoords_min_into(&bounds->beg, bak_bounds.beg);
-      mushcoords_max_into(&bounds->end, bak_bounds.end);
+      mushbounds_expand_to_cover(bounds, &bak_bounds);
    }
 #endif
    space->last_beg = bounds->beg;

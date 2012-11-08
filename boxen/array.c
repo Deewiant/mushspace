@@ -93,10 +93,8 @@ bool mushboxen_contains_bounds(const mushboxen* boxen, const mushbounds* bs) {
 }
 
 void mushboxen_loosen_bounds(const mushboxen* boxen, mushbounds* bounds) {
-   for (size_t i = 0; i < boxen->count; ++i) {
-      mushcoords_min_into(&bounds->beg, boxen->ptr[i].bounds.beg);
-      mushcoords_max_into(&bounds->end, boxen->ptr[i].bounds.end);
-   }
+   for (size_t i = 0; i < boxen->count; ++i)
+      mushbounds_expand_to_cover(bounds, &boxen->ptr[i].bounds);
 }
 
 ////////////////////////////////////////// Iterator test

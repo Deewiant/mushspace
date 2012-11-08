@@ -153,10 +153,8 @@ void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
    bounds->end = MUSHSTATICAABB_END;
    mushboxen_loosen_bounds(&space->boxen, bounds);
 #if USE_BAKAABB
-   if (space->bak.data) {
-      mushcoords_min_into(&bounds->beg, space->bak.bounds.beg);
-      mushcoords_max_into(&bounds->end, space->bak.bounds.end);
-   }
+   if (space->bak.data)
+      mushbounds_expand_to_cover(bounds, &space->bak.bounds);
 #endif
 }
 

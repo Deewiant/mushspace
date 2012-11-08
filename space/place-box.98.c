@@ -454,8 +454,7 @@ static void min_max_size(
       max->size = box->size;
       max->iter = mushboxen_iter_copy(it, max->iter_aux);
    }
-   mushcoords_min_into(&bounds->beg, box->bounds.beg);
-   mushcoords_max_into(&bounds->end, box->bounds.end);
+   mushbounds_expand_to_cover(bounds, &box->bounds);
 }
 
 // Fills in the input values with the min_max_size data, returning what the
