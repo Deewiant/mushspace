@@ -121,22 +121,26 @@ static bool overout_test(mushboxen_iter_overout it) {
 
 ////////////////////////////////////////// Iterator init
 
-mushboxen_iter mushboxen_iter_init(const mushboxen* boxen) {
+size_t mushboxen_iter_aux_size(const mushboxen* bn) { (void)bn; return 0; }
+
+mushboxen_iter mushboxen_iter_init(const mushboxen* boxen, void* aux) {
+   (void)aux;
    return (mushboxen_iter){ boxen->ptr };
 }
 mushboxen_iter_above mushboxen_iter_above_init(
-   const mushboxen* boxen, mushboxen_iter sentinel)
+   const mushboxen* boxen, mushboxen_iter sentinel, void* aux)
 {
    assert (sentinel.ptr >= boxen->ptr);
    assert (sentinel.ptr <  boxen->ptr + boxen->count);
    return (mushboxen_iter_above){
-      .iter     = mushboxen_iter_init(boxen),
+      .iter     = mushboxen_iter_init(boxen, aux),
       .sentinel = sentinel.ptr,
    };
 }
 mushboxen_iter_below mushboxen_iter_below_init(
-   const mushboxen* boxen, mushboxen_iter sentinel)
+   const mushboxen* boxen, mushboxen_iter sentinel, void* aux)
 {
+   (void)aux;
    assert (sentinel.ptr >= boxen->ptr);
    assert (sentinel.ptr <  boxen->ptr + boxen->count);
    return (mushboxen_iter_below){
@@ -145,10 +149,10 @@ mushboxen_iter_below mushboxen_iter_below_init(
    };
 }
 mushboxen_iter_in mushboxen_iter_in_init(
-   const mushboxen* boxen, const mushbounds* bounds)
+   const mushboxen* boxen, const mushbounds* bounds, void* aux)
 {
    mushboxen_iter_in it = (mushboxen_iter_in){
-      .iter   = mushboxen_iter_init(boxen),
+      .iter   = mushboxen_iter_init(boxen, aux),
       .bounds = bounds,
    };
    if (boxen->count && !in_test(it))
@@ -156,8 +160,9 @@ mushboxen_iter_in mushboxen_iter_in_init(
    return it;
 }
 mushboxen_iter_in_bottomup mushboxen_iter_in_bottomup_init(
-   const mushboxen* boxen, const mushbounds* bounds)
+   const mushboxen* boxen, const mushbounds* bounds, void* aux)
 {
+   (void)aux;
    mushboxen_iter_in_bottomup it = (mushboxen_iter_in_bottomup){
       .iter   = (mushboxen_iter){ boxen->ptr + boxen->count - 1 },
       .bounds = bounds,
@@ -167,10 +172,10 @@ mushboxen_iter_in_bottomup mushboxen_iter_in_bottomup_init(
    return it;
 }
 mushboxen_iter_out mushboxen_iter_out_init(
-   const mushboxen* boxen, const mushbounds* bounds)
+   const mushboxen* boxen, const mushbounds* bounds, void* aux)
 {
    mushboxen_iter_out it = (mushboxen_iter_out){
-      .iter   = mushboxen_iter_init(boxen),
+      .iter   = mushboxen_iter_init(boxen, aux),
       .bounds = bounds,
    };
    if (boxen->count && !out_test(it))
@@ -178,10 +183,11 @@ mushboxen_iter_out mushboxen_iter_out_init(
    return it;
 }
 mushboxen_iter_overout mushboxen_iter_overout_init(
-   const mushboxen* boxen, const mushbounds* over, const mushbounds* out)
+   const mushboxen* boxen, const mushbounds* over, const mushbounds* out,
+   void* aux)
 {
    mushboxen_iter_overout it = (mushboxen_iter_overout){
-      .iter = mushboxen_iter_init(boxen),
+      .iter = mushboxen_iter_init(boxen, aux),
       .over = over,
       .out  = out,
    };
@@ -282,8 +288,11 @@ void mushboxen_iter_remove(mushboxen_iter* it, mushboxen* boxen) {
    memmove(p, p + 1, (--boxen->count - (p - boxen->ptr)) * sizeof *p);
 }
 
-mushboxen_remsched mushboxen_remsched_init(mushboxen* bn, mushboxen_iter it) {
-   const size_t i = it.ptr - bn->ptr;
+mushboxen_remsched mushboxen_remsched_init(
+   mushboxen* boxen, mushboxen_iter it, void* aux)
+{
+   (void)aux;
+   const size_t i = it.ptr - boxen->ptr;
    return (mushboxen_remsched){i, i};
 }
 

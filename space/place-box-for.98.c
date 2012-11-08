@@ -2,6 +2,7 @@
 
 #include "space/place-box-for.98.h"
 
+#include <alloca.h>
 #include <assert.h>
 
 #include "space/heuristic-constants.98.h"
@@ -45,7 +46,8 @@ bool mushspace_place_box_for(
 
 static void get_box_for(mushspace* space, mushcoords c, mushaabb* aabb) {
 #ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
-   for (mushboxen_iter it = mushboxen_iter_init(&space->boxen);
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
+   for (mushboxen_iter it = mushboxen_iter_init(&space->boxen, aux);
         !mushboxen_iter_done( it, &space->boxen);
          mushboxen_iter_next(&it, &space->boxen))
    {

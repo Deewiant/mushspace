@@ -2,6 +2,7 @@
 
 #include "space/get-tight-bounds.all.h"
 
+#include <alloca.h>
 #include <assert.h>
 
 static bool find_beg_in(mushcoords*, mushdim, const mushbounds*,
@@ -33,8 +34,10 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
 
    bool changed = false;
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
+
    for (mushdim axis = 0; axis < MUSHSPACE_DIM; ++axis) {
-      for (mushboxen_iter it = mushboxen_iter_init(&space->boxen);
+      for (mushboxen_iter it = mushboxen_iter_init(&space->boxen, aux);
            !mushboxen_iter_done( it, &space->boxen);)
       {
          mushaabb *box = mushboxen_iter_box(it);

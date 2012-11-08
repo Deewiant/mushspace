@@ -2,6 +2,7 @@
 
 #include "cursor.all.h"
 
+#include <alloca.h>
 #include <assert.h>
 #include <string.h>
 
@@ -318,6 +319,8 @@ void mushcursor93_wrap(mushcursor* cursor) {
 void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
    mushspace *sp = cursor->space;
 
+   void *aux = alloca(mushboxen_iter_aux_size(&sp->boxen));
+
    switch (MUSHCURSOR_MODE(cursor)) {
    case MushCursorMode_static:
       cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
@@ -332,7 +335,7 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
       mushbounds_tessellate(&cursor->actual_bounds, pos,
                             &MUSHSTATICAABB_BOUNDS);
 
-      for (mushboxen_iter it = mushboxen_iter_init(&sp->boxen);
+      for (mushboxen_iter it = mushboxen_iter_init(&sp->boxen, aux);
            !mushboxen_iter_done( it, &sp->boxen);
             mushboxen_iter_next(&it, &sp->boxen))
       {
@@ -359,7 +362,7 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
       // Here we need to tessellate only with the boxes above cursor->box.
       mushbounds_tessellate(&bounds, pos, &MUSHSTATICAABB_BOUNDS);
       for (mushboxen_iter_above it =
-              mushboxen_iter_above_init(&sp->boxen, cursor->box_iter);
+              mushboxen_iter_above_init(&sp->boxen, cursor->box_iter, aux);
            !mushboxen_iter_above_done( it, &sp->boxen);
             mushboxen_iter_above_next(&it, &sp->boxen))
       {

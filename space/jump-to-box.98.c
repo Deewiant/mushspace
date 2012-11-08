@@ -2,6 +2,7 @@
 
 #include "space/jump-to-box.98.h"
 
+#include <alloca.h>
 #include <assert.h>
 
 #include "bounds/ray-intersects.98.h"
@@ -29,7 +30,8 @@ bool mushspace_jump_to_box(
       hit_static = true;
    }
 
-   for (mushboxen_iter it = mushboxen_iter_init(&space->boxen);
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
+   for (mushboxen_iter it = mushboxen_iter_init(&space->boxen, aux);
         !mushboxen_iter_done( it, &space->boxen);
          mushboxen_iter_next(&it, &space->boxen))
    {

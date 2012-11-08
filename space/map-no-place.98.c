@@ -2,6 +2,7 @@
 
 #include "space/map-no-place.98.h"
 
+#include <alloca.h>
 #include <assert.h>
 #include <string.h>
 
@@ -116,8 +117,9 @@ static bool map_in_box(
    mushbounds tes = box->bounds;
    mushbounds_tessellate(&tes, *bpos.pos, &MUSHSTATICAABB_BOUNDS);
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_above it =
-           mushboxen_iter_above_init(&space->boxen, iter);
+           mushboxen_iter_above_init(&space->boxen, iter, aux);
         !mushboxen_iter_above_done( it, &space->boxen);
          mushboxen_iter_above_next(&it, &space->boxen))
    {
@@ -257,8 +259,9 @@ static bool mapex_in_box(
    mushbounds tes = box->bounds;
    mushbounds_tessellate(&tes, *pos, &MUSHSTATICAABB_BOUNDS);
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_above it =
-           mushboxen_iter_above_init(&space->boxen, iter);
+           mushboxen_iter_above_init(&space->boxen, iter, aux);
         !mushboxen_iter_above_done( it, &space->boxen);
          mushboxen_iter_above_next(&it, &space->boxen))
    {
@@ -440,6 +443,8 @@ restart:
       assert (!mushboxen_get(&space->boxen, *pos));
    }
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
+
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
 
       // Check every box until we find the best allocated solution.
@@ -456,7 +461,7 @@ restart:
                    mushboxen_iter_null,
                    &increment, &best_beg, &best_wrapped_beg);
 
-      for (mushboxen_iter it = mushboxen_iter_init(&space->boxen);
+      for (mushboxen_iter it = mushboxen_iter_init(&space->boxen, aux);
            !mushboxen_iter_done( it, &space->boxen);
             mushboxen_iter_next(&it, &space->boxen))
       {

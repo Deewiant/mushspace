@@ -27,6 +27,7 @@
 #define mushboxen_reservation       MUSHSPACE_CAT(mushboxen,_reservation)
 #define mushboxen_reserve           MUSHSPACE_CAT(mushboxen,_reserve)
 #define mushboxen_unreserve         MUSHSPACE_CAT(mushboxen,_unreserve)
+#define mushboxen_iter_aux_size     MUSHSPACE_CAT(mushboxen,_iter_aux_size)
 #define mushboxen_iter_init         MUSHSPACE_CAT(mushboxen,_iter_init)
 #define mushboxen_iter_done         MUSHSPACE_CAT(mushboxen,_iter_done)
 #define mushboxen_iter_next         MUSHSPACE_CAT(mushboxen,_iter_next)
@@ -97,34 +98,41 @@ mushboxen_iter mushboxen_insert_reservation(
 
 ///// Iterator API
 
+// This should be a small, allocaäble size. Typically used to emulate
+// recursion, since the call stack isn't available due to using iterators.
+//
+// The size should never grow when boxes are removed.
+size_t mushboxen_iter_aux_size(const mushboxen*);
+
 // It should always be safe to cast any mushboxen_iter_FOO* to const
 // mushboxen_iter*.
 
 // Iterator creation functions
 
-mushboxen_iter mushboxen_iter_init(const mushboxen*);
+mushboxen_iter mushboxen_iter_init(const mushboxen*, void* aux);
 
 mushboxen_iter_above mushboxen_iter_above_init(
-   const mushboxen*, mushboxen_iter);
+   const mushboxen*, mushboxen_iter, void* aux);
 mushboxen_iter_below mushboxen_iter_below_init(
-   const mushboxen*, mushboxen_iter);
+   const mushboxen*, mushboxen_iter, void* aux);
 
 // This and all the other bounds-based iterators refer to the bounds by
 // reference! If it changes, the appropriate _updated function should be
 // called.
-mushboxen_iter_in mushboxen_iter_in_init(const mushboxen*, const mushbounds*);
+mushboxen_iter_in mushboxen_iter_in_init(
+   const mushboxen*, const mushbounds*, void* aux);
 
 // Like mushboxen_iter_in, but guarantees bottom-up traversal order.
 mushboxen_iter_in_bottomup mushboxen_iter_in_bottomup_init(
-   const mushboxen*, const mushbounds*);
+   const mushboxen*, const mushbounds*, void* aux);
 
 mushboxen_iter_out mushboxen_iter_out_init(
-   const mushboxen*, const mushbounds*);
+   const mushboxen*, const mushbounds*, void* aux);
 
 // Iterates over all boxes which overlap with "over" but are also not contained
 // in "out".
 mushboxen_iter_overout mushboxen_iter_overout_init(
-   const mushboxen*, const mushbounds* over, const mushbounds* out);
+   const mushboxen*, const mushbounds* over, const mushbounds* out, void* aux);
 
 // Common iterator API
 
@@ -163,7 +171,9 @@ void mushboxen_iter_remove(mushboxen_iter*, mushboxen*);
 
 // Scheduled removal
 
-mushboxen_remsched mushboxen_remsched_init(mushboxen*, mushboxen_iter);
+// Being an iterator-like construct this also needs auxiliary storage.
+mushboxen_remsched mushboxen_remsched_init(
+   mushboxen*, mushboxen_iter, void* aux);
 
 void mushboxen_iter_in_bottomup_sched_remove(
    mushboxen_iter_in_bottomup*, mushboxen*, mushboxen_remsched*);

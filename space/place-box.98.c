@@ -2,6 +2,7 @@
 
 #include "space/place-box.98.h"
 
+#include <alloca.h>
 #include <assert.h>
 
 #include "aabb/consume.98.h"
@@ -9,7 +10,11 @@
 #include "aabb/space-area.98.h"
 #include "space/heuristic-constants.98.h"
 
-typedef struct consumee { mushboxen_iter iter; size_t size; } consumee;
+typedef struct consumee {
+   mushboxen_iter iter;
+   size_t size;
+   void* iter_aux;
+} consumee;
 
 static mushboxen_iter really_place_box(mushspace*, mushaabb*);
 
@@ -103,9 +108,11 @@ bool mushspace_place_box(
       if (!mushbounds_overlaps(bounds, &space->bak.bounds))
          continue;
 
+      void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
       const bool overlaps =
          !mushboxen_iter_above_done(
-            mushboxen_iter_above_init(&space->boxen, iter), &space->boxen);
+            mushboxen_iter_above_init(&space->boxen, iter, aux),
+            &space->boxen);
 
       unsigned char buf[mushbakaabb_iter_sizeof];
       mushbakaabb_iter *it = mushbakaabb_it_start(&space->bak, buf);
@@ -139,7 +146,7 @@ static mushboxen_iter really_place_box(mushspace* space, mushaabb* aabb) {
    assert (!mushboxen_contains_bounds(&space->boxen, &aabb->bounds));
 #endif
 
-   consumee consumee = {.size = 0};
+   consumee consumee = {.size = 0, .iter_aux = external_aux};
    size_t used_cells = aabb->size;
 
    mushaabb consumer;
@@ -174,16 +181,19 @@ static mushboxen_iter really_place_box(mushspace* space, mushaabb* aabb) {
    //
    // Disjoints and overlaps can bring in new contained boxes that weren't
    // handled at all before this, so we do need to do this here.
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_in it =
-           mushboxen_iter_in_init(&space->boxen, &consumer.bounds);
+           mushboxen_iter_in_init(&space->boxen, &consumer.bounds, aux);
         !mushboxen_iter_in_done( it, &space->boxen);
          mushboxen_iter_in_next(&it, &space->boxen))
    {
       const mushaabb *box = mushboxen_iter_in_box(it);
       any_subsumees = true;
-      if (box->size > consumee.size)
-         consumee = (struct consumee){ .size = box->size,
-                                       .iter = *(mushboxen_iter*)&it };
+      if (box->size > consumee.size) {
+         consumee.size = box->size;
+         consumee.iter =
+            mushboxen_iter_copy(*(mushboxen_iter*)&it, consumee.iter_aux);
+      }
    }
 
    mushboxen_iter inserted;
@@ -258,10 +268,13 @@ static bool subsume_fusables(
 
    UPDATE_EXP(consumer);
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
+
 #if MUSHSPACE_DIM == 1
    // The one-dimensional case is simple, as we don't have to worry about axes.
 
-   it = mushboxen_iter_overout_init(&space->boxen, &exp_consumer, consumer);
+   it =
+      mushboxen_iter_overout_init(&space->boxen, &exp_consumer, consumer, aux);
 
    bool any = false;
    for (; !mushboxen_iter_overout_done( it, &space->boxen);
@@ -296,7 +309,8 @@ static bool subsume_fusables(
 
    size_t n = 0;
 
-   it = mushboxen_iter_overout_init(&space->boxen, &exp_consumer, &tentative_consumer);
+   it = mushboxen_iter_overout_init(
+      &space->boxen, &exp_consumer, &tentative_consumer, aux);
 
    for (; !mushboxen_iter_overout_done( it, &space->boxen);
            mushboxen_iter_overout_next(&it, &space->boxen))
@@ -362,8 +376,9 @@ static bool subsume_disjoint(
    // All fusables have been removed, so a sufficient condition for
    // disjointness is non-overlappingness. This also takes care of excluding
    // the subsumees, which are contained and hence overlapping.
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_out it =
-           mushboxen_iter_out_init(&space->boxen, consumer);
+           mushboxen_iter_out_init(&space->boxen, consumer, aux);
         !mushboxen_iter_out_done( it, &space->boxen);
          mushboxen_iter_out_next(&it, &space->boxen))
    {
@@ -391,8 +406,9 @@ static bool subsume_overlaps(
    consumee* consumee, size_t* used_cells)
 {
    bool any = false;
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_overout it =
-           mushboxen_iter_overout_init(&space->boxen, consumer, consumer);
+           mushboxen_iter_overout_init(&space->boxen, consumer, consumer, aux);
         !mushboxen_iter_overout_done( it, &space->boxen);
          mushboxen_iter_overout_next(&it, &space->boxen))
    {
@@ -430,7 +446,7 @@ static void min_max_size(
    *total_size += box->size;
    if (box->size > max->size) {
       max->size = box->size;
-      max->iter = it;
+      max->iter = mushboxen_iter_copy(it, max->iter_aux);
    }
    mushcoords_min_into(&bounds->beg, box->bounds.beg);
    mushcoords_max_into(&bounds->end, box->bounds.end);
@@ -499,15 +515,18 @@ static bool consume_and_subsume(
    //
    // We need to copy data from each subsumee S to all boxes that are currently
    // below S and which will end up above the consumer.
+   void *aux  = alloca(mushboxen_iter_aux_size(&space->boxen)),
+        *aux2 = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_in hit =
-           mushboxen_iter_in_init(&space->boxen, &consumer->bounds);
+           mushboxen_iter_in_init(&space->boxen, &consumer->bounds, aux);
         !mushboxen_iter_in_done( hit, &space->boxen);
          mushboxen_iter_in_next(&hit, &space->boxen))
    {
       const mushaabb *higher = mushboxen_iter_in_box(hit);
 
       for (mushboxen_iter_below lit =
-              mushboxen_iter_below_init(&space->boxen, *(mushboxen_iter*)&hit);
+              mushboxen_iter_below_init(
+                 &space->boxen, *(mushboxen_iter*)&hit, aux2);
            !mushboxen_iter_below_done( lit, &space->boxen);
             mushboxen_iter_below_next(&lit, &space->boxen))
       {
@@ -541,12 +560,14 @@ static bool consume_and_subsume(
    // realloced.
    mushboxen_iter_box(consumee)->data = NULL;
 
-   mushboxen_remsched rs = mushboxen_remsched_init(&space->boxen, consumee);
+   mushboxen_remsched rs =
+      mushboxen_remsched_init(&space->boxen, consumee, aux);
 
    // Subsume lower boxes first: we want higher boxes to overwrite lower ones,
    // not the other way around.
    for (mushboxen_iter_in_bottomup it =
-           mushboxen_iter_in_bottomup_init(&space->boxen, &consumer->bounds);
+           mushboxen_iter_in_bottomup_init(
+              &space->boxen, &consumer->bounds, aux2);
         !mushboxen_iter_in_bottomup_done(it, &space->boxen);)
    {
       mushaabb *box = mushboxen_iter_in_bottomup_box(it);
