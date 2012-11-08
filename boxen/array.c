@@ -283,15 +283,14 @@ void mushboxen_iter_overout_next(
 
 ////////////////////////////////////////// Iterator misc
 
-void mushboxen_iter_out_updated(mushboxen_iter_out* it, const mushboxen* b) {
-   (void)it;
-   (void)b;
+void mushboxen_iter_out_updated(mushboxen_iter_out* it, const mushboxen* boxen)
+{
+   *it = mushboxen_iter_out_init(boxen, it->bounds, NULL);
 }
 void mushboxen_iter_overout_updated(
-   mushboxen_iter_overout* it, const mushboxen* b)
+   mushboxen_iter_overout* it, const mushboxen* boxen)
 {
-   (void)it;
-   (void)b;
+   *it = mushboxen_iter_overout_init(boxen, it->over, it->out, NULL);
 }
 
 mushaabb* mushboxen_iter_box(mushboxen_iter it) { return it.ptr; }
