@@ -59,18 +59,14 @@ bool mushbounds_safe_overlaps(const mushbounds* a, const mushbounds* b) {
 }
 
 #if !MUSHSPACE_93
-bool mushbounds_get_overlap(
+void mushbounds_get_overlap(
    const mushbounds* a, const mushbounds* b, mushbounds* overlap)
 {
-   if (!mushbounds_overlaps(a, b))
-      return false;
-
    overlap->beg = a->beg; mushcoords_max_into(&overlap->beg, b->beg);
    overlap->end = a->end; mushcoords_min_into(&overlap->end, b->end);
 
    assert (mushbounds_contains_bounds(a, overlap));
    assert (mushbounds_contains_bounds(b, overlap));
-   return true;
 }
 
 #if MUSHSPACE_DIM > 1

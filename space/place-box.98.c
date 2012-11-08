@@ -542,13 +542,11 @@ static bool consume_and_subsume(
 
          mushaabb overlap;
 
-         // If they overlap, copy the overlap area to the lower box.
-         if (mushbounds_get_overlap(&higher->bounds, &lower->bounds,
-                                    &overlap.bounds))
-         {
-            mushaabb_finalize(&overlap);
-            mushaabb_subsume_area(lower, higher, &overlap);
-         }
+         // Copy the overlap area to the lower box.
+         mushbounds_get_overlap(&higher->bounds, &lower->bounds,
+                                &overlap.bounds);
+         mushaabb_finalize(&overlap);
+         mushaabb_subsume_area(lower, higher, &overlap);
       }
    }
 
