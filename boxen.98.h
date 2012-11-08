@@ -46,7 +46,6 @@
 #define mushboxen_iter_out_init     MUSHSPACE_CAT(mushboxen,_iter_out_init)
 #define mushboxen_iter_out_done     MUSHSPACE_CAT(mushboxen,_iter_out_done)
 #define mushboxen_iter_out_next     MUSHSPACE_CAT(mushboxen,_iter_out_next)
-#define mushboxen_iter_out_updated  MUSHSPACE_CAT(mushboxen,_iter_out_updated)
 #define mushboxen_iter_box          MUSHSPACE_CAT(mushboxen,_iter_box)
 #define mushboxen_iter_null         MUSHSPACE_CAT(mushboxen,_iter_null)
 #define mushboxen_iter_is_null      MUSHSPACE_CAT(mushboxen,_iter_is_null)
@@ -63,8 +62,10 @@
    MUSHSPACE_CAT(mushboxen,_iter_in_bottomup_sched_remove)
 #define mushboxen_insert_reservation \
    MUSHSPACE_CAT(mushboxen,_insert_reservation)
-#define mushboxen_iter_overout_updated \
-   MUSHSPACE_CAT(mushboxen,_iter_overout_updated)
+#define mushboxen_iter_out_updated_next \
+   MUSHSPACE_CAT(mushboxen,_iter_out_updated_next)
+#define mushboxen_iter_overout_updated_next \
+   MUSHSPACE_CAT(mushboxen,_iter_overout_updated_next)
 
 // Internals are visible so that we can store mushboxen directly in mushspace,
 // and for the rest, because it's convenient to not mess around with buffers.
@@ -159,9 +160,11 @@ mushaabb* mushboxen_iter_box(mushboxen_iter);
 
 // Uncommon iterator API
 
-// Used when the bounds referenced by the iterator were modified.
-void mushboxen_iter_out_updated    (mushboxen_iter_out*,     const mushboxen*);
-void mushboxen_iter_overout_updated(mushboxen_iter_overout*, const mushboxen*);
+// Used when the bounds referenced by the iterator were modified. Otherwise
+// work like the ordinary _next functions.
+void mushboxen_iter_out_updated_next(mushboxen_iter_out*, const mushboxen*);
+void mushboxen_iter_overout_updated_next(
+   mushboxen_iter_overout*, const mushboxen*);
 
 extern const mushboxen_iter mushboxen_iter_null;
 bool mushboxen_iter_is_null(mushboxen_iter);

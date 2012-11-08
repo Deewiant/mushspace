@@ -283,11 +283,12 @@ void mushboxen_iter_overout_next(
 
 ////////////////////////////////////////// Iterator misc
 
-void mushboxen_iter_out_updated(mushboxen_iter_out* it, const mushboxen* boxen)
+void mushboxen_iter_out_updated_next(
+   mushboxen_iter_out* it, const mushboxen* boxen)
 {
    *it = mushboxen_iter_out_init(boxen, it->bounds, NULL);
 }
-void mushboxen_iter_overout_updated(
+void mushboxen_iter_overout_updated_next(
    mushboxen_iter_overout* it, const mushboxen* boxen)
 {
    *it = mushboxen_iter_overout_init(boxen, it->over, it->out, NULL);

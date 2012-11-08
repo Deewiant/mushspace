@@ -261,7 +261,7 @@ static bool subsume_fusables(
 
    #define UPDATE_ITER(cons) do { \
       UPDATE_EXP(cons); \
-      mushboxen_iter_overout_updated(&it, &space->boxen); \
+      mushboxen_iter_overout_updated_next(&it, &space->boxen); \
    } while (0)
 
    mushboxen_iter_overout it;
@@ -277,12 +277,12 @@ static bool subsume_fusables(
       mushboxen_iter_overout_init(&space->boxen, &exp_consumer, consumer, aux);
 
    bool any = false;
-   for (; !mushboxen_iter_overout_done( it, &space->boxen);
-           mushboxen_iter_overout_next(&it, &space->boxen))
-   {
+   while (!mushboxen_iter_overout_done(it, &space->boxen)) {
       const mushbounds *bounds = &mushboxen_iter_overout_box(it)->bounds;
-      if (!mushbounds_can_fuse(consumer, bounds))
+      if (!mushbounds_can_fuse(consumer, bounds)) {
+         mushboxen_iter_overout_next(&it, &space->boxen);
          continue;
+      }
 
       min_max_size(consumer, consumee, used_cells, *(mushboxen_iter*)&it);
       UPDATE_ITER(consumer);
@@ -312,9 +312,11 @@ static bool subsume_fusables(
    it = mushboxen_iter_overout_init(
       &space->boxen, &exp_consumer, &tentative_consumer, aux);
 
-   for (; !mushboxen_iter_overout_done( it, &space->boxen);
-           mushboxen_iter_overout_next(&it, &space->boxen))
-   {
+   for (;; mushboxen_iter_overout_next(&it, &space->boxen)) {
+next:
+      if (mushboxen_iter_overout_done(it, &space->boxen))
+         break;
+
       const mushbounds *bounds = &mushboxen_iter_overout_box(it)->bounds;
       if (!mushbounds_can_fuse(&tentative_consumer, bounds))
          continue;
@@ -340,7 +342,7 @@ static bool subsume_fusables(
             *(mushboxen_iter*)&it);
          UPDATE_ITER(&tentative_consumer);
          ++n;
-         continue;
+         goto next;
       }
 
       // Try all axes starting from the primary one.
@@ -354,7 +356,7 @@ static bool subsume_fusables(
          UPDATE_ITER(&tentative_consumer);
          ++n;
          axis = x;
-         break;
+         goto next;
       }
    }
    if (n) {
@@ -379,14 +381,16 @@ static bool subsume_disjoint(
    void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_out it =
            mushboxen_iter_out_init(&space->boxen, consumer, aux);
-        !mushboxen_iter_out_done( it, &space->boxen);
-         mushboxen_iter_out_next(&it, &space->boxen))
+        !mushboxen_iter_out_done( it, &space->boxen);)
    {
       if (!valid_min_max_size(disjoint_mms_validator, NULL, consumer, consumee,
                               used_cells, *(mushboxen_iter*)&it))
+      {
+         mushboxen_iter_out_next(&it, &space->boxen);
          continue;
+      }
 
-      mushboxen_iter_out_updated(&it, &space->boxen);
+      mushboxen_iter_out_updated_next(&it, &space->boxen);
       mushstats_add(space->stats, MushStat_subsumed_disjoint, 1);
       any = true;
    }
@@ -409,14 +413,16 @@ static bool subsume_overlaps(
    void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (mushboxen_iter_overout it =
            mushboxen_iter_overout_init(&space->boxen, consumer, consumer, aux);
-        !mushboxen_iter_overout_done( it, &space->boxen);
-         mushboxen_iter_overout_next(&it, &space->boxen))
+        !mushboxen_iter_overout_done(it, &space->boxen);)
    {
       if (!valid_min_max_size(overlaps_mms_validator, consumer, consumer,
                               consumee, used_cells, *(mushboxen_iter*)&it))
+      {
+         mushboxen_iter_overout_next(&it, &space->boxen);
          continue;
+      }
 
-      mushboxen_iter_overout_updated(&it, &space->boxen);
+      mushboxen_iter_overout_updated_next(&it, &space->boxen);
       mushstats_add(space->stats, MushStat_subsumed_overlaps, 1);
       any = true;
    }
