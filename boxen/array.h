@@ -7,12 +7,12 @@ typedef struct mushboxen {
 
 typedef struct mushboxen_iter {
    mushaabb *ptr;
-} mushboxen_iter;
+} mushboxen_iter, mushboxen_iter_below;
 
 typedef struct {
    mushboxen_iter iter;
    const mushaabb *sentinel;
-} mushboxen_iter_above, mushboxen_iter_below;
+} mushboxen_iter_above;
 
 typedef struct {
    mushboxen_iter iter;

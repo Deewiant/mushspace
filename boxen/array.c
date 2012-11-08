@@ -141,12 +141,10 @@ mushboxen_iter_below mushboxen_iter_below_init(
    const mushboxen* boxen, mushboxen_iter sentinel, void* aux)
 {
    (void)aux;
+   (void)boxen;
    assert (sentinel.ptr >= boxen->ptr);
    assert (sentinel.ptr <  boxen->ptr + boxen->count);
-   return (mushboxen_iter_below){
-      .iter     = (mushboxen_iter) { sentinel.ptr + 1 },
-      .sentinel = boxen->ptr + boxen->count,
-   };
+   return (mushboxen_iter){ sentinel.ptr + 1 };
 }
 mushboxen_iter_in mushboxen_iter_in_init(
    const mushboxen* boxen, const mushbounds* bounds, void* aux)
@@ -206,8 +204,7 @@ bool mushboxen_iter_above_done(mushboxen_iter_above it, const mushboxen* b) {
    return it.iter.ptr == it.sentinel;
 }
 bool mushboxen_iter_below_done(mushboxen_iter_below it, const mushboxen* b) {
-   (void)b;
-   return it.iter.ptr == it.sentinel;
+   return mushboxen_iter_done(it, b);
 }
 bool mushboxen_iter_in_done(mushboxen_iter_in it, const mushboxen* boxen) {
    return mushboxen_iter_done(it.iter, boxen);
@@ -236,7 +233,7 @@ void mushboxen_iter_above_next(mushboxen_iter_above* it, const mushboxen* b) {
    mushboxen_iter_next(&it->iter, b);
 }
 void mushboxen_iter_below_next(mushboxen_iter_below* it, const mushboxen* b) {
-   mushboxen_iter_next(&it->iter, b);
+   mushboxen_iter_next(it, b);
 }
 void mushboxen_iter_in_next(mushboxen_iter_in* it, const mushboxen* boxen) {
    do ++it->iter.ptr;
