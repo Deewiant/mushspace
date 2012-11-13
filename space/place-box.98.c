@@ -63,6 +63,9 @@ bool mushspace_place_box(
       }
    }
 
+   bool invalidate = false,
+        success    = true;
+
    // Then do the actual placement.
    for (size_t b = 0; b < a; ++b) {
       mushaabb   *box    = &aabbs[b];
@@ -78,8 +81,12 @@ bool mushspace_place_box(
 
       mushaabb_finalize(box);
       mushboxen_iter iter = really_place_box(space, box);
-      if (mushboxen_iter_is_null(iter))
-         return false;
+      if (mushboxen_iter_is_null(iter)) {
+         success = false;
+         break;
+      }
+
+      invalidate = true;
 
       bounds = &box->bounds;
 
@@ -136,7 +143,9 @@ bool mushspace_place_box(
       mushbakaabb_it_stop(it);
 #endif
    }
-   return true;
+   if (invalidate)
+      mushspace_invalidate_all(space);
+   return success;
 }
 
 // Returns the placed box, which may be bigger than the given box. Returns the
@@ -239,8 +248,6 @@ static mushboxen_iter really_place_box(mushspace* space, mushaabb* aabb) {
    mushstats_add    (space->stats, MushStat_boxes_placed, 1);
    mushstats_new_max(space->stats, MushStat_max_boxes_live,
                      (uint64_t)mushboxen_count(&space->boxen));
-
-   mushspace_invalidate_all(space);
 
    return inserted;
 }
