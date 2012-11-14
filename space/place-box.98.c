@@ -38,7 +38,7 @@ static bool cheaper_to_alloc(size_t, size_t);
 
 static bool consume_and_subsume(mushspace*, mushboxen_iter, mushaabb*);
 
-bool mushspace_place_box(
+int mushspace_place_box(
    mushspace* space, mushaabb* aabb, mushcoords* reason, mushaabb** reason_box)
 {
    assert ((reason == NULL) == (reason_box == NULL));
@@ -143,9 +143,11 @@ bool mushspace_place_box(
       mushbakaabb_it_stop(it);
 #endif
    }
-   if (invalidate)
-      mushspace_invalidate_all(space);
-   return success;
+   if (invalidate && !mushspace_invalidate_all(space) && success)
+      return MUSHERR_INVALIDATION_FAILURE;
+   if (!success)
+      return MUSHERR_OOM;
+   return MUSHERR_NONE;
 }
 
 // Returns the placed box, which may be bigger than the given box. Returns the

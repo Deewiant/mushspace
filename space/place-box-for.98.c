@@ -21,19 +21,20 @@ static bool extend_big_sequence_start_for(
 static bool extend_first_placed_big_for(
    const mushspace*, mushcoords, const mushbounds*, mushaabb*);
 
-bool mushspace_place_box_for(
+int mushspace_place_box_for(
    mushspace* space, mushcoords c, mushaabb** placed)
 {
 #if USE_BAKAABB
    if (mushboxen_count(&space->boxen) >= MAX_PLACED_BOXEN)
-      return false;
+      return MUSHERR_OOM;
 #endif
 
    mushaabb aabb;
    get_box_for(space, c, &aabb);
 
-   if (!mushspace_place_box(space, &aabb, &c, placed))
-      return false;
+   int err = mushspace_place_box(space, &aabb, &c, placed);
+   if (err && err != MUSHERR_INVALIDATION_FAILURE)
+      return err;
 
    if (!*placed)
       *placed = mushboxen_get(&space->boxen, c);
@@ -41,7 +42,7 @@ bool mushspace_place_box_for(
    mushmemorybuf_push(
       &space->recent_buf, (mushmemory){.placed = (*placed)->bounds, c});
 
-   return true;
+   return err;
 }
 
 static void get_box_for(mushspace* space, mushcoords c, mushaabb* aabb) {

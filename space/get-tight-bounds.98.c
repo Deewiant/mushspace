@@ -66,9 +66,6 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
                   mushstaticaabb_getter_no_offset, &space->static_box);
    }
 
-   if (changed)
-      mushspace_invalidate_all(space);
-
 #if USE_BAKAABB
    if (space->bak.data && mushbakaabb_size(&space->bak) > 0) {
       found_nonspace = true;
@@ -96,6 +93,13 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
 #endif
    space->last_beg = bounds->beg;
    space->last_end = bounds->end;
+   if (changed) {
+      // Since we only removed boxes and thus didn't increase the space's size,
+      // there is no reason for any invalidatee to fail.
+      bool invalidated = mushspace_invalidate_all(space);
+      assert (invalidated);
+      (void)invalidated;
+   }
    return found_nonspace;
 }
 

@@ -31,7 +31,7 @@ typedef struct mushspace {
    bool just_placed_big;
    mushcoords big_sequence_start, first_placed_big;
 
-   void (**invalidatees)(void*);
+   bool (**invalidatees)(void*);
    void  **invalidatees_data;
 
    mushcoords last_beg, last_end;
@@ -105,9 +105,9 @@ int mushspace_map(
    mushspace*, mushbounds,
    void(*)(musharr_mushcell, mushcoords, mushcoords, void*), void*);
 
-bool mushspace_add_invalidatee(mushspace*, void(*)(void*), void*);
+bool mushspace_add_invalidatee(mushspace*, bool(*)(void*), void*);
 void mushspace_del_invalidatee(mushspace*, void*);
-void mushspace_invalidate_all (mushspace*);
+bool mushspace_invalidate_all (mushspace*);
 #endif
 
 #endif

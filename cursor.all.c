@@ -27,7 +27,7 @@
 
 #if !MUSHSPACE_93
 static int  initial_position_fixup(mushcursor*, mushcoords, mushcoords);
-static void mushcursor_recalibrate(void*);
+static bool mushcursor_recalibrate(void*);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
@@ -302,11 +302,12 @@ void mushcursor_retreat(mushcursor* cursor, mushcoords delta) {
 }
 
 #if !MUSHSPACE_93
-static void mushcursor_recalibrate(void* p) {
+static bool mushcursor_recalibrate(void* p) {
    mushcursor *cursor = p;
    mushcoords pos = mushcursor_get_pos(cursor);
    if (!mushcursor_get_box(cursor, pos))
       mushcursor_set_nowhere_pos(cursor, pos);
+   return true;
 }
 #endif
 

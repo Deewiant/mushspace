@@ -130,11 +130,13 @@ int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
    }
 
    mushaabb* box;
+   int err = MUSHERR_NONE;
    if ((box = mushboxen_get(&space->boxen, p))
-    || mushspace_place_box_for(space, p, &box))
+    || (err = mushspace_place_box_for(space, p, &box)) == MUSHERR_NONE
+    || err == MUSHERR_INVALIDATION_FAILURE)
    {
       mushaabb_put(box, p, c);
-      return MUSHERR_NONE;
+      return err;
    }
 
 #if USE_BAKAABB
@@ -181,17 +183,20 @@ void mushspace_map_existing(
    mushspace_map_no_place(space, &bounds, data, f, g);
 }
 
-void mushspace_invalidate_all(mushspace* space) {
-   void (**i)(void*) = space->invalidatees;
+bool mushspace_invalidate_all(mushspace* space) {
+   bool (**i)(void*) = space->invalidatees;
    void  **d         = space->invalidatees_data;
+   bool success = true;
    if (i)
       while (*i)
-         (*i++)(*d++);
+         if (!(*i++)(*d++))
+            success = false;
+   return success;
 }
 
-bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
+bool mushspace_add_invalidatee(mushspace* space, bool(*i)(void*), void* d) {
    size_t n = 1;
-   void (**is)(void*) = space->invalidatees;
+   bool (**is)(void*) = space->invalidatees;
    void  **id;
    if (is) {
       while (*is++)
@@ -227,7 +232,7 @@ bool mushspace_add_invalidatee(mushspace* space, void(*i)(void*), void* d) {
 void mushspace_del_invalidatee(mushspace* spac, void* d) {
    size_t i = 0;
    void  **id         = spac->invalidatees_data;
-   void (**is)(void*) = spac->invalidatees;
+   bool (**is)(void*) = spac->invalidatees;
 
    for (; id[i] != d; ++i)
       assert (is[i]);

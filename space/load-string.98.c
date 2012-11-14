@@ -64,13 +64,15 @@ static int load_string_generic(
       return MUSHERR_NONE;
    }
 
+   int placement_err;
    for (size_t i = 0; i < boundses.len; ++i) {
       if (end)
          mushcoords_max_into(end, boundses.ptr[i].end);
 
       mushaabb aabb;
       mushaabb_make_unsafe(&aabb, &boundses.ptr[i]);
-      if (!mushspace_place_box(space, &aabb, NULL, NULL))
+      placement_err = mushspace_place_box(space, &aabb, NULL, NULL);
+      if (placement_err && placement_err != MUSHERR_INVALIDATION_FAILURE)
          return MUSHERR_OOM;
    }
 
@@ -163,7 +165,7 @@ static int load_string_generic(
       mushspace_mapex_no_place(space, bounds, &aux, load_arr, load_blank);
       *str = aux.str;
    }
-   return MUSHERR_NONE;
+   return placement_err;
 }
 
 #define UTF
