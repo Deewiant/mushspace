@@ -49,6 +49,7 @@ void mushspace_map_no_place(
    mushcoords       pos = bounds->beg;
    mushbounded_pos bpos = {bounds, &pos};
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (;;) next_pos: {
       assert (mushbounds_safe_contains(bounds, pos));
 
@@ -62,7 +63,7 @@ void mushspace_map_no_place(
          goto next_pos;
       }
 
-      mushboxen_iter iter = mushboxen_get_iter(&space->boxen, pos);
+      mushboxen_iter iter = mushboxen_get_iter(&space->boxen, pos, aux);
       if (!mushboxen_iter_is_null(iter)) {
          if (map_in_box(space, bpos, iter, fg, f))
             return;
@@ -192,6 +193,7 @@ void mushspace_mapex_no_place(
    mushcoords       pos = bounds->beg;
    mushbounded_pos bpos = {bounds, &pos};
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
    for (;;) next_pos: {
       assert (mushbounds_safe_contains(bounds, pos));
 
@@ -205,7 +207,7 @@ void mushspace_mapex_no_place(
          goto next_pos;
       }
 
-      mushboxen_iter iter = mushboxen_get_iter(&space->boxen, pos);
+      mushboxen_iter iter = mushboxen_get_iter(&space->boxen, pos, aux);
       if (!mushboxen_iter_is_null(iter)) {
          if (mapex_in_box(space, bpos, iter, fg, f))
             return;

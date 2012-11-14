@@ -8,6 +8,7 @@
 #define mushspace_jump_to_box MUSHSPACE_CAT(mushspace,_jump_to_box)
 
 bool mushspace_jump_to_box(mushspace*, mushcoords*, mushcoords,
-                           MushCursorMode*, mushaabb**, mushboxen_iter*);
+                           MushCursorMode*, mushaabb**, mushboxen_iter*,
+                           void* aux);
 
 #endif

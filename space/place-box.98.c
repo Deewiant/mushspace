@@ -16,7 +16,7 @@ typedef struct consumee {
    void* iter_aux;
 } consumee;
 
-static mushboxen_iter really_place_box(mushspace*, mushaabb*);
+static mushboxen_iter really_place_box(mushspace*, mushaabb*, void* aux);
 
 static bool subsume_fusables(mushspace*, mushbounds*, consumee*, size_t*);
 static bool subsume_disjoint(mushspace*, mushbounds*, consumee*, size_t*);
@@ -66,6 +66,12 @@ int mushspace_place_box(
    bool invalidate = false,
         success    = true;
 
+   void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
+
+#if USE_BAKAABB
+   void *aux2 = alloca(mushboxen_iter_aux_size(&space->boxen));
+#endif
+
    // Then do the actual placement.
    for (size_t b = 0; b < a; ++b) {
       mushaabb   *box    = &aabbs[b];
@@ -80,7 +86,7 @@ int mushspace_place_box(
       }
 
       mushaabb_finalize(box);
-      mushboxen_iter iter = really_place_box(space, box);
+      mushboxen_iter iter = really_place_box(space, box, aux);
       if (mushboxen_iter_is_null(iter)) {
          success = false;
          break;
@@ -115,10 +121,9 @@ int mushspace_place_box(
       if (!mushbounds_overlaps(bounds, &space->bak.bounds))
          continue;
 
-      void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
       const bool overlaps =
          !mushboxen_iter_above_done(
-            mushboxen_iter_above_init(&space->boxen, iter, aux),
+            mushboxen_iter_above_init(&space->boxen, iter, aux2),
             &space->boxen);
 
       unsigned char buf[mushbakaabb_iter_sizeof];
@@ -152,7 +157,9 @@ int mushspace_place_box(
 
 // Returns the placed box, which may be bigger than the given box. Returns the
 // null iterator if memory allocation failed.
-static mushboxen_iter really_place_box(mushspace* space, mushaabb* aabb) {
+static mushboxen_iter really_place_box(
+   mushspace* space, mushaabb* aabb, void* external_aux)
+{
 #ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
    assert (!mushboxen_contains_bounds(&space->boxen, &aabb->bounds));
 #endif
@@ -229,8 +236,8 @@ static mushboxen_iter really_place_box(mushspace* space, mushaabb* aabb) {
          return mushboxen_iter_null;
       }
 
-      inserted =
-         mushboxen_insert_reservation(&space->boxen, &reserved, &consumer);
+      inserted = mushboxen_insert_reservation(
+         &space->boxen, &reserved, &consumer, external_aux);
 
       *aabb = consumer;
    } else {
@@ -240,7 +247,7 @@ static mushboxen_iter really_place_box(mushspace* space, mushaabb* aabb) {
       if (!mushaabb_alloc(aabb))
          return mushboxen_iter_null;
 
-      inserted = mushboxen_insert(&space->boxen, aabb);
+      inserted = mushboxen_insert(&space->boxen, aabb, external_aux);
       if (mushboxen_iter_is_null(inserted)) {
          free(aabb->data);
          return inserted;

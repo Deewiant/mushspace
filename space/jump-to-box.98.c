@@ -9,7 +9,8 @@
 
 bool mushspace_jump_to_box(
    mushspace* space, mushcoords* pos, mushcoords delta,
-   MushCursorMode* hit_type, mushaabb** aabb, mushboxen_iter* aabb_iter)
+   MushCursorMode* hit_type, mushaabb** aabb, mushboxen_iter* aabb_iter,
+   void* aabb_iter_aux)
 {
    assert (!mushboxen_get(&space->boxen, *pos));
 
@@ -44,7 +45,7 @@ bool mushspace_jump_to_box(
       {
          pos2       = c;
          moves      = m;
-         aabb_iter2 = it;
+         aabb_iter2 = mushboxen_iter_copy(it, aabb_iter_aux);
          hit_static = false;
       }
    }

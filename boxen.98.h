@@ -87,8 +87,8 @@ void           mushboxen_free    (mushboxen*);
 bool           mushboxen_copy    (mushboxen*, const mushboxen*);
 size_t         mushboxen_count   (const mushboxen*);
 mushaabb*      mushboxen_get     (const mushboxen*, mushcoords);
-mushboxen_iter mushboxen_get_iter(const mushboxen*, mushcoords);
-mushboxen_iter mushboxen_insert  (mushboxen*, mushaabb*);
+mushboxen_iter mushboxen_get_iter(const mushboxen*, mushcoords, void* aux);
+mushboxen_iter mushboxen_insert  (mushboxen*, mushaabb*, void* aux);
 
 bool mushboxen_contains_bounds(const mushboxen*, const mushbounds*);
 
@@ -103,7 +103,7 @@ bool mushboxen_reserve_preserve(
 void mushboxen_unreserve(mushboxen*, mushboxen_reservation*);
 
 mushboxen_iter mushboxen_insert_reservation(
-   mushboxen*, mushboxen_reservation*, mushaabb*);
+   mushboxen*, mushboxen_reservation*, mushaabb*, void* aux);
 
 ///// Iterator API
 
@@ -113,12 +113,19 @@ mushboxen_iter mushboxen_insert_reservation(
 // The size should never grow when boxes are removed.
 size_t mushboxen_iter_aux_size(const mushboxen*);
 
+// When alloca isn't available, this can be used to malloc something initially.
+// The idea being that this should be big enough for most uses.
+//
+// Warning: can be zero.
+extern const size_t mushboxen_iter_aux_size_init;
+
 // It should always be safe to cast any mushboxen_iter_FOO* to const
 // mushboxen_iter*.
 
 // Iterator creation functions
 
 mushboxen_iter mushboxen_iter_init(const mushboxen*, void* aux);
+mushboxen_iter mushboxen_iter_copy(mushboxen_iter, void* aux);
 
 // These refer to T-ordering.
 mushboxen_iter_above mushboxen_iter_above_init(

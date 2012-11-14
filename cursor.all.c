@@ -43,6 +43,11 @@ int mushcursor_init(
       return MUSHERR_OOM;
 
 #if !MUSHSPACE_93
+   cursor->box_iter_aux_size = mushboxen_iter_aux_size_init;
+   cursor->box_iter_aux = malloc(cursor->box_iter_aux_size);
+   if (!cursor->box_iter_aux && cursor->box_iter_aux_size)
+      return MUSHERR_OOM;
+
    if (!mushspace_add_invalidatee(space, mushcursor_recalibrate, cursor))
       return MUSHERR_OOM;
 #endif
@@ -61,6 +66,7 @@ void mushcursor_free(mushcursor* cursor) {
 #if MUSHSPACE_93
    (void)cursor;
 #else
+   free(cursor->box_iter_aux);
    mushspace_del_invalidatee(cursor->space, cursor);
 #endif
 }
@@ -81,6 +87,10 @@ int mushcursor_copy(
       copy->space = space;
 
 #if !MUSHSPACE_93
+   copy->box_iter_aux = malloc(copy->box_iter_aux_size);
+   if (!copy->box_iter_aux && copy->box_iter_aux_size)
+      return MUSHERR_OOM;
+
    if (!mushspace_add_invalidatee(copy->space, mushcursor_recalibrate, copy))
       return MUSHERR_OOM;
 #endif
@@ -103,7 +113,8 @@ static int initial_position_fixup(
 {
    if (!mushcursor_get_box(cursor, pos)) {
       if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
-                                 &cursor->box, &cursor->box_iter))
+                                 &cursor->box, &cursor->box_iter,
+                                 cursor->box_iter_aux))
       {
          mushcursor_set_nowhere_pos(cursor, pos);
          return MUSHERR_INFINITE_LOOP_SPACES;
@@ -177,9 +188,9 @@ bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
 
    mushspace *sp = cursor->space;
 
-   if (!mushboxen_iter_is_null(
-         cursor->box_iter = mushboxen_get_iter(&sp->boxen, pos)))
-   {
+   cursor->box_iter =
+      mushboxen_get_iter(&sp->boxen, pos, cursor->box_iter_aux);
+   if (!mushboxen_iter_is_null(cursor->box_iter)) {
       cursor->box  = mushboxen_iter_box(cursor->box_iter);
       cursor->mode = MushCursorMode_dynamic;
       mushcursor_tessellate(cursor, pos);
@@ -304,6 +315,16 @@ void mushcursor_retreat(mushcursor* cursor, mushcoords delta) {
 #if !MUSHSPACE_93
 static bool mushcursor_recalibrate(void* p) {
    mushcursor *cursor = p;
+
+   const size_t aux_size = mushboxen_iter_aux_size(&cursor->space->boxen);
+   if (aux_size > cursor->box_iter_aux_size) {
+      void *aux = realloc(cursor->box_iter_aux, aux_size);
+      if (!aux)
+         return false;
+      cursor->box_iter_aux      = aux;
+      cursor->box_iter_aux_size = aux_size;
+   }
+
    mushcoords pos = mushcursor_get_pos(cursor);
    if (!mushcursor_get_box(cursor, pos))
       mushcursor_set_nowhere_pos(cursor, pos);

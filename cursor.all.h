@@ -29,6 +29,8 @@ typedef struct mushcursor {
          mushcoords obeg;
          mushaabb      *box;
          mushboxen_iter box_iter;
+         void          *box_iter_aux;
+         size_t         box_iter_aux_size;
 #endif
       };
 #if USE_BAKAABB

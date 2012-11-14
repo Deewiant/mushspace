@@ -42,11 +42,16 @@ mushaabb* mushboxen_get(const mushboxen* boxen, mushcoords pos) {
          return &boxen->ptr[i];
    return NULL;
 }
-mushboxen_iter mushboxen_get_iter(const mushboxen* boxen, mushcoords pos) {
+mushboxen_iter mushboxen_get_iter(
+   const mushboxen* boxen, mushcoords pos, void* aux)
+{
+   (void)aux;
    return (mushboxen_iter){ mushboxen_get(boxen, pos) };
 }
 
-mushboxen_iter mushboxen_insert(mushboxen* boxen, mushaabb* box) {
+mushboxen_iter mushboxen_insert(mushboxen* boxen, mushaabb* box, void* aux) {
+   (void)aux;
+
    mushaabb *arr = realloc(boxen->ptr, (boxen->count + 1) * sizeof *arr);
    if (!arr)
       return mushboxen_iter_null;
@@ -77,9 +82,9 @@ void mushboxen_unreserve(mushboxen* boxen, mushboxen_reservation* reserve) {
       boxen->ptr = arr;
 }
 mushboxen_iter mushboxen_insert_reservation(
-   mushboxen* boxen, mushboxen_reservation* reserve, mushaabb* box)
+   mushboxen* boxen, mushboxen_reservation* reserve, mushaabb* box, void* aux)
 {
-   (void)reserve;
+   (void)reserve; (void)aux;
    mushboxen_iter it = (mushboxen_iter){ boxen->ptr + boxen->count++ };
    *it.ptr = *box;
    return it;
@@ -128,10 +133,15 @@ static bool overout_test(mushboxen_iter_overout it) {
 ////////////////////////////////////////// Iterator init
 
 size_t mushboxen_iter_aux_size(const mushboxen* bn) { (void)bn; return 0; }
+const size_t mushboxen_iter_aux_size_init = 0;
 
 mushboxen_iter mushboxen_iter_init(const mushboxen* boxen, void* aux) {
    (void)aux;
    return (mushboxen_iter){ boxen->ptr };
+}
+mushboxen_iter mushboxen_iter_copy(mushboxen_iter it, void* aux) {
+   (void)aux;
+   return it;
 }
 mushboxen_iter_above mushboxen_iter_above_init(
    const mushboxen* boxen, mushboxen_iter sentinel, void* aux)
