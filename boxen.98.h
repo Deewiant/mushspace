@@ -70,7 +70,11 @@
 // Internals are visible so that we can store mushboxen directly in mushspace,
 // and for the rest, because it's convenient to not mess around with buffers.
 
+#if defined(BOXEN_RTREE)
+#include "boxen/r.h"
+#elif defined(BOXEN_ARRAY)
 #include "boxen/array.h"
+#endif
 
 ///// Basic API
 
