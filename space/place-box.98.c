@@ -489,18 +489,14 @@ static bool valid_min_max_size(
    consumee* max, size_t* total_size,
    mushboxen_iter it)
 {
+   const mushaabb *box = mushboxen_iter_box(it);
    mushbounds try_bounds = *bounds;
-   consumee try_max = *max;
-   size_t try_total_size = *total_size;
+   mushbounds_expand_to_cover(&try_bounds, &box->bounds);
 
-   min_max_size(&try_bounds, &try_max, &try_total_size, it);
-
-   if (!valid(&try_bounds, mushboxen_iter_box(it), *total_size, userdata))
+   if (!valid(&try_bounds, box, *total_size, userdata))
       return false;
 
-   *bounds     = try_bounds;
-   *max        = try_max;
-   *total_size = try_total_size;
+   min_max_size(bounds, max, total_size, it);
    return true;
 }
 
