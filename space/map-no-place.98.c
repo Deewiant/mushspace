@@ -124,7 +124,7 @@ static bool map_in_box(
         !mushboxen_iter_above_done( it, &space->boxen);
          mushboxen_iter_above_next(&it, &space->boxen))
    {
-      mushbounds_tessellate_unsafe(
+      mushbounds_tessellate(
          &tes, *bpos.pos, &mushboxen_iter_above_box(it)->bounds);
    }
 
@@ -267,8 +267,7 @@ static bool mapex_in_box(
         !mushboxen_iter_above_done( it, &space->boxen);
          mushboxen_iter_above_next(&it, &space->boxen))
    {
-      mushbounds_tessellate_unsafe(
-         &tes, *pos, &mushboxen_iter_above_box(it)->bounds);
+      mushbounds_tessellate(&tes, *pos, &mushboxen_iter_above_box(it)->bounds);
    }
 
    bool hit_end;

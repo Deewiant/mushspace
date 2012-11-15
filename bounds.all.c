@@ -115,12 +115,6 @@ void mushbounds_tessellate(
    if (!mushbounds_overlaps(bounds, avoid))
       return;
 
-   mushbounds_tessellate_unsafe(bounds, pos, avoid);
-}
-
-void mushbounds_tessellate_unsafe(
-   mushbounds* bounds, mushcoords pos, const mushbounds* avoid)
-{
    assert (mushbounds_contains(bounds, pos));
 
    for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {

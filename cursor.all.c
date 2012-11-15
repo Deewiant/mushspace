@@ -388,8 +388,8 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
            !mushboxen_iter_above_done( it, &sp->boxen);
             mushboxen_iter_above_next(&it, &sp->boxen))
       {
-         mushbounds_tessellate_unsafe(&bounds, pos,
-                                      &mushboxen_iter_above_box(it)->bounds);
+         mushbounds_tessellate(
+            &bounds, pos, &mushboxen_iter_above_box(it)->bounds);
       }
 
       cursor->rel_pos    = mushcoords_sub(pos, cursor->obeg);

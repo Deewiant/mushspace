@@ -27,8 +27,6 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 #define mushbounds_on_same_axis    MUSHSPACE_CAT(mushbounds,_on_same_axis)
 #define mushbounds_can_fuse        MUSHSPACE_CAT(mushbounds,_can_fuse)
 #define mushbounds_tessellate      MUSHSPACE_CAT(mushbounds,_tessellate)
-#define mushbounds_tessellate_unsafe \
-   MUSHSPACE_CAT(mushbounds,_tessellate_unsafe)
 
 size_t mushbounds_clamped_size(const mushbounds*);
 
@@ -63,8 +61,5 @@ bool mushbounds_can_fuse(const mushbounds*, const mushbounds*);
 // If the given bounds don't overlap with the area to be avoided, they are not
 // modified.
 void mushbounds_tessellate(mushbounds*, mushcoords, const mushbounds*);
-
-// Assumes that the two given bounds overlap.
-void mushbounds_tessellate_unsafe(mushbounds*, mushcoords, const mushbounds*);
 
 #endif
