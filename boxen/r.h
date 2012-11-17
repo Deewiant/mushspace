@@ -17,9 +17,13 @@ union size_helper { rtree *branch_node; mushaabb leaf_aabb; };
 // definition.
 #define R_BRANCHING_FACTOR ((R_IDX)R_BRANCHING_FACTOR_N)
 
-#define R_BRANCHING_FACTOR_N \
+#define R_BRANCHING_FACTOR_CANDIDATE \
    (((1 << 12) - sizeof(R_DEPTH) - sizeof(size_t) - sizeof(R_IDX)) \
     / (sizeof(mushbounds) + sizeof(union size_helper)))
+
+// The branching factor must be at least 3: the algorithms can't handle less.
+#define R_BRANCHING_FACTOR_N \
+   (R_BRANCHING_FACTOR_CANDIDATE < 3 ? 3 : R_BRANCHING_FACTOR_CANDIDATE)
 
 _Static_assert(R_BRANCHING_FACTOR_N <= INT_FAST8_MAX,
                "rare platform: please bump R_IDX from int_fast8_t");
