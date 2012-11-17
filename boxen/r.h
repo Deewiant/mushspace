@@ -10,7 +10,7 @@ union size_helper { rtree *branch_node; mushaabb leaf_aabb; };
 #define R_DEPTH uint8_t
 #define R_IDX   int_fast8_t
 
-// As many branches as possible so that the root fits in 4k.
+// As many branches as possible so that the root fits in 2k.
 //
 // The R_IDX cast is to silence spurious "comparison between signed and
 // unsigned" warnings, but then we need a separate #define for the struct
@@ -18,7 +18,7 @@ union size_helper { rtree *branch_node; mushaabb leaf_aabb; };
 #define R_BRANCHING_FACTOR ((R_IDX)R_BRANCHING_FACTOR_N)
 
 #define R_BRANCHING_FACTOR_CANDIDATE \
-   (((1 << 12) - sizeof(R_DEPTH) - sizeof(size_t) - sizeof(R_IDX)) \
+   (((1 << 11) - sizeof(R_DEPTH) - sizeof(size_t) - sizeof(R_IDX)) \
     / (sizeof(mushbounds) + sizeof(union size_helper)))
 
 // The branching factor must be at least 3: the algorithms can't handle less.
