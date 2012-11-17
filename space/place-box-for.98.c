@@ -39,6 +39,8 @@ int mushspace_place_box_for(
    if (!*placed)
       *placed = mushboxen_get(&space->boxen, c);
 
+   assert (mushbounds_contains(&(*placed)->bounds, c));
+
    mushmemorybuf_push(
       &space->recent_buf, (mushmemory){.placed = (*placed)->bounds, c});
 
