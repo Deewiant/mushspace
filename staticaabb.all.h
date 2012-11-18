@@ -12,7 +12,7 @@
 
 #define mushstaticaabb MUSHSPACE_NAME(mushstaticaabb)
 
-#ifdef MUSHSPACE_93
+#if MUSHSPACE_93
    // These need to be separate instead of MUSHCOORDS so that
    // MUSHSTATICAABB_BOUNDS can be defined as a global constant (BEG) and so
    // that we can define the static array (SIZE).

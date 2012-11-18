@@ -12,28 +12,28 @@
 
 int mushspace_load_string
    ( mushspace*, const unsigned char*, size_t len
-#ifndef MUSHSPACE_93
+#if !MUSHSPACE_93
    , mushcoords* end, mushcoords target, bool binary
 #endif
    );
 
 int mushspace_load_string_utf8
    ( mushspace*, const uint8_t*, size_t len
-#ifndef MUSHSPACE_93
+#if !MUSHSPACE_93
    , mushcoords* end, mushcoords target, bool binary
 #endif
    );
 
 int mushspace_load_string_utf16
    ( mushspace*, const uint16_t*, size_t len
-#ifndef MUSHSPACE_93
+#if !MUSHSPACE_93
    , mushcoords* end, mushcoords target, bool binary
 #endif
    );
 
 int mushspace_load_string_cell
    ( mushspace*, const mushcell*, size_t len
-#ifndef MUSHSPACE_93
+#if !MUSHSPACE_93
    , mushcoords* end, mushcoords target, bool binary
 #endif
    );
