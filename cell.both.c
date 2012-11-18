@@ -187,6 +187,8 @@ uint_fast8_t mushucell_gcd_lg(mushucell n) {
    // in a clever way: the result we want is exactly the trailing zero bit
    // count of n.
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
 #ifdef __GNUC__
    if (sizeof(mushucell) == sizeof(unsigned))
       return __builtin_clz(n);
@@ -218,5 +220,6 @@ uint_fast8_t mushucell_gcd_lg(mushucell n) {
       mask >>= mask_bits;
    }
    return c - (uint_fast8_t)(n & 1);
+#pragma clang diagnostic pop
 }
 #endif // !MUSHSPACE_93

@@ -162,6 +162,8 @@ static size_t hash(mushcoords c) {
 
    uint64_t k1 = 0, k2 = 0;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
    switch ((sizeof c) % 16) {
    case 12: k2 ^= (uint64_t)tail[11] << 24;
             k2 ^= (uint64_t)tail[10] << 16;
@@ -179,6 +181,7 @@ static size_t hash(mushcoords c) {
             k1 *= c1; k1 = k1 << 31 | k1 >> 33; k1 *= c2; h1 ^= k1;
    case  0: (void)tail; break;
    }
+#pragma clang diagnostic pop
 
    h1 ^= sizeof c;
    h2 ^= sizeof c;
