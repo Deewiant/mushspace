@@ -109,10 +109,9 @@ static size_t hash(mushcoords c) {
 
    assert ((sizeof c) % 4 == 0);
 
-   const uint8_t *data = (const uint8_t*)&c;
    static const int nblocks = (sizeof c) / 4;
 
-   const uint32_t *blocks = (const uint32_t*)(data + nblocks*4);
+   const uint32_t *blocks = (const uint32_t*)((const uint8_t*)&c + nblocks*4);
 
    for (int i = -nblocks; i; ++i) {
       uint32_t k = blocks[i];
@@ -140,13 +139,13 @@ static size_t hash(mushcoords c) {
 
    assert ((sizeof c) % 4 == 0);
 
-   const uint8_t *data = (const uint8_t*)&c;
+   const uint64_t *blocks = (const uint64_t*)&c;
+
+   const uint8_t *data = (const uint8_t*)blocks;
    static const int nblocks = (sizeof c) / 16;
 
    static const uint64_t c1 = 0x87c37b91114253d5ULL,
                          c2 = 0x4cf5ad432745937fULL;
-
-   const uint64_t *blocks = (const uint64_t*)data;
 
    for (int i = 0; i < nblocks; ++i) {
       uint64_t k1 = blocks[2*i],
