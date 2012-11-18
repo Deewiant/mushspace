@@ -3,6 +3,10 @@
 #ifndef MUSH_CONFIG_H
 #define MUSH_CONFIG_H
 
+#ifndef MUSHSPACE_93
+#define MUSHSPACE_93 0
+#endif
+
 #if '@DISABLE_ALL_ASSERTIONS@' == 'y'
 #define NDEBUG
 #endif
