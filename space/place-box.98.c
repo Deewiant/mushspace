@@ -394,19 +394,32 @@ static bool subsume_disjoint(
    // All fusables have been removed, so a sufficient condition for
    // disjointness is non-overlappingness. This also takes care of excluding
    // the subsumees, which are contained and hence overlapping.
+   //
+   // But to avoid considering a large number of boxes, limit it to a nearby
+   // area. Since we allow a "waste" of at most ACCEPTABLE_WASTE, all eligible
+   // boxes fall within ACCEPTABLE_WASTE+1 in all directions.
+
+   mushbounds range = {
+      .beg = mushcoords_subs_clamped(consumer->beg, ACCEPTABLE_WASTE + 1),
+      .end = mushcoords_adds_clamped(consumer->end, ACCEPTABLE_WASTE + 1)};
+
    void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
-   for (mushboxen_iter_out it =
-           mushboxen_iter_out_init(&space->boxen, consumer, aux);
-        !mushboxen_iter_out_done( it, &space->boxen);)
+   for (mushboxen_iter_overout it =
+           mushboxen_iter_overout_init(&space->boxen, &range, consumer, aux);
+        !mushboxen_iter_overout_done(it, &space->boxen);)
    {
       if (!valid_min_max_size(disjoint_mms_validator, NULL, consumer, consumee,
                               used_cells, *(mushboxen_iter*)&it))
       {
-         mushboxen_iter_out_next(&it, &space->boxen);
+         mushboxen_iter_overout_next(&it, &space->boxen);
          continue;
       }
 
-      mushboxen_iter_out_updated_next(&it, &space->boxen);
+      range = (mushbounds){
+         .beg = mushcoords_subs_clamped(consumer->beg, ACCEPTABLE_WASTE + 1),
+         .end = mushcoords_adds_clamped(consumer->end, ACCEPTABLE_WASTE + 1)};
+
+      mushboxen_iter_overout_updated_next(&it, &space->boxen);
       mushstats_add(space->stats, MushStat_subsumed_disjoint, 1);
       any = true;
    }
