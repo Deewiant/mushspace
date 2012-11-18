@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
       init_by_array((uint32_t*)&s, sizeof s / sizeof(uint32_t));
    }
 
-   unsigned char *data = malloc(DATA_LEN);
+   void *data = malloc(DATA_LEN);
    random_fill(data, DATA_LEN);
 
    const size_t codepoints = DATA_LEN * CHAR_BIT / 21;
