@@ -547,8 +547,10 @@ static void load_arr(
          // Nonspaces can also cause us to fall out of bounds->end, which is
          // why we check for being past of it instead of on it, like in the
          // line break case below.
-         if (MUSHSPACE_DIM >= 2 && pos.x == mushcell_inc(bounds->end.x))
-            break;
+         #if MUSHSPACE_DIM >= 2
+            if (pos.x == mushcell_inc(bounds->end.x))
+               break;
+         #endif
          ++i;
          pos.x = mushcell_inc(pos.x);
 
@@ -567,8 +569,10 @@ static void load_arr(
             (void)ASCII_NEXT(str);
       CASE_LF:
       case '\n': {
-         if (MUSHSPACE_DIM >= 3 && pos.y == bounds->end.y)
-            break;
+         #if MUSHSPACE_DIM >= 3
+            if (pos.y == bounds->end.y)
+               break;
+         #endif
 
          i = line_start += width;
          pos.x = target_x;
@@ -691,7 +695,10 @@ static void load_arr(
          C c;
          while (str < str_end
              && ((c = ASCII_NEXT(str)) == ' '
-              || (MUSHSPACE_DIM < 3 && c == '\f')));
+         #if MUSHSPACE_DIM < 3
+              || c == '\f'
+         #endif
+         ));
 
          if (str < str_end) switch (c) {
             case '\r':
