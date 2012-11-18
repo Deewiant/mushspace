@@ -34,6 +34,17 @@
 #error CONFIG_CELL_SIZE setting is incorrect!
 #endif
 
+#if defined(__GNUC__)
+#define MUSH_PACKED_STRUCT     struct __attribute__((__packed__))
+#define MUSH_PACKED_STRUCT_END
+#else
+#define MUSH_PACKED_STRUCT \
+   _Pragma("pack(push)") \
+   _Pragma("pack(1)") \
+   struct
+#define MUSH_PACKED_STRUCT_END _Pragma("pack(pop)")
+#endif
+
 //#define BOXEN_ARRAY
 #define BOXEN_RTREE
 
