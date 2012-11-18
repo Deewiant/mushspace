@@ -136,7 +136,10 @@ mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 #endif
 #endif
    }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 }
+#pragma GCC diagnostic pop
 
 void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
    switch (MUSHCURSOR_MODE(cursor)) {
@@ -171,7 +174,10 @@ bool mushcursor_in_box(const mushcursor* cursor) {
 #endif
 #endif
    }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 }
+#pragma GCC diagnostic pop
 
 #if !MUSHSPACE_93
 bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
