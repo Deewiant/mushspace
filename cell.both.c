@@ -4,13 +4,13 @@
 
 #include <assert.h>
 
+#if !MUSHSPACE_93
 #if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 #define GNU_X86_ASM 1
 #else
 #define GNU_X86_ASM 0
 #endif
 
-#if !MUSHSPACE_93
 static mushucell mushucell_mod_inv(mushucell);
 #endif
 

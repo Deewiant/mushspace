@@ -29,6 +29,11 @@ void mushcoords_min_into(mushcoords* a, mushcoords b) {
       return x; \
    }
 
+DEFINE_OP(add)
+DEFINE_OP(sub)
+DEFINE_OP(mul)
+
+#if !MUSHSPACE_93
 #define DEFINE_CLAMPED_OP(NAME) \
    mushcoords mushcoords_##NAME##s_clamped(mushcoords a, mushcell b) { \
       mushcoords x = a; \
@@ -37,11 +42,6 @@ void mushcoords_min_into(mushcoords* a, mushcoords b) {
       return x; \
    }
 
-DEFINE_OP(add)
-DEFINE_OP(sub)
-DEFINE_OP(mul)
-
-#if !MUSHSPACE_93
 DEFINE_CLAMPED_OP(add)
 DEFINE_CLAMPED_OP(sub)
 #endif
