@@ -19,8 +19,7 @@ SRCFLAGS     = -Weverything -pedantic \
                -Wno-sign-conversion \
                -Wno-shadow  \
                -Wno-shorten-64-to-32 \
-               -Wno-switch-enum \
-               -Wno-unused-macros
+               -Wno-switch-enum
 MUSHSRCFLAGS = -std=c11
 LIBSRCFLAGS  =
 
