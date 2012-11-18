@@ -18,8 +18,9 @@ static bool newline(bool* got_cr, mushcoords* pos) {
       mushcoords pos = MUSHCOORDS(0,0,0); \
 \
       for (const C *str_end = str + len; str < str_end;) { \
-         mushcell c; \
-         NEXT(str, str_end, c); \
+         UChar32 c32; \
+         NEXT(str, str_end, c32); \
+         mushcell c = (mushcell)c32; \
 \
          switch (c) { \
          case '\r': got_cr = true; break; \
@@ -36,7 +37,7 @@ static bool newline(bool* got_cr, mushcoords* pos) {
 \
             /* Skip to and past EOL after column 80. */ \
             while (str < str_end) { \
-               c = *str++; \
+               c = (mushcell)*str++; \
                switch (c) { \
                case '\r': got_cr = true; break; \
                default:   if (!got_cr) break; \

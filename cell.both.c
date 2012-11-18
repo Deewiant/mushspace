@@ -188,11 +188,11 @@ uint_fast8_t mushucell_gcd_lg(mushucell n) {
 #pragma clang diagnostic ignored "-Wunreachable-code"
 #ifdef __GNUC__
    if (sizeof(mushucell) == sizeof(unsigned))
-      return __builtin_clz(n);
+      return (uint_fast8_t)__builtin_clz(n);
    if (sizeof(mushucell) == sizeof(unsigned long))
-      return __builtin_clzl(n);
+      return (uint_fast8_t)__builtin_clzl(n);
    if (sizeof(mushucell) == sizeof(unsigned long long))
-      return __builtin_clzll(n);
+      return (uint_fast8_t)__builtin_clzll(n);
 #endif
 
    // Odd numbers have a trivial gcd of 1.

@@ -104,7 +104,7 @@ static int load_string_generic(
          const mushbounds *box = &boundses.ptr[b];
 
          for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-            const uint8_t axis = 1 << i;
+            const uint8_t axis = (uint8_t)(1 << i);
 
             if (box->beg.v[i] < target.v[i]) {
                // This box is past this axis, in the positive direction: it

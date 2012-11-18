@@ -68,24 +68,24 @@ size_t encode_utf8(const void* data, uint8_t* out, size_t codepoints) {
    codepoint_reader reader = make_codepoint_reader(data, codepoints);
    for (uint32_t cp; (cp = next_codepoint(&reader)) != UINT32_MAX;) {
       if (cp <= 0x7f) {
-         out[i++] = cp;
+         out[i++] = (uint8_t)cp;
          continue;
       }
       if (cp <= 0x7ff) {
-         out[i++] = 0xc0 | (cp >> 6);
-         out[i++] = 0x80 | (cp >> 0 & ((1 << 6) - 1));
+         out[i++] = 0xc0 | (uint8_t)(cp >> 6);
+         out[i++] = 0x80 | (uint8_t)(cp >> 0 & ((1 << 6) - 1));
          continue;
       }
       if (cp <= 0xffff) {
-         out[i++] = 0xe0 |  (cp >> 12);
-         out[i++] = 0x80 | ((cp >>  6) & ((1 << 6) - 1));
-         out[i++] = 0x80 | ((cp >>  0) & ((1 << 6) - 1));
+         out[i++] = 0xe0 | (uint8_t) (cp >> 12);
+         out[i++] = 0x80 | (uint8_t)((cp >>  6) & ((1 << 6) - 1));
+         out[i++] = 0x80 | (uint8_t)((cp >>  0) & ((1 << 6) - 1));
          continue;
       }
-      out[i++] = 0xf0 |  (cp >> 18);
-      out[i++] = 0x80 | ((cp >> 12) & ((1 << 6) - 1));
-      out[i++] = 0x80 | ((cp >>  6) & ((1 << 6) - 1));
-      out[i++] = 0x80 | ((cp >>  0) & ((1 << 6) - 1));
+      out[i++] = 0xf0 | (uint8_t) (cp >> 18);
+      out[i++] = 0x80 | (uint8_t)((cp >> 12) & ((1 << 6) - 1));
+      out[i++] = 0x80 | (uint8_t)((cp >>  6) & ((1 << 6) - 1));
+      out[i++] = 0x80 | (uint8_t)((cp >>  0) & ((1 << 6) - 1));
       continue;
    }
 
@@ -98,12 +98,12 @@ size_t encode_utf16(const void* data, uint16_t* out, size_t codepoints) {
    codepoint_reader reader = make_codepoint_reader(data, codepoints);
    for (uint32_t cp; (cp = next_codepoint(&reader)) != UINT32_MAX;) {
       if (cp <= 0xffff) {
-         out[i++] = cp;
+         out[i++] = (uint16_t)cp;
          continue;
       }
       cp -= 0x10000;
-      out[i++] = 0xd800 + (cp >> 10);
-      out[i++] = 0xdc00 + (cp & ((1 << 10) - 1));
+      out[i++] = 0xd800 + (uint16_t)(cp >> 10);
+      out[i++] = 0xdc00 + (uint16_t)(cp & ((1 << 10) - 1));
    }
 
    return i;
