@@ -8,7 +8,21 @@ AR = ar rcs
 
 SHAREDLIBFLAGS = -shared
 
-SRCFLAGS     = -Wall -Wextra -pedantic
+SRCFLAGS     = -Weverything -pedantic \
+               -Wno-cast-align \
+               -Wno-conditional-uninitialized \
+               -Wno-conversion \
+               -Wno-covered-switch-default \
+               -Wno-disabled-macro-expansion \
+               -Wno-missing-prototypes \
+               -Wno-padded \
+               -Wno-sign-conversion \
+               -Wno-shadow  \
+               -Wno-shorten-64-to-32 \
+               -Wno-switch-enum \
+               -Wno-undef \
+               -Wno-unreachable-code \
+               -Wno-unused-macros
 MUSHSRCFLAGS = -std=c11
 LIBSRCFLAGS  =
 
