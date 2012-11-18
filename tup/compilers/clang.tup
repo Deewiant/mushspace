@@ -11,7 +11,6 @@ SHAREDLIBFLAGS = -shared
 SRCFLAGS     = -Weverything -pedantic \
                -Wno-cast-align \
                -Wno-conditional-uninitialized \
-               -Wno-covered-switch-default \
                -Wno-disabled-macro-expansion \
                -Wno-missing-prototypes \
                -Wno-padded \
