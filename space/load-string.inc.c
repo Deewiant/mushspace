@@ -385,9 +385,9 @@ static size_t get_aabbs_binary(
 }
 
 static void binary_load_arr(
-   musharr_mushcell arr, mushcoords beg, mushcoords end, void* p)
+   musharr_mushcell arr, mushcoords cbeg, mushcoords cend, void* p)
 {
-   (void)beg; (void)end;
+   (void)cbeg; (void)cend;
 
    binary_load_arr_auxdata *aux = p;
    const C *str = aux->str, *str_end = aux->end;
@@ -593,9 +593,9 @@ static void load_arr(
             // if our line_start is outside it that must mean that there are
             // spaces on the beginning of every line.
 
-            const mushcell c = ASCII_READ(str);
+            const mushcell c2 = ASCII_READ(str);
             (void)ASCII_NEXT(str);
-            switch (c) {
+            switch (c2) {
             case ' ': pos.x = mushcell_inc(pos.x); break;
 
             // If a line containing only whitespace doesn't reach aabb_beg,
@@ -635,9 +635,9 @@ static void load_arr(
          while ((pos.x != bounds->beg.x || pos.y != bounds->beg.y)
              && str < str_end)
          {
-            const mushcell c = ASCII_READ(str);
+            const mushcell c2 = ASCII_READ(str);
             (void)ASCII_NEXT(str);
-            switch (c) {
+            switch (c2) {
             case ' ':
                pos.x = mushcell_inc(pos.x);
                break;

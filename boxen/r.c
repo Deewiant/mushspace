@@ -1234,15 +1234,15 @@ done:; \
 ////////////////////////////////////////// Iterator init
 
 mushboxen_iter mushboxen_iter_init(const mushboxen* boxen, void* aux) {
-   mushboxen_iter i = {
+   mushboxen_iter i0 = {
       .node       = (rtree*)&boxen->root,
       .idx        = 0,
       .path_depth = 0,
       .aux        = aux,
-   }, *iter = &i;
+   }, *iter = &i0;
    if (boxen->count)
       ITER_GOTO_FIRST_ACCEPTABLE_LEAF(false, CONST_TRUE, CONST_TRUE);
-   return i;
+   return i0;
 }
 mushboxen_iter mushboxen_iter_copy(mushboxen_iter it, void* aux) {
    assert (!it.path_depth || aux != it.aux);
@@ -1253,57 +1253,57 @@ mushboxen_iter mushboxen_iter_copy(mushboxen_iter it, void* aux) {
 mushboxen_iter_above mushboxen_iter_above_init(
    const mushboxen* boxen, mushboxen_iter sentinel, void* aux)
 {
-   mushboxen_iter_above i = {
+   mushboxen_iter_above i0 = {
       .iter   = mushboxen_iter_copy(sentinel, aux),
       .bounds = &mushboxen_iter_box(sentinel)->bounds,
    };
-   mushboxen_iter_above_next(&i, boxen);
-   return i;
+   mushboxen_iter_above_next(&i0, boxen);
+   return i0;
 }
 mushboxen_iter_below mushboxen_iter_below_init(
    const mushboxen* boxen, mushboxen_iter sentinel, void* aux)
 {
-   mushboxen_iter_below i = {
+   mushboxen_iter_below i0 = {
       .iter   = mushboxen_iter_copy(sentinel, aux),
       .bounds = &mushboxen_iter_box(sentinel)->bounds,
    };
-   mushboxen_iter_below_next(&i, boxen);
-   return i;
+   mushboxen_iter_below_next(&i0, boxen);
+   return i0;
 }
 mushboxen_iter_in mushboxen_iter_in_init(
    const mushboxen* boxen, const mushbounds* bounds, void* aux)
 {
-   mushboxen_iter_in i = {
+   mushboxen_iter_in i0 = {
       .iter   = { (rtree*)&boxen->root, 0, 0, aux },
       .bounds = bounds,
-   }, *iter = &i;
+   }, *iter = &i0;
    if (boxen->count)
       ITER_GOTO_FIRST_ACCEPTABLE_LEAF(false, in_nonleaf_test, in_leaf_test);
-   return i;
+   return i0;
 }
 mushboxen_iter_in_bottomup mushboxen_iter_in_bottomup_init(
    const mushboxen* boxen, const mushbounds* bounds, void* aux)
 {
-   mushboxen_iter_in_bottomup i = {
+   mushboxen_iter_in_bottomup i0 = {
       .iter   = { (rtree*)&boxen->root, 0, 0, aux },
       .bounds = bounds,
-   }, *iter = &i;
+   }, *iter = &i0;
    if (boxen->count)
       ITER_GOTO_LAST_ACCEPTABLE_LEAF(false, in_nonleaf_test, in_leaf_test);
-   return i;
+   return i0;
 }
 mushboxen_iter_overout mushboxen_iter_overout_init(
    const mushboxen* boxen, const mushbounds* over, const mushbounds* out,
    void* aux)
 {
-   mushboxen_iter_overout i = {
+   mushboxen_iter_overout i0 = {
       .iter = { (rtree*)&boxen->root, 0, 0, aux },
       .over = over,
       .out  = out,
-   }, *iter = &i;
+   }, *iter = &i0;
    if (boxen->count)
       ITER_GOTO_FIRST_ACCEPTABLE_LEAF(false, overout_test, overout_test);
-   return i;
+   return i0;
 }
 
 ////////////////////////////////////////// Iterator done
@@ -1339,27 +1339,27 @@ bool mushboxen_iter_overout_done(
 ////////////////////////////////////////// Iterator next
 
 #define ITER_NEXT(NL_TEST, L_TEST) \
-   mushboxen_iter *it = (mushboxen_iter*)iter; \
+   mushboxen_iter *jt = (mushboxen_iter*)iter; \
    \
-   assert (it->node->count >= 0 && "not a leaf"); \
-   while (++it->idx < it->node->count) \
-      if (L_TEST(*iter, &it->node->bounds[it->idx])) \
+   assert (jt->node->count >= 0 && "not a leaf"); \
+   while (++jt->idx < jt->node->count) \
+      if (L_TEST(*iter, &jt->node->bounds[jt->idx])) \
          return; \
    \
-   if (it->path_depth == 0) \
+   if (jt->path_depth == 0) \
       return; \
    \
    ITER_GOTO_FIRST_ACCEPTABLE_LEAF(true, NL_TEST, L_TEST);
 
 #define ITER_PREV(NL_TEST, L_TEST) \
-   mushboxen_iter *it = (mushboxen_iter*)iter; \
+   mushboxen_iter *jt = (mushboxen_iter*)iter; \
    \
-   assert (it->node->count >= 0 && "not a leaf"); \
-   while (it->idx--) \
-      if (L_TEST(*iter, &it->node->bounds[it->idx])) \
+   assert (jt->node->count >= 0 && "not a leaf"); \
+   while (jt->idx--) \
+      if (L_TEST(*iter, &jt->node->bounds[jt->idx])) \
          return; \
    \
-   if (it->path_depth == 0) \
+   if (jt->path_depth == 0) \
       return; \
    \
    ITER_GOTO_LAST_ACCEPTABLE_LEAF(true, NL_TEST, L_TEST);
