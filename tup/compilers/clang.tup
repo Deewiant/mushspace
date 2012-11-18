@@ -9,7 +9,6 @@ AR = ar rcs
 SHAREDLIBFLAGS = -shared
 
 SRCFLAGS     = -Weverything -pedantic \
-               -Wno-cast-align \
                -Wno-conditional-uninitialized \
                -Wno-disabled-macro-expansion \
                -Wno-missing-prototypes \
