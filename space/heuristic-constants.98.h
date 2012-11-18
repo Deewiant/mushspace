@@ -10,7 +10,7 @@
 #endif
 
 // Padding of box created by default when mushspace_putting to an unallocated
-// area. The size of the resulting box will be NEWBOX_PAD+1 along each axis.
+// area. The size of the resulting box will be 2*NEWBOX_PAD+1 along each axis.
 // (Clamped to the edges of space to avoid allocating more than one box.)
 #define NEWBOX_PAD 8
 
