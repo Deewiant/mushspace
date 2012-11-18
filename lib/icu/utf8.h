@@ -48,7 +48,7 @@ utf8_nextCharPtrSafeBody(const uint8_t **s, const uint8_t *s_end, UChar32 c);
             ++(s); \
         } else if(U8_IS_LEAD(c)) { \
             /* function call for "complicated" and error cases */ \
-            (c)=utf8_nextCharPtrSafeBody((const uint8_t**)&s, s_end, c); \
+            (c)=utf8_nextCharPtrSafeBody((const uint8_t**)&s, s_end, (UChar32)c); \
         } else { \
             (c)=U_SENTINEL; \
         } \
