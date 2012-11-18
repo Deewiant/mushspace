@@ -17,7 +17,6 @@
 #define mushboxen_iter_below       MUSHSPACE_CAT(mushboxen,_iter_below)
 #define mushboxen_iter_in          MUSHSPACE_CAT(mushboxen,_iter_in)
 #define mushboxen_iter_in_bottomup MUSHSPACE_CAT(mushboxen,_iter_in_bottomup)
-#define mushboxen_iter_out         MUSHSPACE_CAT(mushboxen,_iter_out)
 
 #define mushboxen_init              MUSHSPACE_CAT(mushboxen,_init)
 #define mushboxen_count             MUSHSPACE_CAT(mushboxen,_count)
@@ -43,9 +42,6 @@
 #define mushboxen_iter_overout_init MUSHSPACE_CAT(mushboxen,_iter_overout_init)
 #define mushboxen_iter_overout_done MUSHSPACE_CAT(mushboxen,_iter_overout_done)
 #define mushboxen_iter_overout_next MUSHSPACE_CAT(mushboxen,_iter_overout_next)
-#define mushboxen_iter_out_init     MUSHSPACE_CAT(mushboxen,_iter_out_init)
-#define mushboxen_iter_out_done     MUSHSPACE_CAT(mushboxen,_iter_out_done)
-#define mushboxen_iter_out_next     MUSHSPACE_CAT(mushboxen,_iter_out_next)
 #define mushboxen_iter_box          MUSHSPACE_CAT(mushboxen,_iter_box)
 #define mushboxen_iter_null         MUSHSPACE_CAT(mushboxen,_iter_null)
 #define mushboxen_iter_is_null      MUSHSPACE_CAT(mushboxen,_iter_is_null)
@@ -62,8 +58,6 @@
    MUSHSPACE_CAT(mushboxen,_iter_in_bottomup_sched_remove)
 #define mushboxen_insert_reservation \
    MUSHSPACE_CAT(mushboxen,_insert_reservation)
-#define mushboxen_iter_out_updated_next \
-   MUSHSPACE_CAT(mushboxen,_iter_out_updated_next)
 #define mushboxen_iter_overout_updated_next \
    MUSHSPACE_CAT(mushboxen,_iter_overout_updated_next)
 
@@ -147,9 +141,6 @@ mushboxen_iter_in mushboxen_iter_in_init(
 mushboxen_iter_in_bottomup mushboxen_iter_in_bottomup_init(
    const mushboxen*, const mushbounds*, void* aux);
 
-mushboxen_iter_out mushboxen_iter_out_init(
-   const mushboxen*, const mushbounds*, void* aux);
-
 // Iterates over all boxes which overlap with "over" but are also not contained
 // in "out".
 mushboxen_iter_overout mushboxen_iter_overout_init(
@@ -166,7 +157,6 @@ MUSHBOXEN_ITERATOR_API(mushboxen_iter_above)
 MUSHBOXEN_ITERATOR_API(mushboxen_iter_below)
 MUSHBOXEN_ITERATOR_API(mushboxen_iter_in)
 MUSHBOXEN_ITERATOR_API(mushboxen_iter_in_bottomup)
-MUSHBOXEN_ITERATOR_API(mushboxen_iter_out)
 MUSHBOXEN_ITERATOR_API(mushboxen_iter_overout)
 
 mushaabb* mushboxen_iter_box(mushboxen_iter);
@@ -175,14 +165,12 @@ mushaabb* mushboxen_iter_box(mushboxen_iter);
 #define mushboxen_iter_below_box(i)       MUSHBOXEN_ITER_BOX(i)
 #define mushboxen_iter_in_box(i)          MUSHBOXEN_ITER_BOX(i)
 #define mushboxen_iter_in_bottomup_box(i) MUSHBOXEN_ITER_BOX(i)
-#define mushboxen_iter_out_box(i)         MUSHBOXEN_ITER_BOX(i)
 #define mushboxen_iter_overout_box(i)     MUSHBOXEN_ITER_BOX(i)
 
 // Uncommon iterator API
 
 // Used when the bounds referenced by the iterator were modified. Otherwise
-// work like the ordinary _next functions.
-void mushboxen_iter_out_updated_next(mushboxen_iter_out*, const mushboxen*);
+// works like the ordinary _next function.
 void mushboxen_iter_overout_updated_next(
    mushboxen_iter_overout*, const mushboxen*);
 

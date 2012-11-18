@@ -68,7 +68,7 @@ typedef struct {
    mushboxen_iter iter;
    const mushbounds *bounds;
 } mushboxen_iter_above, mushboxen_iter_below,
-  mushboxen_iter_in, mushboxen_iter_in_bottomup, mushboxen_iter_out;
+  mushboxen_iter_in, mushboxen_iter_in_bottomup;
 
 typedef struct {
    mushboxen_iter iter;

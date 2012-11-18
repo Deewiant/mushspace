@@ -1094,10 +1094,6 @@ static bool in_nonleaf_test(mushboxen_iter_in it, const mushbounds* bounds) {
    return mushbounds_overlaps(it.bounds, bounds);
 }
 
-static bool out_test(mushboxen_iter_out it, const mushbounds* bounds) {
-   return !mushbounds_contains_bounds(it.bounds, bounds);
-}
-
 static bool overout_test(mushboxen_iter_overout it, const mushbounds* bounds) {
    return  mushbounds_overlaps       (it.over, bounds)
        && !mushbounds_contains_bounds(it.out,  bounds);
@@ -1296,17 +1292,6 @@ mushboxen_iter_in_bottomup mushboxen_iter_in_bottomup_init(
       ITER_GOTO_LAST_ACCEPTABLE_LEAF(false, in_nonleaf_test, in_leaf_test);
    return i;
 }
-mushboxen_iter_out mushboxen_iter_out_init(
-   const mushboxen* boxen, const mushbounds* bounds, void* aux)
-{
-   mushboxen_iter_out i = {
-      .iter   = { (rtree*)&boxen->root, 0, 0, aux },
-      .bounds = bounds,
-   }, *iter = &i;
-   if (boxen->count)
-      ITER_GOTO_FIRST_ACCEPTABLE_LEAF(false, out_test, out_test);
-   return i;
-}
 mushboxen_iter_overout mushboxen_iter_overout_init(
    const mushboxen* boxen, const mushbounds* over, const mushbounds* out,
    void* aux)
@@ -1344,9 +1329,6 @@ bool mushboxen_iter_in_bottomup_done(
 {
    (void)boxen;
    return it.iter.idx == -1;
-}
-bool mushboxen_iter_out_done(mushboxen_iter_out it, const mushboxen* boxen) {
-   return mushboxen_iter_done(it.iter, boxen);
 }
 bool mushboxen_iter_overout_done(
    mushboxen_iter_overout it, const mushboxen* boxen)
@@ -1403,10 +1385,6 @@ void mushboxen_iter_in_bottomup_next(
 {
    ITER_PREV(in_nonleaf_test, in_leaf_test);
 }
-void mushboxen_iter_out_next(mushboxen_iter_out* iter, const mushboxen* boxen)
-{
-   ITER_NEXT(out_test, out_test);
-}
 void mushboxen_iter_overout_next(
    mushboxen_iter_overout* iter, const mushboxen* boxen)
 {
@@ -1415,11 +1393,6 @@ void mushboxen_iter_overout_next(
 
 ////////////////////////////////////////// Iterator misc
 
-void mushboxen_iter_out_updated_next(
-   mushboxen_iter_out* it, const mushboxen* boxen)
-{
-   *it = mushboxen_iter_out_init(boxen, it->bounds, it->iter.aux);
-}
 void mushboxen_iter_overout_updated_next(
    mushboxen_iter_overout* it, const mushboxen* boxen)
 {
