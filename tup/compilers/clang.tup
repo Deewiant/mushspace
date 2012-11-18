@@ -13,6 +13,7 @@ SRCFLAGS     = -Weverything -pedantic \
                -Wno-conditional-uninitialized \
                -Wno-disabled-macro-expansion \
                -Wno-missing-prototypes \
+               -Wno-packed \
                -Wno-padded \
                -Wno-sign-conversion \
                -Wno-switch-enum
