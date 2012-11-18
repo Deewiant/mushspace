@@ -33,6 +33,6 @@
 #define BOXEN_ARRAY
 //#define BOXEN_RTREE
 
-#define USE_BAKAABB (!defined(MUSHSPACE_93) && 1)
+#define USE_BAKAABB (!defined(MUSHSPACE_93) && defined(BOXEN_ARRAY))
 
 #endif
