@@ -7,25 +7,62 @@
 
 #include "mush/cell.h"
 
+typedef union mushcoords1 {
+#if defined(__GNUC__)
+   struct __attribute__((__packed__))
+#else
 #pragma pack(push)
 #pragma pack(1)
-typedef union mushcoords1 {
-   struct { mushcell x; };
+   struct
+#endif
+   { mushcell x; };
+#if !defined(__GNUC__)
+#pragma pack(pop)
+#endif
    mushcell v[1];
 } mushcoords1;
 typedef union mushcoords2 {
-   struct { mushcell x, y; };
+#if defined(__GNUC__)
+   struct __attribute__((__packed__))
+#else
+#pragma pack(push)
+#pragma pack(1)
+   struct
+#endif
+   { mushcell x, y; };
+#if !defined(__GNUC__)
+#pragma pack(pop)
+#endif
    mushcell v[2];
 } mushcoords2;
 typedef union mushcoords3 {
-   struct { mushcell x, y, z; };
+#if defined(__GNUC__)
+   struct __attribute__((__packed__))
+#else
+#pragma pack(push)
+#pragma pack(1)
+   struct
+#endif
+   { mushcell x, y, z; };
+#if !defined(__GNUC__)
+#pragma pack(pop)
+#endif
    mushcell v[3];
 } mushcoords3;
 typedef union mushcoords93 {
-   struct { mushcell93 x, y; };
+#if defined(__GNUC__)
+   struct __attribute__((__packed__))
+#else
+#pragma pack(push)
+#pragma pack(1)
+   struct
+#endif
+   { mushcell93 x, y; };
+#if !defined(__GNUC__)
+#pragma pack(pop)
+#endif
    mushcell93 v[2];
 } mushcoords93;
-#pragma pack(pop)
 
 #define MUSHCOORDS1_INIT(a)     {{.x = a}}
 #define MUSHCOORDS2_INIT(a,b)   {{.x = a, .y = b}}
