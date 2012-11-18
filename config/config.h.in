@@ -30,8 +30,8 @@
 #error CONFIG_CELL_SIZE setting is incorrect!
 #endif
 
-#define BOXEN_ARRAY
-//#define BOXEN_RTREE
+//#define BOXEN_ARRAY
+#define BOXEN_RTREE
 
 #define USE_BAKAABB (!defined(MUSHSPACE_93) && defined(BOXEN_ARRAY))
 
