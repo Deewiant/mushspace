@@ -17,6 +17,7 @@
 #define mushboxen_iter_below       MUSHSPACE_CAT(mushboxen,_iter_below)
 #define mushboxen_iter_in          MUSHSPACE_CAT(mushboxen,_iter_in)
 #define mushboxen_iter_in_bottomup MUSHSPACE_CAT(mushboxen,_iter_in_bottomup)
+#define mushboxen_iter_overout     MUSHSPACE_CAT(mushboxen,_iter_overout)
 
 #define mushboxen_init              MUSHSPACE_CAT(mushboxen,_init)
 #define mushboxen_count             MUSHSPACE_CAT(mushboxen,_count)
