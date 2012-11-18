@@ -2,7 +2,7 @@
 
 #include "util/tap.h"
 
-#if MUSHSPACE_93
+#if defined(MUSHSPACE_93) && MUSHSPACE_93
 #undef MUSHCELL_MIN
 #undef MUSHCELL_MAX
 #define mushcell mushcell93

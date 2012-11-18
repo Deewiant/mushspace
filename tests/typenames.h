@@ -6,7 +6,7 @@
 #define CATHELPER(a,b) a##b
 #define CAT(a,b) CATHELPER(a,b)
 
-#if MUSHSPACE_93
+#if defined(MUSHSPACE_93) && MUSHSPACE_93
 #define NAME(x) CAT(x,93)
 #else
 #define NAME(x) CAT(x,MUSHSPACE_DIM)

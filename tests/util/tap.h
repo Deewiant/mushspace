@@ -42,7 +42,7 @@ void tap_geqc93vs(const mushcell93*, const mushcell93*, uint8_t,
 
 #define tap_eqc93(a, b) tap_eqc93s((a), (b), #a " == " #b, #a " != " #b)
 
-#if MUSHSPACE_93
+#if defined(MUSHSPACE_93) && MUSHSPACE_93
    #define tap_eqc tap_eqc93
    #define tap_eqcs tap_eqc93s
 

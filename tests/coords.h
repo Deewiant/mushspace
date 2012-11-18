@@ -5,7 +5,7 @@
 
 #include <mush/coords.h>
 
-#if MUSHSPACE_93
+#if defined(MUSHSPACE_93) && MUSHSPACE_93
 #define MUSHCOORDS(a,b,c)      MUSHCOORDS93(a,b)
 #define MUSHCOORDS_INIT(a,b,c) MUSHCOORDS93_INIT(a,b)
 #elif MUSHSPACE_DIM == 1

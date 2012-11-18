@@ -7,6 +7,10 @@
 
 #include "util/tap.h"
 
+#ifndef MUSHSPACE_93
+#define MUSHSPACE_93 0
+#endif
+
 #define mushcoords                 NAME(mushcoords)
 #define mushbounds                 NAME(mushbounds)
 #define mushbounds_contains        CAT(mushbounds,_contains)
