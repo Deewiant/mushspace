@@ -4,6 +4,8 @@
 
 #include <assert.h>
 
+#define ABS(x) ((x) < 0 ? -(x) : (x))
+
 static void check_one_axis(mushcoords, mushcoords, const mushbounds*,
                            mushcell, mushcell, mushdim, bool*, mushucell*);
 static bool matches(mushucell, mushcell, mushcell, mushcell, mushcell);
@@ -128,7 +130,7 @@ bool mushbounds_ray_intersects(
 
       // Note that since we cast to mushucell, this gives the correct result
       // for MUSHCELL_MIN as well.
-      const mushucell d = abs(delta.v[i]);
+      const mushucell d = ABS(delta.v[i]);
 
       // The multiplications can overflow. We can check g*s quickly since we
       // have the gcd_lg:
