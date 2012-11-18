@@ -15,8 +15,6 @@
 #include "util/utf.h"
 
 #define mushcoords                  NAME(mushcoords)
-#define mushcoords_add              CAT(mushcoords,_add)
-#define mushbounds                  NAME(mushbounds)
 #define mushspace                   NAME(mushspace)
 #define mushspace_sizeof            CAT(mushspace,_sizeof)
 #define mushspace_init              CAT(mushspace,_init)
