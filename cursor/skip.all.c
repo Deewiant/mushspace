@@ -64,10 +64,10 @@
 
 #endif
 
-bool skip_spaces_here    (mushcursor*, mushcoords, mushcell*);
-bool skip_semicolons_here(mushcursor*, mushcoords, mushcell*, bool*);
+static bool skip_spaces_here    (mushcursor*, mushcoords, mushcell*);
+static bool skip_semicolons_here(mushcursor*, mushcoords, mushcell*, bool*);
 
-int skip_markers_rest(mushcursor*, mushcoords, mushcell*, mushcell);
+static int skip_markers_rest(mushcursor*, mushcoords, mushcell*, mushcell);
 
 inline MUSH_ALWAYS_INLINE
 int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta, mushcell* p)
