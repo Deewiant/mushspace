@@ -64,10 +64,11 @@
 
 #endif
 
-static bool skip_spaces_here    (mushcursor*, mushcoords, mushcell*);
-static bool skip_semicolons_here(mushcursor*, mushcoords, mushcell*, bool*);
+bool skip_spaces_here    (mushcursor*, mushcoords, mushcell*);
+bool skip_semicolons_here(mushcursor*, mushcoords, mushcell*, bool*);
 
-int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta, mushcell* p)
+inline int mushcursor_skip_markers(
+   mushcursor* cursor, mushcoords delta, mushcell* p)
 {
    INFLOOP_DECLS;
    INFLOOP_CHECK_DELTA;
@@ -175,7 +176,8 @@ jump_to_box:
    return MUSHERR_NONE;
 }
 
-static bool skip_spaces_here(mushcursor* cursor, mushcoords delta, mushcell* p)
+bool skip_spaces_here(
+   mushcursor* cursor, mushcoords delta, mushcell* p)
 {
    assert (mushcursor_in_box(cursor));
 
@@ -210,7 +212,7 @@ int mushcursor_skip_semicolons(
    return MUSHERR_NONE;
 }
 
-static bool skip_semicolons_here(
+bool skip_semicolons_here(
    mushcursor* cursor, mushcoords delta, mushcell* p, bool* in_mid)
 {
    assert (mushcursor_in_box(cursor));
