@@ -951,11 +951,13 @@ static mushboxen_iter r_insert(
          // Like in the splitting case, we have to preserve T-ordering when
          // placing the result of a split.
          i = child_idx + 1;
-         mushbounds  *arr0 = node->bounds;
-         rtree      **arr1 = node->branch_nodes;
          const R_IDX move = abs_count - i;
-         memmove(arr0 + i + 1, arr0 + i, move * sizeof *arr0);
-         memmove(arr1 + i + 1, arr1 + i, move * sizeof *arr1);
+         if (move) {
+            mushbounds  *arr0 = node->bounds;
+            rtree      **arr1 = node->branch_nodes;
+            memmove(arr0 + i + 1, arr0 + i, move * sizeof *arr0);
+            memmove(arr1 + i + 1, arr1 + i, move * sizeof *arr1);
+         }
       } else
          i = abs_count;
 
