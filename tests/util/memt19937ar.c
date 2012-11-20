@@ -1,3 +1,4 @@
+#include "random.h"
 /*
    This is a maximally equidistributed Mersenne Twister MEMT19937 by Shin Harase (2010/1/25).
 
