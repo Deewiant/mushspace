@@ -22,7 +22,7 @@ bool mushspace_jump_to_box(
    bool hit_static;
    mushboxen_iter aabb_iter2;
 
-   // Pick the closest box that we hit, starting from the topmost.
+   // Pick the closest box that we hit.
 
    if (mushbounds_ray_intersects(*pos, delta, &MUSHSTATICAABB_BOUNDS, &m, &c))
    {
