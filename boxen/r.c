@@ -862,10 +862,10 @@ static mushboxen_iter r_insert(
 
       --insertee.insert_depth;
 
-      mushbounds child_cover;
       iter = r_insert(insertee, node->branch_nodes[child_idx],
                       path_nodes + 1, path_idxs + 1,
-                      &child_cover, &ins_here.branch_ptr, &ins_here_bounds_st);
+                      &node->bounds[child_idx],
+                      &ins_here.branch_ptr, &ins_here_bounds_st);
       if (mushboxen_iter_is_null(iter))
          return iter;
 
@@ -878,8 +878,6 @@ static mushboxen_iter r_insert(
 
       // Reset to the insert depth of this call, since we still use it below.
       ++insertee.insert_depth;
-
-      node->bounds[child_idx] = child_cover;
 
       if (!ins_here.branch_ptr) {
          // No split happened below: we're done.
