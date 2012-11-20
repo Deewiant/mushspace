@@ -29,6 +29,15 @@
 // Read XS as "things" or "elements" or whatever.
 #define R_MIN_XS_PER_NODE (R_BRANCHING_FACTOR / 2)
 
+// The R-tree branching factor. Can be given either by #defining
+// R_BRANCHING_FACTOR_FROM_ROOT_SIZE, which results in as high a possible
+// branching factor so that the root's sizeof is at most that size, or directly
+// by #defining R_BRANCHING_FACTOR_DIRECT.
+//
+// Either way, if the end result is too large, you may get errors about R_IDX
+// not being able to hold the value.
+#define R_BRANCHING_FACTOR_FROM_ROOT_SIZE (1 << 11)
+
 #endif
 
 #endif

@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "config/tunables/boxen.h"
+
 typedef struct rtree rtree;
 
 union size_helper { rtree *branch_node; mushaabb leaf_aabb; };
@@ -15,10 +17,24 @@ union size_helper { rtree *branch_node; mushaabb leaf_aabb; };
 // definition.
 #define R_BRANCHING_FACTOR ((R_IDX)R_BRANCHING_FACTOR_N)
 
-// As many branches as possible so that the root fits in 2k.
+#ifdef R_BRANCHING_FACTOR_FROM_ROOT_SIZE
+#ifdef R_BRANCHING_FACTOR_DIRECT
+#error Define only one of R_BRANCHING_FACTOR_FROM_ROOT_SIZE \
+and R_BRANCHING_FACTOR_DIRECT, please!
+#endif
+
 #define R_BRANCHING_FACTOR_CANDIDATE \
-   (((1 << 11) - sizeof(R_DEPTH) - sizeof(size_t) - sizeof(R_IDX)) \
+   ((R_BRANCHING_FACTOR_FROM_ROOT_SIZE \
+     - sizeof(R_DEPTH) - sizeof(size_t) - sizeof(R_IDX)) \
     / (sizeof(mushbounds) + sizeof(union size_helper)))
+
+#elif defined(R_BRANCHING_FACTOR_DIRECT)
+#define R_BRANCHING_FACTOR_CANDIDATE R_BRANCHING_FACTOR_DIRECT
+#else
+#error One of R_BRANCHING_FACTOR_FROM_ROOT_SIZE and R_BRANCHING_FACTOR_DIRECT \
+must be defined!
+#define R_BRANCHING_FACTOR_CANDIDATE 3 // To silence further errors.
+#endif
 
 // The branching factor must be at least 3: the algorithms can't handle less.
 #define R_BRANCHING_FACTOR_N \
