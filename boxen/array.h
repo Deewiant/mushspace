@@ -6,7 +6,10 @@
 // box B, the index of A is less than the index of B.
 typedef struct mushboxen {
    mushaabb *ptr;
-   size_t count, capacity;
+   size_t count;
+#ifndef MAX_PLACED_BOXEN
+   size_t capacity;
+#endif
 } mushboxen;
 
 typedef struct mushboxen_iter {

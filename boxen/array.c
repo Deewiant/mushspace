@@ -5,8 +5,12 @@
 
 bool mushboxen_init(mushboxen* boxen) {
    boxen->count = 0;
+#ifdef MAX_PLACED_BOXEN
+   boxen->ptr = malloc(MAX_PLACED_BOXEN * sizeof *boxen->ptr);
+#else
    boxen->capacity = 16;
    boxen->ptr      = malloc(boxen->capacity * sizeof *boxen->ptr);
+#endif
    return boxen->ptr != NULL;
 }
 void mushboxen_free(mushboxen* boxen) {
@@ -54,6 +58,7 @@ mushboxen_iter mushboxen_get_iter(
 mushboxen_iter mushboxen_insert(mushboxen* boxen, mushaabb* box, void* aux) {
    (void)aux;
 
+#ifndef MAX_PLACED_BOXEN
    if (boxen->count == boxen->capacity) {
       boxen->capacity *= 2;
       mushaabb *arr = realloc(boxen->ptr, boxen->capacity * sizeof *arr);
@@ -61,6 +66,7 @@ mushboxen_iter mushboxen_insert(mushboxen* boxen, mushaabb* box, void* aux) {
          return mushboxen_iter_null;
       boxen->ptr = arr;
    }
+#endif
 
    mushaabb *ptr = boxen->ptr + boxen->count++;
    *ptr = *box;
@@ -72,6 +78,7 @@ bool mushboxen_reserve_preserve(
    (void)reserve;
    size_t preserve_idx = preserve->ptr - boxen->ptr;
 
+#ifndef MAX_PLACED_BOXEN
    if (boxen->count == boxen->capacity) {
       boxen->capacity *= 2;
       mushaabb *arr = realloc(boxen->ptr, boxen->capacity * sizeof *arr);
@@ -79,18 +86,23 @@ bool mushboxen_reserve_preserve(
          return false;
       boxen->ptr = arr;
    }
+#endif
 
    *preserve = (mushboxen_iter){ boxen->ptr + preserve_idx };
    return true;
 }
 void mushboxen_unreserve(mushboxen* boxen, mushboxen_reservation* reserve) {
    (void)reserve;
+#ifdef MAX_PLACED_BOXEN
+   (void)boxen;
+#else
    if (boxen->count == boxen->capacity / 2) {
       boxen->capacity /= 2;
       mushaabb *arr = realloc(boxen->ptr, boxen->count * sizeof *arr);
       if (arr)
          boxen->ptr = arr;
    }
+#endif
 }
 mushboxen_iter mushboxen_insert_reservation(
    mushboxen* boxen, mushboxen_reservation* reserve, mushaabb* box, void* aux)
