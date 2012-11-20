@@ -6,8 +6,6 @@
 
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
-// FIXME globally: we don't need to use clamped volume everywhere
-
 typedef union r_elem {
    rtree    *branch_ptr;
    mushaabb *leaf_aabb_ptr;
@@ -308,14 +306,14 @@ static mushboxen_iter r_split_node(
    for (R_IDX i = 0; i < R_BRANCHING_FACTOR; ++i) {
       const mushbounds *bounds_i = &old->bounds[i];
       const size_t size_i = is_leaf ? old->leaf_aabbs[i].size
-                                    : mushbounds_clamped_size(bounds_i);
+                                    : mushbounds_size(bounds_i);
 
       bool i_tabove_checked = false;
 
       for (R_IDX j = i + 1; j < R_BRANCHING_FACTOR; ++j) {
          const mushbounds *bounds_j = &old->bounds[j];
          const size_t size_j = is_leaf ? old->leaf_aabbs[j].size
-                                       : mushbounds_clamped_size(bounds_j);
+                                       : mushbounds_size(bounds_j);
 
          mushbounds bounds = *bounds_i;
          mushbounds_expand_to_cover(&bounds, bounds_j);
@@ -395,7 +393,7 @@ next_j:;
       const size_t waste = mushbounds_clamped_size(&bounds)
                          - size_i
                          - (is_leaf ? elem.leaf_aabb_ptr->size
-                                    : mushbounds_clamped_size(elem_bounds));
+                                    : mushbounds_size(elem_bounds));
       if (waste <= max_waste)
          continue;
       if (!i_tabove_checked) {
@@ -850,7 +848,7 @@ static mushboxen_iter r_insert(
             break;
          }
 
-         const size_t bounds_size = mushbounds_clamped_size(&bounds);
+         const size_t bounds_size = mushbounds_size(&bounds);
 
          mushbounds_expand_to_cover(&bounds, insertee.bounds);
          const size_t exp_size = mushbounds_clamped_size(&bounds);
