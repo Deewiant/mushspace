@@ -67,21 +67,34 @@
 bool skip_spaces_here    (mushcursor*, mushcoords, mushcell*);
 bool skip_semicolons_here(mushcursor*, mushcoords, mushcell*, bool*);
 
+int skip_markers_rest(mushcursor*, mushcoords, mushcell*, mushcell);
+
 inline MUSH_ALWAYS_INLINE
 int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta, mushcell* p)
 {
-   INFLOOP_DECLS;
    INFLOOP_CHECK_DELTA;
 
-   if (!mushcursor_in_box(cursor))
-      goto find_box;
+   mushcell c;
+   if (mushcursor_in_box(cursor)) {
+      c = mushcursor_get_unsafe(cursor);
+      if (c != ';' && c != ' ') {
+         *p = c;
+         return MUSHERR_NONE;
+      }
+   } else
+      c = ' ';
+   return skip_markers_rest(cursor, delta, p, c);
+}
 
-   mushcell c = *p = mushcursor_get_unsafe(cursor);
+int skip_markers_rest(
+   mushcursor* cursor, mushcoords delta, mushcell* p, mushcell c)
+{
+   INFLOOP_DECLS;
+   assert (c == ' ' || c == ';');
    if (c == ';')
       goto semicolon;
-   else if (c != ' ')
-      return MUSHERR_NONE;
-
+   if (!mushcursor_in_box(cursor))
+      goto find_box;
    do {
       while (!skip_spaces_here(cursor, delta, &c))
          find_box: FIND_BOX(cursor, delta, c, MUSHERR_INFINITE_LOOP_SPACES);
