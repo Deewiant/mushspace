@@ -67,12 +67,13 @@ const size_t mushboxen_iter_aux_size_init = 16 * AUX_SIZEOF;
 
 ////////////////////////////////////////// Boxen main
 
-void mushboxen_init(mushboxen* boxen) {
+bool mushboxen_init(mushboxen* boxen) {
    *boxen = (mushboxen){
       .max_depth  = 0,
       .count      = 0,
       .root.count = 0,
    };
+   return true;
 }
 
 static void r_free(rtree* node) {

@@ -3,9 +3,10 @@
 #include <assert.h>
 #include <string.h>
 
-void mushboxen_init(mushboxen* boxen) {
+bool mushboxen_init(mushboxen* boxen) {
    boxen->ptr   = NULL;
    boxen->count = 0;
+   return true;
 }
 void mushboxen_free(mushboxen* boxen) {
    for (size_t i = 0; i < boxen->count; ++i)

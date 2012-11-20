@@ -81,7 +81,7 @@
 // T-ordering between nonoverlapping boxes is meaningless: if A and B do not
 // overlap, neither is T-above the other.
 
-void           mushboxen_init    (mushboxen*);
+bool           mushboxen_init    (mushboxen*);
 void           mushboxen_free    (mushboxen*);
 bool           mushboxen_copy    (mushboxen*, const mushboxen*);
 size_t         mushboxen_count   (const mushboxen*);

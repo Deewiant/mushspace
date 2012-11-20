@@ -16,6 +16,11 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
    if (!space)
       return NULL;
 
+   if (!mushboxen_init(&space->boxen)) {
+      free(space);
+      return NULL;
+   }
+
    if (stats) {
       space->private_stats = false;
       space->stats = stats;
@@ -36,8 +41,6 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
    }
 
    space->invalidatees = NULL;
-
-   mushboxen_init(&space->boxen);
 
 #if USE_BAKAABB
    space->bak.data = NULL;
