@@ -10,6 +10,7 @@
 #include "bounds.all.h"
 #include "coords.all.h"
 #include "typenames.any.h"
+#include "config/tunables.h"
 
 #define mushboxen                  MUSHSPACE_NAME(mushboxen)
 #define mushboxen_iter             MUSHSPACE_CAT(mushboxen,_iter)

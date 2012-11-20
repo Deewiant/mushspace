@@ -6,6 +6,7 @@
 #include <stdbool.h>
 
 #include "cell.both.h"
+#include "compilers.any.h"
 #include "typenames.any.h"
 
 #define mushcoords MUSHSPACE_NAME(mushcoords)
