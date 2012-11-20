@@ -45,6 +45,14 @@
 #define MUSH_PACKED_STRUCT_END _Pragma("pack(pop)")
 #endif
 
+#if defined(__GNUC__)
+#define MUSH_ALWAYS_INLINE __attribute__((__always_inline__))
+#elif defined(_MSC_VER)
+#define MUSH_ALWAYS_INLINE __forceinline
+#else
+#define MUSH_ALWAYS_INLINE
+#endif
+
 //#define BOXEN_ARRAY
 #define BOXEN_RTREE
 
