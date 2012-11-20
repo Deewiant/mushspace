@@ -4,9 +4,10 @@
 #include <string.h>
 
 bool mushboxen_init(mushboxen* boxen) {
-   boxen->ptr   = NULL;
    boxen->count = 0;
-   return true;
+   boxen->capacity = 16;
+   boxen->ptr      = malloc(boxen->capacity * sizeof *boxen->ptr);
+   return boxen->ptr != NULL;
 }
 void mushboxen_free(mushboxen* boxen) {
    for (size_t i = 0; i < boxen->count; ++i)
@@ -53,10 +54,13 @@ mushboxen_iter mushboxen_get_iter(
 mushboxen_iter mushboxen_insert(mushboxen* boxen, mushaabb* box, void* aux) {
    (void)aux;
 
-   mushaabb *arr = realloc(boxen->ptr, (boxen->count + 1) * sizeof *arr);
-   if (!arr)
-      return mushboxen_iter_null;
-   boxen->ptr = arr;
+   if (boxen->count == boxen->capacity) {
+      boxen->capacity *= 2;
+      mushaabb *arr = realloc(boxen->ptr, boxen->capacity * sizeof *arr);
+      if (!arr)
+         return mushboxen_iter_null;
+      boxen->ptr = arr;
+   }
 
    mushaabb *ptr = boxen->ptr + boxen->count++;
    *ptr = *box;
@@ -68,19 +72,25 @@ bool mushboxen_reserve_preserve(
    (void)reserve;
    size_t preserve_idx = preserve->ptr - boxen->ptr;
 
-   mushaabb *arr = realloc(boxen->ptr, (boxen->count + 1) * sizeof *arr);
-   if (!arr)
-      return false;
-   boxen->ptr = arr;
+   if (boxen->count == boxen->capacity) {
+      boxen->capacity *= 2;
+      mushaabb *arr = realloc(boxen->ptr, boxen->capacity * sizeof *arr);
+      if (!arr)
+         return false;
+      boxen->ptr = arr;
+   }
 
    *preserve = (mushboxen_iter){ boxen->ptr + preserve_idx };
    return true;
 }
 void mushboxen_unreserve(mushboxen* boxen, mushboxen_reservation* reserve) {
    (void)reserve;
-   mushaabb *arr = realloc(boxen->ptr, boxen->count * sizeof *arr);
-   if (arr)
-      boxen->ptr = arr;
+   if (boxen->count == boxen->capacity / 2) {
+      boxen->capacity /= 2;
+      mushaabb *arr = realloc(boxen->ptr, boxen->count * sizeof *arr);
+      if (arr)
+         boxen->ptr = arr;
+   }
 }
 mushboxen_iter mushboxen_insert_reservation(
    mushboxen* boxen, mushboxen_reservation* reserve, mushaabb* box, void* aux)
