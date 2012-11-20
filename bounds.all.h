@@ -15,6 +15,7 @@ typedef struct mushbounds {
 
 MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 
+#define mushbounds_size            MUSHSPACE_CAT(mushbounds,_size)
 #define mushbounds_clamped_size    MUSHSPACE_CAT(mushbounds,_clamped_size)
 #define mushbounds_contains        MUSHSPACE_CAT(mushbounds,_contains)
 #define mushbounds_safe_contains   MUSHSPACE_CAT(mushbounds,_safe_contains)
@@ -28,6 +29,7 @@ MUSH_DECL_CONST_DYN_ARRAY(mushbounds)
 #define mushbounds_can_fuse        MUSHSPACE_CAT(mushbounds,_can_fuse)
 #define mushbounds_tessellate      MUSHSPACE_CAT(mushbounds,_tessellate)
 
+size_t mushbounds_size        (const mushbounds*);
 size_t mushbounds_clamped_size(const mushbounds*);
 
 // The safe versions work even if the bounds have beg > end.
