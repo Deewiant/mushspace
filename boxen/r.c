@@ -502,8 +502,7 @@ next_i:;
       #define NEXT_UNASS(i) \
          while (i < R_BRANCHING_FACTOR \
              && ((is_leaf ? !old->leaf_aabbs[i].data : !old->branch_nodes[i]) \
-              || (max_waste_i != R_BRANCHING_FACTOR \
-               && IS_TABOVE(i, max_waste_i)))) \
+              || IS_TABOVE(i, max_waste_i))) \
             ++i;
 
       NEXT_UNASS(first_unass);
