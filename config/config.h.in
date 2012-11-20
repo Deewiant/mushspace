@@ -1,5 +1,7 @@
 // File created: 2011-08-14 01:23:54
 
+// Don't modify this file! Modify your tup.config instead.
+
 #ifndef MUSH_CONFIG_H
 #define MUSH_CONFIG_H
 
