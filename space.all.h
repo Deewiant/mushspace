@@ -13,7 +13,7 @@
 #include "staticaabb.all.h"
 #include "stats.any.h"
 #include "typenames.any.h"
-#include "config/tunables.h"
+#include "config/tunables/overall.h"
 
 #if !MUSHSPACE_93
 #include "aabb.98.h"

@@ -5,6 +5,7 @@
 #include <alloca.h>
 #include <assert.h>
 
+#include "config/tunables/placement.h"
 #include "space/place-box.98.h"
 
 static void get_box_for(mushspace*, mushcoords, mushaabb*);

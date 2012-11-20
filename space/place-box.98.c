@@ -8,6 +8,7 @@
 #include "aabb/consume.98.h"
 #include "aabb/subsume.98.h"
 #include "aabb/space-area.98.h"
+#include "config/tunables/placement.h"
 
 typedef struct consumee {
    mushboxen_iter iter;

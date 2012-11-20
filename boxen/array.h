@@ -1,5 +1,8 @@
 // File created: 2012-11-06 13:53:02
 
+// For MAX_PLACED_BOXEN.
+#include "config/tunables/placement.h"
+
 // An array.
 //
 // T-ordering is implemented trivially: for any box A that is T-above another
