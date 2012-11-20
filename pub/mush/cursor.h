@@ -73,24 +73,24 @@ void mushcursor93_retreat(mushcursor93*, mushcoords93);
 
 void mushcursor93_wrap(mushcursor93*);
 
-int mushcursor1_skip_markers(mushcursor1*, mushcoords1);
-int mushcursor2_skip_markers(mushcursor2*, mushcoords2);
-int mushcursor3_skip_markers(mushcursor3*, mushcoords3);
-int mushcursor93_skip_markers_98(mushcursor93*, mushcoords93);
+int mushcursor1_skip_markers(mushcursor1*, mushcoords1, mushcell*);
+int mushcursor2_skip_markers(mushcursor2*, mushcoords2, mushcell*);
+int mushcursor3_skip_markers(mushcursor3*, mushcoords3, mushcell*);
+int mushcursor93_skip_markers_98(mushcursor93*, mushcoords93, mushcell*);
 
-int mushcursor1_skip_semicolons(mushcursor1*, mushcoords1);
-int mushcursor2_skip_semicolons(mushcursor2*, mushcoords2);
-int mushcursor3_skip_semicolons(mushcursor3*, mushcoords3);
-int mushcursor93_skip_semicolons(mushcursor93*, mushcoords93);
+int mushcursor1_skip_semicolons(mushcursor1*, mushcoords1, mushcell*);
+int mushcursor2_skip_semicolons(mushcursor2*, mushcoords2, mushcell*);
+int mushcursor3_skip_semicolons(mushcursor3*, mushcoords3, mushcell*);
+int mushcursor93_skip_semicolons(mushcursor93*, mushcoords93, mushcell*);
 
-int mushcursor1_skip_spaces(mushcursor1*, mushcoords1);
-int mushcursor2_skip_spaces(mushcursor2*, mushcoords2);
-int mushcursor3_skip_spaces(mushcursor3*, mushcoords3);
-int mushcursor93_skip_spaces(mushcursor93*, mushcoords93);
+int mushcursor1_skip_spaces(mushcursor1*, mushcoords1, mushcell*);
+int mushcursor2_skip_spaces(mushcursor2*, mushcoords2, mushcell*);
+int mushcursor3_skip_spaces(mushcursor3*, mushcoords3, mushcell*);
+int mushcursor93_skip_spaces(mushcursor93*, mushcoords93, mushcell*);
 
-int mushcursor1_skip_to_last_space(mushcursor1*, mushcoords1);
-int mushcursor2_skip_to_last_space(mushcursor2*, mushcoords2);
-int mushcursor3_skip_to_last_space(mushcursor3*, mushcoords3);
-int mushcursor93_skip_to_last_space(mushcursor93*, mushcoords93);
+int mushcursor1_skip_to_last_space(mushcursor1*, mushcoords1, mushcell*);
+int mushcursor2_skip_to_last_space(mushcursor2*, mushcoords2, mushcell*);
+int mushcursor3_skip_to_last_space(mushcursor3*, mushcoords3, mushcell*);
+int mushcursor93_skip_to_last_space(mushcursor93*, mushcoords93, mushcell*);
 
 #endif

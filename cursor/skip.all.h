@@ -16,9 +16,9 @@
 #define mushcursor_skip_markers MUSHSPACE_CAT(mushcursor,_skip_markers)
 #endif
 
-int mushcursor_skip_markers      (mushcursor*, mushcoords);
-int mushcursor_skip_semicolons   (mushcursor*, mushcoords);
-int mushcursor_skip_spaces       (mushcursor*, mushcoords);
-int mushcursor_skip_to_last_space(mushcursor*, mushcoords);
+int mushcursor_skip_markers      (mushcursor*, mushcoords, mushcell*);
+int mushcursor_skip_semicolons   (mushcursor*, mushcoords, mushcell*);
+int mushcursor_skip_spaces       (mushcursor*, mushcoords, mushcell*);
+int mushcursor_skip_to_last_space(mushcursor*, mushcoords, mushcell*);
 
 #endif
