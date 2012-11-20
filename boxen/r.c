@@ -411,21 +411,67 @@ next_i:;
    bool assigned_elem = false,
         elem_in_old;
 
+   // We'll be doing a lot of assignments to both nodes: reduce repetition with
+   // these macros.
+   //
+   // We won't use them in every case, though, since we can sometimes get by
+   // with doing less.
+
+   #define ASSIGN_TO_NEW(I) do { \
+      new->bounds[I] = old->bounds[I]; \
+      mushbounds_expand_to_cover(&new_cover, &new->bounds[I]); \
+      if (is_leaf) { \
+         new->leaf_aabbs[I] = old->leaf_aabbs[I]; \
+         old->leaf_aabbs[I].data = NULL; \
+      } else { \
+         new->branch_nodes[I] = old->branch_nodes[I]; \
+         old->branch_nodes[I] = NULL; \
+      } \
+      ++new->count; \
+   } while (0)
+
+   #define ASSIGN_TO_OLD(I) do { \
+      /* We subvert T-aboveness: if something is marked as T-above max_waste_i,
+       * it's something that has been assigned to the old node.
+       */ \
+      SET_TABOVE(I, max_waste_i); \
+      mushbounds_expand_to_cover(&old_cover, &old->bounds[I]); \
+      if (is_leaf) \
+         new->leaf_aabbs[I].data = NULL; \
+      else \
+         new->branch_nodes[I] = NULL; \
+      \
+      ++old->count; \
+   } while (0)
+
+   // Note that elem is not written anywhere in either of these macros: since
+   // it must come last, we only actually write it at the very end.
+   #define ASSIGN_ELEM_TO_NEW do { \
+      assigned_elem = true; \
+      elem_in_old   = false; \
+      mushbounds_expand_to_cover(&new_cover, elem_bounds); \
+      ++new->count; \
+   } while (0)
+
+   #define ASSIGN_ELEM_TO_OLD do { \
+      assigned_elem = true; \
+      elem_in_old   = true; \
+      mushbounds_expand_to_cover(&old_cover, elem_bounds); \
+      ++old->count; \
+   } while (0)
+
    // Assign max_waste_j to the new node.
    new->count = 1;
    mushbounds new_cover;
    if (max_waste_j == R_BRANCHING_FACTOR) {
-      // elem must come last, so don't actually write it yet.
       new_cover = *elem_bounds;
       assigned_elem = true;
       elem_in_old   = false;
    } else {
-      new->bounds[max_waste_j] = new_cover = old->bounds[max_waste_j];
+      new_cover = new->bounds[max_waste_j] = old->bounds[max_waste_j];
 
       if (is_leaf) {
          new->leaf_aabbs[max_waste_j] = old->leaf_aabbs[max_waste_j];
-
-         // Mark it as placed.
          old->leaf_aabbs[max_waste_j].data = NULL;
       } else {
          new->branch_nodes[max_waste_j] = old->branch_nodes[max_waste_j];
@@ -434,35 +480,14 @@ next_i:;
 
       // Assign all boxes transitively T-below max_waste_j to the new node as
       // well.
-      for (R_IDX i = max_waste_j + 1; i < R_BRANCHING_FACTOR; ++i) {
-         if (!IS_TABOVE(max_waste_j, i))
-            continue;
-
-         new->bounds[i] = old->bounds[i];
-
-         if (is_leaf) {
-            new->leaf_aabbs[i] = old->leaf_aabbs[i];
-            old->leaf_aabbs[i].data = NULL;
-         } else {
-            new->branch_nodes[i] = old->branch_nodes[i];
-            old->branch_nodes[i] = NULL;
-         }
-
-         mushbounds_expand_to_cover(&new_cover, &new->bounds[i]);
-         ++new->count;
-      }
-      if (IS_TABOVE(max_waste_j, R_BRANCHING_FACTOR)) {
-         assigned_elem = true;
-         elem_in_old = false;
-         mushbounds_expand_to_cover(&new_cover, elem_bounds);
-         ++new->count;
-      }
+      for (R_IDX i = max_waste_j + 1; i < R_BRANCHING_FACTOR; ++i)
+         if (IS_TABOVE(max_waste_j, i))
+            ASSIGN_TO_NEW(i);
+      if (IS_TABOVE(max_waste_j, R_BRANCHING_FACTOR))
+         ASSIGN_ELEM_TO_NEW;
    }
 
    // Assign max_waste_i to the old node.
-   //
-   // At this point we start subverting T-aboveness, using it also to mark
-   // boxes assigned to the old node.
    old->count = 1;
    mushbounds old_cover;
    if (max_waste_i == R_BRANCHING_FACTOR) {
@@ -478,18 +503,9 @@ next_i:;
    }
 
    // Assign all boxes transitively T-above max_waste_i as well.
-   for (R_IDX i = 0; i < max_waste_i; ++i) {
-      if (!IS_TABOVE(i, max_waste_i))
-         continue;
-      SET_TABOVE(i, max_waste_i);
-      mushbounds_expand_to_cover(&old_cover, &old->bounds[i]);
-      ++old->count;
-
-      if (is_leaf)
-         new->leaf_aabbs[i].data = NULL;
-      else
-         new->branch_nodes[i] = NULL;
-   }
+   for (R_IDX i = 0; i < max_waste_i; ++i)
+      if (IS_TABOVE(i, max_waste_i))
+         ASSIGN_TO_OLD(i);
 
    size_t old_cover_size = mushbounds_clamped_size(&old_cover),
           new_cover_size = mushbounds_clamped_size(&new_cover);
@@ -512,19 +528,10 @@ next_i:;
 
       if (old->count + remaining == R_MIN_XS_PER_NODE) {
          // Assign the rest to old.
-         if (!assigned_elem) {
-            assigned_elem = true;
-            elem_in_old   = true;
-            mushbounds_expand_to_cover(&old_cover, elem_bounds);
-            ++old->count;
-         }
+         if (!assigned_elem)
+            ASSIGN_ELEM_TO_OLD;
          for (R_IDX i = first_unass; i < R_BRANCHING_FACTOR;) {
-            mushbounds_expand_to_cover(&old_cover, &old->bounds[i]);
-            ++old->count;
-            if (is_leaf)
-               new->leaf_aabbs[i].data = NULL;
-            else
-               new->branch_nodes[i] = NULL;
+            ASSIGN_TO_OLD(i);
             ++i;
             NEXT_UNASS(i);
          }
@@ -533,23 +540,10 @@ next_i:;
 
       if (new->count + remaining == R_MIN_XS_PER_NODE) {
          // Assign the rest to new.
-         if (!assigned_elem) {
-            assigned_elem = true;
-            elem_in_old   = false;
-            mushbounds_expand_to_cover(&new_cover, elem_bounds);
-            ++new->count;
-         }
+         if (!assigned_elem)
+            ASSIGN_ELEM_TO_NEW;
          for (R_IDX i = first_unass; i < R_BRANCHING_FACTOR;) {
-            new->bounds[i] = old->bounds[i];
-            if (is_leaf) {
-               new->leaf_aabbs[i] = old->leaf_aabbs[i];
-               old->leaf_aabbs[i].data = NULL;
-            } else {
-               new->branch_nodes[i] = old->branch_nodes[i];
-               old->branch_nodes[i] = NULL;
-            }
-            mushbounds_expand_to_cover(&new_cover, &new->bounds[i]);
-            ++new->count;
+            ASSIGN_TO_NEW(i);
             ++i;
             NEXT_UNASS(i);
          }
@@ -566,15 +560,13 @@ next_i:;
       // other one's count below R_MIN_XS_PER_NODE, we have no choice but to
       // put that box in the other node.
 
-      size_t            picked_ddiff = 0;
-      R_IDX             picked_idx;
-      r_elem            picked_elem;
-      const mushbounds *picked_bounds;
-      bool              picked_old;
-      mushbounds        picked_cover;
-      size_t            picked_cover_size;
+      size_t     picked_ddiff = 0;
+      R_IDX      picked_idx;
+      bool       picked_old;
+      mushbounds picked_cover;
+      size_t     picked_cover_size;
 
-      #define TRY_PICK_NEXT(BOUNDS, IDX, ELEM) do { \
+      #define TRY_PICK_NEXT(BOUNDS, IDX) do { \
          mushbounds old_cover2 = old_cover, \
                     new_cover2 = new_cover; \
          mushbounds_expand_to_cover(&old_cover2, BOUNDS); \
@@ -588,8 +580,6 @@ next_i:;
          if (ddiff > picked_ddiff || !picked_ddiff) { \
             picked_ddiff      = ddiff; \
             picked_idx        = IDX; \
-            picked_elem       = ELEM; \
-            picked_bounds     = BOUNDS; \
             picked_old        = old_diff <= new_diff; \
             picked_cover      = picked_old ? old_cover2 : new_cover2; \
             picked_cover_size = \
@@ -598,9 +588,6 @@ next_i:;
       } while (0)
 
       for (R_IDX i = first_unass; i < R_BRANCHING_FACTOR;) {
-         const r_elem elem_i =
-            is_leaf ? (r_elem){ .leaf_aabb_ptr = &old->leaf_aabbs  [i] }
-                    : (r_elem){ .branch_ptr    =  old->branch_nodes[i] };
 
          R_IDX tabove_forced = 0,
                tbelow_forced = 0;
@@ -619,11 +606,9 @@ next_i:;
          // would force new->count too low, this must be placed in new.
          if (new->count + remaining - tabove_forced - 1 < R_MIN_XS_PER_NODE) {
             picked_idx        = i;
-            picked_elem       = elem_i;
-            picked_bounds     = &old->bounds[i];
             picked_cover      = new_cover;
             picked_cover_size = 0;
-            mushbounds_expand_to_cover(&picked_cover, picked_bounds);
+            mushbounds_expand_to_cover(&picked_cover, &old->bounds[i]);
             goto forced_new;
          }
 
@@ -640,7 +625,7 @@ next_i:;
             goto forced_old;
          }
 
-         TRY_PICK_NEXT(&old->bounds[i], i, elem_i);
+         TRY_PICK_NEXT(&old->bounds[i], i);
          ++i;
          NEXT_UNASS(i);
       }
@@ -656,46 +641,29 @@ next_i:;
 
          if (new->count + remaining - tabove_forced - 1 < R_MIN_XS_PER_NODE) {
             picked_idx        = R_BRANCHING_FACTOR;
-            picked_elem       = elem;
-            picked_bounds     = elem_bounds;
             picked_cover      = new_cover;
             picked_cover_size = 0;
-            mushbounds_expand_to_cover(&picked_cover, picked_bounds);
+            mushbounds_expand_to_cover(&picked_cover, elem_bounds);
             goto forced_elem_new;
          }
 
-         TRY_PICK_NEXT(elem_bounds, R_BRANCHING_FACTOR, elem);
+         TRY_PICK_NEXT(elem_bounds, R_BRANCHING_FACTOR);
       }
 
       if (picked_old) {
-         if (picked_idx == R_BRANCHING_FACTOR) {
-            assigned_elem = true;
-            elem_in_old   = true;
-         } else {
+         if (picked_idx == R_BRANCHING_FACTOR)
+            ASSIGN_ELEM_TO_OLD;
+         else {
 forced_old:
-            SET_TABOVE(picked_idx, max_waste_i);
-
-            if (is_leaf)
-               new->leaf_aabbs[picked_idx].data = NULL;
-            else
-               new->branch_nodes[picked_idx] = NULL;
+            ASSIGN_TO_OLD(picked_idx);
          }
-         ++old->count;
          old_cover = picked_cover;
 
          // Putting this one in old also means that all boxes transitively
          // T-above it must stay in old.
          for (R_IDX i = first_unass; i < picked_idx;) {
             if (IS_TABOVE(i, picked_idx)) {
-               SET_TABOVE(i, max_waste_i);
-
-               if (is_leaf)
-                  new->leaf_aabbs[i].data = NULL;
-               else
-                  new->branch_nodes[i] = NULL;
-
-               mushbounds_expand_to_cover(&old_cover, &old->bounds[i]);
-               ++old->count;
+               ASSIGN_TO_OLD(i);
 
                // Unset this so that we know we have to recompute it below.
                picked_cover_size = 0;
@@ -709,20 +677,11 @@ forced_old:
       } else {
          if (picked_idx == R_BRANCHING_FACTOR) {
 forced_elem_new:
-            assigned_elem = true;
-            elem_in_old   = false;
+            ASSIGN_ELEM_TO_NEW;
          } else {
 forced_new:
-            new->bounds[picked_idx] = *picked_bounds;
-            if (is_leaf) {
-               new->leaf_aabbs[picked_idx] = *picked_elem.leaf_aabb_ptr;
-               old->leaf_aabbs[picked_idx].data = NULL;
-            } else {
-               new->branch_nodes[picked_idx] = picked_elem.branch_ptr;
-               old->branch_nodes[picked_idx] = NULL;
-            }
+            ASSIGN_TO_NEW(picked_idx);
          }
-         ++new->count;
          new_cover = picked_cover;
 
          // Putting this one in new also means that all boxes transitively
@@ -731,26 +690,14 @@ forced_new:
          NEXT_UNASS(i);
          while (i < R_BRANCHING_FACTOR) {
             if (IS_TABOVE(picked_idx, i)) {
-               new->bounds[i] = old->bounds[i];
-               if (is_leaf) {
-                  new->leaf_aabbs[i] = old->leaf_aabbs[i];
-                  old->leaf_aabbs[i].data = NULL;
-               } else {
-                  new->branch_nodes[i] = old->branch_nodes[i];
-                  old->branch_nodes[i] = NULL;
-               }
-               mushbounds_expand_to_cover(&new_cover, &old->bounds[i]);
-               ++new->count;
+               ASSIGN_TO_NEW(i);
                picked_cover_size = 0;
             }
             ++i;
             NEXT_UNASS(i);
          }
          if (!assigned_elem && IS_TABOVE(picked_idx, R_BRANCHING_FACTOR)) {
-            assigned_elem = true;
-            elem_in_old   = false;
-            mushbounds_expand_to_cover(&new_cover, elem_bounds);
-            ++new->count;
+            ASSIGN_ELEM_TO_NEW;
             picked_cover_size = 0;
          }
          new_cover_size =
@@ -807,6 +754,10 @@ forced_new:
    return iter;
    #undef IS_TABOVE
    #undef SET_TABOVE
+   #undef ASSIGN_TO_NEW
+   #undef ASSIGN_TO_OLD
+   #undef ASSIGN_ELEM_TO_NEW
+   #undef ASSIGN_ELEM_TO_OLD
 #else
 #error Only the quadratic split algorithm is implemented!
 #endif
