@@ -67,8 +67,8 @@
 bool skip_spaces_here    (mushcursor*, mushcoords, mushcell*);
 bool skip_semicolons_here(mushcursor*, mushcoords, mushcell*, bool*);
 
-inline int mushcursor_skip_markers(
-   mushcursor* cursor, mushcoords delta, mushcell* p)
+inline MUSH_ALWAYS_INLINE
+int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta, mushcell* p)
 {
    INFLOOP_DECLS;
    INFLOOP_CHECK_DELTA;
