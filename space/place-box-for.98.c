@@ -5,7 +5,6 @@
 #include <alloca.h>
 #include <assert.h>
 
-#include "space/heuristic-constants.98.h"
 #include "space/place-box.98.h"
 
 static void get_box_for(mushspace*, mushcoords, mushaabb*);
