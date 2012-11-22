@@ -9,6 +9,10 @@ typedef struct rtree rtree;
 
 union size_helper { rtree *branch_node; mushaabb leaf_aabb; };
 
+#ifdef R_T_ORDER_AT_SEARCH_TIME
+typedef struct r_time_range { uint64_t min, max; } r_time_range;
+#endif
+
 #define R_DEPTH uint8_t
 #define R_IDX   int_fast8_t
 
@@ -23,10 +27,23 @@ union size_helper { rtree *branch_node; mushaabb leaf_aabb; };
 and R_BRANCHING_FACTOR_DIRECT, please!
 #endif
 
+#ifdef R_T_ORDER_AT_SEARCH_TIME
+#define R_ARRAYS_ELEMENT_SIZEOF \
+   (sizeof(mushbounds) + sizeof(union size_helper) + sizeof(r_time_range))
+
+#define R_ROOT_NONARRAY_SIZEOF \
+   (sizeof(R_DEPTH) + sizeof(size_t) + sizeof(uint64_t) + sizeof(R_IDX))
+#else
+#define R_ARRAYS_ELEMENT_SIZEOF \
+   (sizeof(mushbounds) + sizeof(union size_helper))
+
+#define R_ROOT_NONARRAY_SIZEOF \
+   (sizeof(R_DEPTH) + sizeof(size_t) + sizeof(R_IDX))
+#endif
+
 #define R_BRANCHING_FACTOR_CANDIDATE \
-   ((R_BRANCHING_FACTOR_FROM_ROOT_SIZE \
-     - sizeof(R_DEPTH) - sizeof(size_t) - sizeof(R_IDX)) \
-    / (sizeof(mushbounds) + sizeof(union size_helper)))
+   ((R_BRANCHING_FACTOR_FROM_ROOT_SIZE - R_ROOT_NONARRAY_SIZEOF) \
+    / R_ARRAYS_ELEMENT_SIZEOF)
 
 #elif defined(R_BRANCHING_FACTOR_DIRECT)
 #define R_BRANCHING_FACTOR_CANDIDATE R_BRANCHING_FACTOR_DIRECT
@@ -45,11 +62,19 @@ _Static_assert(R_BRANCHING_FACTOR_N <= INT_FAST8_MAX,
 
 // An R-tree.
 //
+#ifdef R_T_ORDER_AT_SEARCH_TIME
+// T-ordering is implemented by storing, for each box, a value corresponding to
+// that box's global "insertion time", starting from zero for the first
+// insertion. Queries can then act on these values as appropriate. Nonleaf
+// nodes store the range of times included in each child node, to speed up
+// querying.
+#else
 // T-ordering is implemented by keeping the invariant that for any box A that
 // is T-above another box B, A is either in a lesser index in the same node as
 // B, or, for an ancestor P of B, in a subtree rooted at P or rooted at a
 // lesser index in the same node as P. Colloquially: A has to be "to the left"
 // of B in the tree.
+#endif
 struct rtree {
    // The sign bit determines whether this is a leaf: nonleafs have negative
    // counts.
@@ -60,14 +85,24 @@ struct rtree {
       rtree   *branch_nodes[R_BRANCHING_FACTOR_N];
       mushaabb leaf_aabbs  [R_BRANCHING_FACTOR_N];
    };
+#ifdef R_T_ORDER_AT_SEARCH_TIME
+   union {
+      r_time_range branch_times[R_BRANCHING_FACTOR_N];
+      uint64_t     leaf_times  [R_BRANCHING_FACTOR_N];
+   };
+#endif
 };
 
 typedef struct mushboxen {
    // This is also the depth of all leaf nodes. The depth of the root is zero.
    R_DEPTH max_depth;
-
    size_t count;
-   rtree  root;
+
+#ifdef R_T_ORDER_AT_SEARCH_TIME
+   uint64_t time;
+#endif
+
+   rtree root;
 } mushboxen;
 
 typedef struct mushboxen_iter {
@@ -83,8 +118,28 @@ typedef struct mushboxen_iter {
 typedef struct {
    mushboxen_iter iter;
    const mushbounds *bounds;
-} mushboxen_iter_above, mushboxen_iter_below,
-  mushboxen_iter_in, mushboxen_iter_in_bottomup;
+} mushboxen_iter_in;
+
+#ifdef R_T_ORDER_AT_SEARCH_TIME
+typedef struct {
+   mushboxen_iter iter;
+   const mushbounds *bounds;
+
+   const rtree *interesting_root;
+   R_DEPTH      interesting_depth;
+   r_time_range time_range;
+} mushboxen_iter_in_bottomup;
+#else
+typedef mushboxen_iter_in mushboxen_iter_in_bottomup;
+#endif
+
+typedef struct {
+   mushboxen_iter iter;
+   const mushbounds *bounds;
+#ifdef R_T_ORDER_AT_SEARCH_TIME
+   uint64_t sentinel_time;
+#endif
+} mushboxen_iter_above, mushboxen_iter_below;
 
 typedef struct {
    mushboxen_iter iter;

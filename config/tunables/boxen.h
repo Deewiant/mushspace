@@ -19,8 +19,20 @@
 //
 // TODO: figure out the best one for our use-case.
 //
-// Currently only 1, R_SPLIT_QUADRATIC, is implemented.
+// Currently only 1 and 3, R_SPLIT_QUADRATIC without or with
+// R_T_ORDER_AT_SEARCH_TIME respectively, are implemented.
 #define R_SPLIT_QUADRATIC
+
+// Instead of worrying about T-ordering when inserting and splitting, use the
+// vanilla R-tree algorithms, but store a monotonically increasing T-order
+// value in each leaf node (and a range of T-orders in each nonleaf). Then,
+// when searching, order the results based on that.
+//
+// This essentially moves the cost of T-ordering from modifications to queries.
+// But it's not that clear-cut, because giving more freedom to the modification
+// functions may result in a better ordered and balanced tree which can make
+// queries cheaper again.
+//#define R_T_ORDER_AT_SEARCH_TIME
 
 // Must be at most R_BRANCHING_FACTOR / 2, or splitting won't work.
 //
