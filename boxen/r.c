@@ -1380,24 +1380,25 @@ void mushboxen_iter_in_bottomup_sched_remove(
 
    mushboxen_remsched_apply(boxen, rs);
 
-   if (rs->node) {
-      if (it->iter.node == rs->node) {
-         if (rs->end < i)
-            it->iter.idx -= rs->end - rs->beg + 1;
-         if (rs->also < i && rs->also != rs->beg && rs->also != rs->end)
-            --it->iter.idx;
-
-         // Nullify the node, because we have nothing to remove now.
-         rs->node = NULL;
-      } else {
-         rs->node                     = it->iter.node;
-         rs->path_depth               = it->iter.path_depth;
-         rs->beg = rs->end = rs->also = it->iter.idx;
-         memcpy(rs->aux, it->iter.aux, rs->path_depth * AUX_SIZEOF);
-      }
-   } else {
+   if (!rs->node) {
       // The tree might be completely different: we have to "start over".
       *it = mushboxen_iter_in_bottomup_init(boxen, it->bounds, it->iter.aux);
+      return;
+   }
+
+   if (it->iter.node == rs->node) {
+      if (rs->end < i)
+         it->iter.idx -= rs->end - rs->beg + 1;
+      if (rs->also < i && rs->also != rs->beg && rs->also != rs->end)
+         --it->iter.idx;
+
+      // Nullify the node, because we have nothing to remove now.
+      rs->node = NULL;
+   } else {
+      rs->node                     = it->iter.node;
+      rs->path_depth               = it->iter.path_depth;
+      rs->beg = rs->end = rs->also = it->iter.idx;
+      memcpy(rs->aux, it->iter.aux, rs->path_depth * AUX_SIZEOF);
    }
 end:
    mushboxen_iter_in_bottomup_next(it, boxen);
