@@ -2045,7 +2045,7 @@ void mushboxen_remsched_apply(mushboxen* boxen, mushboxen_remsched* rs) {
 #endif
    }
 
-   if (rs->also != b && rs->also != e) {
+   if (rs->also < b || rs->also > e) {
       const R_IDX i = rs->also - (rs->also > e ? e - b + 1 : 0);
 
       free(rs->node->leaf_aabbs[i].data);
