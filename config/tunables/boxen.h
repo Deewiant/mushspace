@@ -48,7 +48,7 @@
 //
 // Either way, if the end result is too large, you may get errors about R_IDX
 // not being able to hold the value.
-#define R_BRANCHING_FACTOR_FROM_ROOT_SIZE (1 << 11)
+#define R_BRANCHING_FACTOR_FROM_ROOT_SIZE (1 << 10)
 
 #endif
 
