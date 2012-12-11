@@ -369,7 +369,7 @@ static mushboxen_iter r_split_node(
       (tabove[I][J / TABOVE_BITS] |= TABOVE_ONE << J % TABOVE_BITS)
 
    // Zero init.
-   for (R_IDX i = 0; i < R_BRANCHING_FACTOR + 1; ++i)
+   for (R_IDX i = 0; i < R_BRANCHING_FACTOR; ++i)
       for (R_IDX j = 0; j < TABOVE_BITS_LEN; ++j)
          tabove[i][j] = 0;
 
