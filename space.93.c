@@ -32,10 +32,9 @@ mushcell mushspace_get(const mushspace* space, mushcoords c) {
                                      : ' ';
 }
 
-int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
+void mushspace_put(mushspace* space, mushcoords p, mushcell c) {
    if (mushstaticaabb_contains(p))
       mushstaticaabb_put(&space->box, p, c);
-   return MUSHERR_NONE;
 }
 
 void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {

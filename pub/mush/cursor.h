@@ -55,7 +55,7 @@ mushcell mushcursor3_get_unsafe(mushcursor3*);
 int mushcursor1_put(mushcursor1*, mushcell);
 int mushcursor2_put(mushcursor2*, mushcell);
 int mushcursor3_put(mushcursor3*, mushcell);
-int mushcursor93_put(mushcursor93*, mushcell93);
+void mushcursor93_put(mushcursor93*, mushcell93);
 
 int mushcursor1_put_unsafe(mushcursor1*, mushcell);
 int mushcursor2_put_unsafe(mushcursor2*, mushcell);

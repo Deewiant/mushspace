@@ -11,7 +11,7 @@ static bool newline(bool* got_cr, mushcoords* pos) {
 }
 
 #define define_load_string(SUF, C, NEXT) \
-   int MUSHSPACE_CAT(mushspace_load_string, SUF)( \
+   void MUSHSPACE_CAT(mushspace_load_string, SUF)( \
       mushspace* space, const C* str, size_t len) \
    { \
       bool got_cr = false; \
@@ -24,10 +24,10 @@ static bool newline(bool* got_cr, mushcoords* pos) {
 \
          switch (c) { \
          case '\r': got_cr = true; break; \
-         case '\n': if (newline(&got_cr, &pos)) goto end; else break; \
+         case '\n': if (newline(&got_cr, &pos)) return; else break; \
          default: \
             if (got_cr && newline(&got_cr, &pos)) \
-               goto end; \
+               return; \
 \
             if (c != ' ') \
                mushstaticaabb_put(&space->box, pos, c); \
@@ -41,7 +41,7 @@ static bool newline(bool* got_cr, mushcoords* pos) {
                switch (c) { \
                case '\r': got_cr = true; break; \
                default:   if (!got_cr) break; \
-               case '\n': if (newline(&got_cr, &pos)) goto end; \
+               case '\n': if (newline(&got_cr, &pos)) return; \
                           else                        goto skipped; \
                } \
             } \
@@ -49,8 +49,6 @@ static bool newline(bool* got_cr, mushcoords* pos) {
             break; \
          } \
       } \
-   end: \
-      return MUSHERR_NONE; \
    }
 
 #define PLAIN_NEXT(s, s_end, c) do { (void)s_end; (c = (*(s)++)); } while (0)

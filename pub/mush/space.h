@@ -46,7 +46,7 @@ int mushspace2_load_string
    (mushspace2*, const unsigned char*, size_t, mushcoords2*, mushcoords2,bool);
 int mushspace3_load_string
    (mushspace3*, const unsigned char*, size_t, mushcoords3*, mushcoords3,bool);
-int mushspace93_load_string(mushspace93*, const unsigned char*, size_t);
+void mushspace93_load_string(mushspace93*, const unsigned char*, size_t);
 
 int mushspace1_load_string_utf8
    (mushspace1*, const uint8_t*, size_t, mushcoords1*, mushcoords1, bool);
@@ -54,7 +54,7 @@ int mushspace2_load_string_utf8
    (mushspace2*, const uint8_t*, size_t, mushcoords2*, mushcoords2, bool);
 int mushspace3_load_string_utf8
    (mushspace3*, const uint8_t*, size_t, mushcoords3*, mushcoords3, bool);
-int mushspace93_load_string_utf8(mushspace93*, const uint8_t*, size_t);
+void mushspace93_load_string_utf8(mushspace93*, const uint8_t*, size_t);
 
 int mushspace1_load_string_utf16
    (mushspace1*, const uint16_t*, size_t, mushcoords1*, mushcoords1, bool);
@@ -62,7 +62,7 @@ int mushspace2_load_string_utf16
    (mushspace2*, const uint16_t*, size_t, mushcoords2*, mushcoords2, bool);
 int mushspace3_load_string_utf16
    (mushspace3*, const uint16_t*, size_t, mushcoords3*, mushcoords3, bool);
-int mushspace93_load_string_utf16(mushspace93*, const uint16_t*, size_t);
+void mushspace93_load_string_utf16(mushspace93*, const uint16_t*, size_t);
 
 int mushspace1_load_string_cell
    (mushspace1*, const mushcell*, size_t, mushcoords1*, mushcoords1, bool);
@@ -70,7 +70,7 @@ int mushspace2_load_string_cell
    (mushspace2*, const mushcell*, size_t, mushcoords2*, mushcoords2, bool);
 int mushspace3_load_string_cell
    (mushspace3*, const mushcell*, size_t, mushcoords3*, mushcoords3, bool);
-int mushspace93_load_string_cell(mushspace93*, const mushcell93*, size_t);
+void mushspace93_load_string_cell(mushspace93*, const mushcell93*, size_t);
 
 mushcell mushspace1_get(const mushspace1*, mushcoords1);
 mushcell mushspace2_get(const mushspace2*, mushcoords2);
@@ -80,7 +80,7 @@ mushcell mushspace93_get(const mushspace93*, mushcoords93);
 int mushspace1_put(mushspace1*, mushcoords1, mushcell);
 int mushspace2_put(mushspace2*, mushcoords2, mushcell);
 int mushspace3_put(mushspace3*, mushcoords3, mushcell);
-int mushspace93_put(mushspace93*, mushcoords93, mushcell93);
+void mushspace93_put(mushspace93*, mushcoords93, mushcell93);
 
 void mushspace1_get_loose_bounds(const mushspace1*, mushbounds1*);
 void mushspace2_get_loose_bounds(const mushspace2*, mushbounds2*);

@@ -92,7 +92,13 @@ mushspace *mushspace_copy(void*, const mushspace*
 );
 
 mushcell mushspace_get(const mushspace*, mushcoords);
-int      mushspace_put(      mushspace*, mushcoords, mushcell);
+
+#if MUSHSPACE_93
+void
+#else
+int
+#endif
+mushspace_put(mushspace*, mushcoords, mushcell);
 
 void mushspace_get_loose_bounds(const mushspace*, mushbounds*);
 

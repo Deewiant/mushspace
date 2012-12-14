@@ -248,7 +248,12 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
    return c;
 }
 
-int mushcursor_put(mushcursor* cursor, mushcell c) {
+#if MUSHSPACE_93
+void
+#else
+int
+#endif
+mushcursor_put(mushcursor* cursor, mushcell c) {
 #if !MUSHSPACE_93
    if (!mushcursor_in_box(cursor)) {
       mushcoords pos = mushcursor_get_pos(cursor);
@@ -258,21 +263,31 @@ int mushcursor_put(mushcursor* cursor, mushcell c) {
          return ret;
       }
    }
+   return
 #endif
-   return mushcursor_put_unsafe(cursor, c);
+      mushcursor_put_unsafe(cursor, c);
 }
 
-int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
+#if MUSHSPACE_93
+void
+#else
+int
+#endif
+mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
    assert (mushcursor_in_box(cursor));
 
    mushspace *sp = cursor->space;
 
+#if !MUSHSPACE_93
    int ret;
+#endif
 
    switch (MUSHCURSOR_MODE(cursor)) {
    case MushCursorMode_static:
       mushstaticaabb_put_no_offset(STATIC_BOX(sp), cursor->rel_pos, c);
+#if !MUSHSPACE_93
       ret = MUSHERR_NONE;
+#endif
       break;
 
 #if !MUSHSPACE_93
@@ -291,7 +306,9 @@ int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
    default: BAD_CURSOR_MODE;
    }
    DEBUG_CHECK(cursor, c);
+#if !MUSHSPACE_93
    return ret;
+#endif
 }
 
 void mushcursor_advance(mushcursor* cursor, mushcoords delta) {
