@@ -212,7 +212,7 @@ void mushcursor_skip_semicolons(
    if (!mushcursor_in_box(cursor))
       goto find_box;
 
-   mushcell c;
+   mushcell c = *p;
    while (!skip_semicolons_here(cursor, delta, &c, &in_mid))
       find_box: FIND_BOX(cursor, delta, c, MUSHERR_INFINITE_LOOP_SEMICOLONS);
 
