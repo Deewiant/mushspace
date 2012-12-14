@@ -2,6 +2,8 @@
 
 #include "space/put-textual.all.h"
 
+#include <assert.h>
+
 static bool put_textual_row(
    const mushcell*, size_t*, const char*, size_t*,
    void(*)(const mushcell*, size_t, void*), void(*)(char, void*),
@@ -12,29 +14,39 @@ static void put_textual_page(
    void(*)(const mushcell*, size_t, void*), void(*)(char, void*),
    void*);
 
+#if !MUSHSPACE_93
 static bool put_textual_add_ws(char**, size_t*, size_t*, char);
+#endif
 
-int mushspace_put_textual(
+#if MUSHSPACE_93
+void
+#else
+int
+#endif
+mushspace_put_textual(
    const mushspace* space, mushbounds bounds,
+#if !MUSHSPACE_93
    mushcell**   bufp, size_t*   buflenp,
    char    ** wsbufp, size_t* wsbuflenp,
+#endif
    void(*putrow)(const mushcell*, size_t, void*),
    void(*put)   (char, void*),
    void* pdat)
 {
-   if (!bufp != !buflenp) {
-      bufp    = NULL;
-      buflenp = NULL;
-   }
-   if (!wsbufp != !wsbuflenp) {
-      wsbufp    = NULL;
-      wsbuflenp = NULL;
-   }
+#if MUSHSPACE_93
+   static const size_t buflen = 80*25, wsbuflen = 80*25;
+   mushcell buf[  buflen];
+   char   wsbuf[wsbuflen];
+#else
+   // If we have a buffer but not a length or vice versa, we have neither.
+   if (!  bufp != !  buflenp) {   bufp = NULL;   buflenp = NULL; }
+   if (!wsbufp != !wsbuflenp) { wsbufp = NULL; wsbuflenp = NULL; }
 
    mushcell*  buf    =   bufp    ? *  bufp    : NULL;
    char    *wsbuf    = wsbufp    ? *wsbufp    : NULL;
    size_t     buflen =   buflenp ? *  buflenp : 0,
             wsbuflen = wsbuflenp ? *wsbuflenp : 0;
+#endif
 
    // Clamp end to loose bounds: no point in going beyond them. Don't clamp the
    // beginning: leading whitespace is not invisible.
@@ -42,10 +54,24 @@ int mushspace_put_textual(
    mushspace_get_loose_bounds(space, &lbounds);
    mushcoords_min_into(&bounds.end, lbounds.end);
 
+#if !MUSHSPACE_93
    int ret = MUSHERR_OOM;
+#endif
 
    mushcoords c;
    size_t i = 0, w = 0;
+
+#if MUSHSPACE_93
+#define ADD_WS(ws) do { \
+   assert (w < wsbuflen); \
+   wsbuf[w++] = (ws); \
+} while (0)
+#else
+#define ADD_WS(ws) do { \
+   if (!put_textual_add_ws(&wsbuf, &wsbuflen, &w, ws)) \
+      goto end; \
+} while (0)
+#endif
 
 #if MUSHSPACE_DIM >= 3
    for (c.z = bounds.beg.z; c.z <= bounds.end.z; ++c.z) {
@@ -54,6 +80,9 @@ int mushspace_put_textual(
       for (c.y = bounds.beg.y; c.y <= bounds.end.y; ++c.y) {
 #endif
          for (c.x = bounds.beg.x; c.x <= bounds.end.x; ++c.x) {
+#if MUSHSPACE_93
+            assert (i < buflen);
+#else
             if (i == buflen) {
                mushcell *p = realloc(buf,
                   (buflen ? (buflen *= 2) : (buflen += 1024)) * sizeof *buf);
@@ -61,7 +90,7 @@ int mushspace_put_textual(
                   goto end;
                buf = p;
             }
-
+#endif
             switch (buf[i++] = mushspace_get(space, c)) {
             case '\r':
                if (c.x < bounds.end.x) {
@@ -70,9 +99,8 @@ int mushspace_put_textual(
                      --c.x;
                }
             case '\n':
-               if (!put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat)
-                &&  put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\n'))
-                  goto end;
+               if (!put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat))
+                  ADD_WS('\n');
                break;
 
             case '\f': {
@@ -80,14 +108,12 @@ int mushspace_put_textual(
 
                // Always buffer this instead of outputting it: form feeds go
                // between pages, not after each one.
-               if (!put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
-                  goto end;
+               ADD_WS('\f');
             }}
          }
 #if MUSHSPACE_DIM >= 2
          if (!put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat))
-            if (!put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\n'))
-               goto end;
+            ADD_WS('\n');
       }
 #endif
 #if MUSHSPACE_DIM >= 3
@@ -95,14 +121,14 @@ int mushspace_put_textual(
 
       // Don't possibly force a reallocation for something that we know we
       // won't use: don't add a form feed at end.z.
-      if (c.z < bounds.end.z
-       && !put_textual_add_ws(&wsbuf, &wsbuflen, &w, '\f'))
-         goto end;
+      if (c.z < bounds.end.z)
+         ADD_WS('\f');
    }
 #endif
    put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat);
-   ret = MUSHERR_NONE;
 
+#if !MUSHSPACE_93
+   ret = MUSHERR_NONE;
 end:
    if (bufp) {
       *bufp    = buf;
@@ -117,6 +143,7 @@ end:
       free(wsbuf);
 
    return ret;
+#endif
 }
 
 static bool put_textual_row(
@@ -159,6 +186,7 @@ static void put_textual_page(
    put_textual_row(buf, i, wsbuf, w, putrow, put, pdat);
 }
 
+#if !MUSHSPACE_93
 static bool put_textual_add_ws(
    char** wsbuf, size_t* wsbuflen, size_t* w, char ws)
 {
@@ -172,3 +200,4 @@ static bool put_textual_add_ws(
    (*wsbuf)[(*w)++] = ws;
    return true;
 }
+#endif

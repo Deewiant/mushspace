@@ -149,9 +149,8 @@ int mushspace3_put_textual(const mushspace3*, mushbounds3,
                            mushcell**, size_t*, unsigned char**, size_t*,
                            void(*)(const mushcell*, size_t, void*),
                            void(*)(unsigned char, void*), void*);
-int mushspace93_put_textual(const mushspace93*, mushbounds93,
-                            mushcell93**, size_t*, unsigned char**, size_t*,
-                            void(*)(const mushcell93*, size_t, void*),
-                            void(*)(unsigned char, void*), void*);
+void mushspace93_put_textual(const mushspace93*, mushbounds93,
+                             void(*)(const mushcell93*, size_t, void*),
+                             void(*)(unsigned char, void*), void*);
 
 #endif

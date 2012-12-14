@@ -7,9 +7,15 @@
 
 #define mushspace_put_textual MUSHSPACE_CAT(mushspace,_put_textual)
 
+#if MUSHSPACE_93
+void mushspace_put_textual(const mushspace*, mushbounds,
+                           void(*)(const mushcell*, size_t, void*),
+                           void(*)(char, void*), void*);
+#else
 int mushspace_put_textual(const mushspace*, mushbounds,
                           mushcell**, size_t*, char**, size_t*,
                           void(*)(const mushcell*, size_t, void*),
                           void(*)(char, void*), void*);
+#endif
 
 #endif
