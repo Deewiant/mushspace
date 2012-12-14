@@ -26,18 +26,12 @@
 #define BAD_CURSOR_MODE MUSH_UNREACHABLE("invalid cursor mode")
 
 #if !MUSHSPACE_93
-static void initial_position_fixup(mushcursor*, mushcoords, mushcoords);
 static bool mushcursor_recalibrate(void*);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
-mushcursor* mushcursor_init(
-   void* vp, mushspace* space, mushcoords pos
-#if !MUSHSPACE_93
-   , mushcoords delta
-#endif
-) {
+mushcursor* mushcursor_init(void* vp, mushspace* space, mushcoords pos) {
    mushcursor *cursor;
    if (vp)
       cursor = vp;
@@ -59,7 +53,8 @@ mushcursor* mushcursor_init(
 #if MUSHSPACE_93
    cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
 #else
-   initial_position_fixup(cursor, pos, delta);
+   if (!mushcursor_get_box(cursor, pos))
+      mushcursor_set_nowhere_pos(cursor, pos);
 #endif
    return cursor;
 
@@ -84,11 +79,8 @@ void mushcursor_free(mushcursor* cursor) {
 }
 
 mushcursor* mushcursor_copy(
-   void* vp, const mushcursor* cursor, mushspace* space
-#if !MUSHSPACE_93
-   , mushcoords delta
-#endif
-) {
+   void* vp, const mushcursor* cursor, mushspace* space)
+{
    mushcursor *copy;
    if (vp)
       copy = vp;
@@ -109,14 +101,13 @@ mushcursor* mushcursor_copy(
       goto fail_freeaux;
 #endif
 
+#if !MUSHSPACE_93
    // We assume that cursor was already in a valid state, so we don't need to
    // fix the position if the space doesn't change.
-   if (!space || space == cursor->space)
-      return copy;
-
-#if !MUSHSPACE_93
-   initial_position_fixup(copy, mushcursor_get_pos(copy), delta);
+   if (copy->space != cursor->space)
+      mushcursor_recalibrate(copy);
 #endif
+
    return copy;
 
 #if !MUSHSPACE_93
@@ -129,27 +120,6 @@ fail_freecopy:
 fail:
    return NULL;
 }
-
-#if !MUSHSPACE_93
-static void initial_position_fixup(
-   mushcursor* cursor, mushcoords pos, mushcoords delta)
-{
-   if (!mushcursor_get_box(cursor, pos)) {
-      if (!mushspace_jump_to_box(cursor->space, &pos, delta, &cursor->mode,
-                                 &cursor->box, &cursor->box_iter,
-                                 cursor->box_iter_aux))
-      {
-         mushcursor_set_nowhere_pos(cursor, pos);
-
-         // We allow an initial zero delta as a special case.
-         if (!mushcoords_equal(delta, MUSHCOORDS(0,0,0)))
-            mushspace_signal(cursor->space, MUSHERR_INFINITE_LOOP_SPACES,
-                             cursor);
-      }
-      mushcursor_tessellate(cursor, pos);
-   }
-}
-#endif
 
 mushcoords mushcursor_get_pos(const mushcursor* cursor) {
    switch (MUSHCURSOR_MODE(cursor)) {

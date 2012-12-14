@@ -41,7 +41,7 @@ int main(void) {
    }
    tap_ok("space_init succeeded");
 
-   mushcursor *cursor = mushcursor_init(NULL, space, beg, MUSHCOORDS(0,0,0));
+   mushcursor *cursor = mushcursor_init(NULL, space, beg);
 
    #define gpg(g, p) do { \
       tap_eqc(mushcursor_get(cursor), g); \
