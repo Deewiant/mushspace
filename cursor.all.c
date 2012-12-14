@@ -23,6 +23,8 @@
 #define DEBUG_CHECK(cursor, c)
 #endif
 
+#define BAD_CURSOR_MODE MUSH_UNREACHABLE("invalid cursor mode")
+
 #if !MUSHSPACE_93
 static int  initial_position_fixup(mushcursor*, mushcoords, mushcoords);
 static bool mushcursor_recalibrate(void*);
@@ -136,10 +138,8 @@ mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 #endif
 #endif
    }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
+   BAD_CURSOR_MODE;
 }
-#pragma GCC diagnostic pop
 
 void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
    switch (MUSHCURSOR_MODE(cursor)) {
@@ -157,6 +157,7 @@ void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
 #endif
 #endif
    }
+   BAD_CURSOR_MODE;
 }
 
 bool mushcursor_in_box(const mushcursor* cursor) {
@@ -174,10 +175,8 @@ bool mushcursor_in_box(const mushcursor* cursor) {
 #endif
 #endif
    }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
+   BAD_CURSOR_MODE;
 }
-#pragma GCC diagnostic pop
 
 #if !MUSHSPACE_93
 bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
@@ -242,6 +241,8 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
       break;
 #endif
 #endif
+
+   default: BAD_CURSOR_MODE;
    }
    DEBUG_CHECK(cursor, c);
    return c;
@@ -286,6 +287,8 @@ int mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
       break;
 #endif
 #endif
+
+   default: BAD_CURSOR_MODE;
    }
    DEBUG_CHECK(cursor, c);
    return ret;
@@ -395,6 +398,8 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
                       mushcoords_sub(bounds.end, cursor->obeg)};
       break;
    }
+
+   default: BAD_CURSOR_MODE;
    }
 }
 #endif
