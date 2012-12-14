@@ -20,10 +20,10 @@ int mushcursor2_init(mushcursor2**, mushspace2*, mushcoords2, mushcoords2);
 int mushcursor3_init(mushcursor3**, mushspace3*, mushcoords3, mushcoords3);
 int mushcursor93_init(mushcursor93**, mushspace93*, mushcoords93);
 
-int mushcursor1_free(mushcursor1*);
-int mushcursor2_free(mushcursor2*);
-int mushcursor3_free(mushcursor3*);
-int mushcursor93_free(mushcursor93*);
+void mushcursor1_free(mushcursor1*);
+void mushcursor2_free(mushcursor2*);
+void mushcursor3_free(mushcursor3*);
+void mushcursor93_free(mushcursor93*);
 
 int mushcursor1_copy(mushcursor1**, const mushcursor1*, mushspace1*,
                      const mushcoords1*);
