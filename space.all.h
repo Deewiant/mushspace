@@ -48,6 +48,11 @@ typedef struct mushspace {
 
    mushstaticaabb static_box;
 #endif
+
+#if MUSH_CAN_SIGNAL
+   void (*signal)(musherr, void*, void*);
+   void  *signal_data;
+#endif
 } mushspace;
 
 // What kind of an area is the cursor in? Defined here because
@@ -76,6 +81,8 @@ MUSH_DECL_DYN_ARRAY(mushcell)
 #define mushspace_add_invalidatee  MUSHSPACE_CAT(mushspace,_add_invalidatee)
 #define mushspace_del_invalidatee  MUSHSPACE_CAT(mushspace,_del_invalidatee)
 #define mushspace_invalidate_all   MUSHSPACE_CAT(mushspace,_invalidate_all)
+#define mushspace_signal           MUSHSPACE_CAT(mushspace,_signal)
+#define mushspace_set_handler      MUSHSPACE_CAT(mushspace,_set_handler)
 
 extern const size_t mushspace_sizeof;
 
@@ -93,12 +100,7 @@ mushspace *mushspace_copy(void*, const mushspace*
 
 mushcell mushspace_get(const mushspace*, mushcoords);
 
-#if MUSHSPACE_93
-void
-#else
-int
-#endif
-mushspace_put(mushspace*, mushcoords, mushcell);
+void mushspace_put(mushspace*, mushcoords, mushcell);
 
 void mushspace_get_loose_bounds(const mushspace*, mushbounds*);
 
@@ -108,7 +110,7 @@ void mushspace_map_existing(
    void(*)(                  mushcoords, mushcoords, void*), void*);
 
 #if !MUSHSPACE_93
-int mushspace_map(
+void mushspace_map(
    mushspace*, mushbounds,
    void(*)(musharr_mushcell, mushcoords, mushcoords, void*), void*);
 
@@ -116,5 +118,11 @@ bool mushspace_add_invalidatee(mushspace*, bool(*)(void*), void*);
 void mushspace_del_invalidatee(mushspace*, void*);
 bool mushspace_invalidate_all (mushspace*);
 #endif
+
+#if MUSH_CAN_SIGNAL
+_Noreturn void mushspace_signal(const mushspace*, musherr, void*);
+#endif
+
+void mushspace_set_handler(mushspace*, void(*)(musherr, void*, void*), void*);
 
 #endif

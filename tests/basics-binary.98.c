@@ -39,7 +39,7 @@ static size_t dummy(const void* a, const void* b, size_t c) {
 }
 
 int main(int argc, char **argv) {
-   tap_n((4+5)*4 + (3+5)*2 + (2+5));
+   tap_n((3+5)*4 + (2+5)*2 + (2+5));
 
    if (argc > 1) {
       long s = atol(argv[1]);
@@ -60,7 +60,6 @@ int main(int argc, char **argv) {
    mushspace *space;
 
    bool ok;
-   int err;
    mushbounds bounds, expected_loose, expected_tight;
 
    size_t spaces_beg, spaces_end;
@@ -107,19 +106,8 @@ int main(int argc, char **argv) {
       cells##suf = codepoints; \
    } \
    \
-   err = mushspace_load_string##suf( \
+   mushspace_load_string##suf( \
       space, encoded_data##suf, encoded_len##suf, &end, beg, true); \
-   \
-   if (err) { \
-      tap_not_ok("load_string" #suf " returned an error"); \
-      printf("  ---\n" \
-             "  code: %d\n" \
-             "  ...\n", \
-             err); \
-      tap_skip_remaining("load_string" #suf " failed"); \
-      return 1; \
-   } else \
-      tap_ok("load_string" #suf " returned ok"); \
    \
    spaces_beg = 0; \
    spaces_end = 0; \
@@ -214,21 +202,9 @@ int main(int argc, char **argv) {
    } \
    tap_ok("init succeeded"); \
    FOREACH_CELL { \
-      err = mushspace_put(space, mushcoords_add(beg, MUSHCOORDS(i, 0, 0)), \
-                          data_cell[i]); \
-      if (!err) \
-         continue; \
-      \
-      tap_not_ok("put returned an error" S); \
-      printf("  ---\n" \
-             "  failed index: %zu\n" \
-             "  error code: %d\n" \
-             "  ...\n", \
-             i, err); \
-      tap_skip_remaining("put failed"); \
-      return 1; \
+      mushspace_put(space, mushcoords_add(beg, MUSHCOORDS(i, 0, 0)), \
+                           data_cell[i]); \
    } \
-   tap_ok("every put succeeded" S); \
    \
    ok = true; \
    for (size_t i = 0; i < data_cell_count; ++i) { \

@@ -33,11 +33,11 @@ typedef struct {
    bool first;
 } load_arr_auxdata;
 
-static int load_string_generic(
+static void load_string_generic(
    mushspace* space, const void** str, const void* str_end,
    mushcoords* end, mushcoords target, bool binary,
    void (*get_aabbs)(const void*, const void*, mushcoords, bool,
-                     musharr_mushbounds*),
+                     musharr_mushbounds*, mushspace*),
    void (*load_arr)         (musharr_mushcell, mushcoords, mushcoords, void*,
                              const mushbounds*, size_t, size_t, size_t, size_t,
                              uint8_t*),
@@ -48,12 +48,7 @@ static int load_string_generic(
    mushbounds bounds_backing[1 << MUSHSPACE_DIM];
    musharr_mushbounds boundses;
    boundses.ptr = bounds_backing;
-   get_aabbs(*str, str_end, target, binary, &boundses);
-
-   if (!boundses.ptr) {
-      // The error code was placed in boundses.len.
-      return (int)boundses.len;
-   }
+   get_aabbs(*str, str_end, target, binary, &boundses, space);
 
    if (end)
       *end = target;
@@ -61,19 +56,17 @@ static int load_string_generic(
    if (!boundses.len) {
       if (end)
          end->x = mushcell_dec(end->x);
-      return MUSHERR_NONE;
+      return;
    }
 
-   int placement_err;
+   bool invalidation_failure;
    for (size_t i = 0; i < boundses.len; ++i) {
       if (end)
          mushcoords_max_into(end, boundses.ptr[i].end);
 
       mushaabb aabb;
       mushaabb_make_unsafe(&aabb, &boundses.ptr[i]);
-      placement_err = mushspace_place_box(space, &aabb, NULL, NULL);
-      if (placement_err && placement_err != MUSHERR_INVALIDATION_FAILURE)
-         return MUSHERR_OOM;
+      invalidation_failure = mushspace_place_box(space, &aabb, NULL, NULL);
    }
 
    // Build one to rule them all.
@@ -165,7 +158,8 @@ static int load_string_generic(
       mushspace_mapex_no_place(space, bounds, &aux, load_arr, load_blank);
       *str = aux.str;
    }
-   return placement_err;
+   if (invalidation_failure)
+      mushspace_signal(space, MUSHERR_INVALIDATION_FAILURE, space);
 }
 
 #define UTF

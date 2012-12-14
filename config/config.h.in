@@ -36,4 +36,10 @@
 #error CONFIG_CELL_SIZE setting is incorrect!
 #endif
 
+#if !MUSHSPACE_93 || defined MUSH_ENABLE_INFINITE_LOOP_DETECTION
+#define MUSH_CAN_SIGNAL 1
+#else
+#define MUSH_CAN_SIGNAL 0
+#endif
+
 #endif

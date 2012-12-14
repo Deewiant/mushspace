@@ -26,40 +26,52 @@
 #define BAD_CURSOR_MODE MUSH_UNREACHABLE("invalid cursor mode")
 
 #if !MUSHSPACE_93
-static int  initial_position_fixup(mushcursor*, mushcoords, mushcoords);
+static void initial_position_fixup(mushcursor*, mushcoords, mushcoords);
 static bool mushcursor_recalibrate(void*);
 #endif
 
 const size_t mushcursor_sizeof = sizeof(mushcursor);
 
-int mushcursor_init(
-   mushcursor** cp, mushspace* space, mushcoords pos
+mushcursor* mushcursor_init(
+   void* vp, mushspace* space, mushcoords pos
 #if !MUSHSPACE_93
    , mushcoords delta
 #endif
 ) {
-   mushcursor *cursor = *cp ? *cp : (*cp = malloc(sizeof *cursor));
-   if (!cursor)
-      return MUSHERR_OOM;
+   mushcursor *cursor;
+   if (vp)
+      cursor = vp;
+   else if (!(cursor = malloc(sizeof *cursor)))
+      goto fail;
 
 #if !MUSHSPACE_93
    cursor->box_iter_aux_size = mushboxen_iter_aux_size_init;
    cursor->box_iter_aux = malloc(cursor->box_iter_aux_size);
    if (!cursor->box_iter_aux && cursor->box_iter_aux_size)
-      return MUSHERR_OOM;
+      goto fail_freecursor;
 
    if (!mushspace_add_invalidatee(space, mushcursor_recalibrate, cursor))
-      return MUSHERR_OOM;
+      goto fail_freeaux;
 #endif
 
    cursor->space = space;
 
 #if MUSHSPACE_93
    cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
-   return MUSHERR_NONE;
 #else
-   return initial_position_fixup(cursor, pos, delta);
+   initial_position_fixup(cursor, pos, delta);
 #endif
+   return cursor;
+
+#if !MUSHSPACE_93
+fail_freeaux:
+   free(cursor->box_iter_aux);
+fail_freecursor:
+   if (!vp)
+      free(cursor);
+#endif
+fail:
+   return NULL;
 }
 
 void mushcursor_free(mushcursor* cursor) {
@@ -71,15 +83,17 @@ void mushcursor_free(mushcursor* cursor) {
 #endif
 }
 
-int mushcursor_copy(
-   mushcursor** cp, const mushcursor* cursor, mushspace* space
+mushcursor* mushcursor_copy(
+   void* vp, const mushcursor* cursor, mushspace* space
 #if !MUSHSPACE_93
    , mushcoords delta
 #endif
 ) {
-   mushcursor *copy = *cp ? *cp : (*cp = malloc(sizeof *copy));
-   if (!copy)
-      return MUSHERR_OOM;
+   mushcursor *copy;
+   if (vp)
+      copy = vp;
+   else if (!(copy = malloc(sizeof *copy)))
+      goto fail;
 
    memcpy(copy, cursor, sizeof *copy);
 
@@ -89,26 +103,35 @@ int mushcursor_copy(
 #if !MUSHSPACE_93
    copy->box_iter_aux = malloc(copy->box_iter_aux_size);
    if (!copy->box_iter_aux && copy->box_iter_aux_size)
-      return MUSHERR_OOM;
+      goto fail_freecopy;
 
    if (!mushspace_add_invalidatee(copy->space, mushcursor_recalibrate, copy))
-      return MUSHERR_OOM;
+      goto fail_freeaux;
 #endif
 
    // We assume that cursor was already in a valid state, so we don't need to
    // fix the position if the space doesn't change.
    if (!space || space == cursor->space)
-      return MUSHERR_NONE;
+      return copy;
 
-#if MUSHSPACE_93
-   return MUSHERR_NONE;
-#else
-   return initial_position_fixup(copy, mushcursor_get_pos(copy), delta);
+#if !MUSHSPACE_93
+   initial_position_fixup(copy, mushcursor_get_pos(copy), delta);
 #endif
+   return copy;
+
+#if !MUSHSPACE_93
+fail_freeaux:
+   free(copy->box_iter_aux);
+fail_freecopy:
+   if (!vp)
+      free(copy);
+#endif
+fail:
+   return NULL;
 }
 
 #if !MUSHSPACE_93
-static int initial_position_fixup(
+static void initial_position_fixup(
    mushcursor* cursor, mushcoords pos, mushcoords delta)
 {
    if (!mushcursor_get_box(cursor, pos)) {
@@ -117,11 +140,14 @@ static int initial_position_fixup(
                                  cursor->box_iter_aux))
       {
          mushcursor_set_nowhere_pos(cursor, pos);
-         return MUSHERR_INFINITE_LOOP_SPACES;
+
+         // We allow an initial zero delta as a special case.
+         if (!mushcoords_equal(delta, MUSHCOORDS(0,0,0)))
+            mushspace_signal(cursor->space, MUSHERR_INFINITE_LOOP_SPACES,
+                             cursor);
       }
       mushcursor_tessellate(cursor, pos);
    }
-   return MUSHERR_NONE;
 }
 #endif
 
@@ -248,57 +274,38 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
    return c;
 }
 
-#if MUSHSPACE_93
-void
-#else
-int
-#endif
-mushcursor_put(mushcursor* cursor, mushcell c) {
+void mushcursor_put(mushcursor* cursor, mushcell c) {
 #if !MUSHSPACE_93
    if (!mushcursor_in_box(cursor)) {
       mushcoords pos = mushcursor_get_pos(cursor);
       if (!mushcursor_get_box(cursor, pos)) {
-         int ret = mushspace_put(cursor->space, pos, c);
+         mushspace_put(cursor->space, pos, c);
          DEBUG_CHECK(cursor, c);
-         return ret;
+         return;
       }
    }
-   return
 #endif
-      mushcursor_put_unsafe(cursor, c);
+   mushcursor_put_unsafe(cursor, c);
 }
 
-#if MUSHSPACE_93
-void
-#else
-int
-#endif
-mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
+void mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
    assert (mushcursor_in_box(cursor));
 
    mushspace *sp = cursor->space;
 
-#if !MUSHSPACE_93
-   int ret;
-#endif
-
    switch (MUSHCURSOR_MODE(cursor)) {
    case MushCursorMode_static:
       mushstaticaabb_put_no_offset(STATIC_BOX(sp), cursor->rel_pos, c);
-#if !MUSHSPACE_93
-      ret = MUSHERR_NONE;
-#endif
       break;
 
 #if !MUSHSPACE_93
    case MushCursorMode_dynamic:
       mushaabb_put_no_offset(cursor->box, cursor->rel_pos, c);
-      ret = MUSHERR_NONE;
       break;
 
 #if USE_BAKAABB
    case MushCursorMode_bak:
-      ret = mushbakaabb_put(&sp->bak, cursor->actual_pos, c);
+      mushbakaabb_put(&sp->bak, cursor->actual_pos, c);
       break;
 #endif
 #endif
@@ -306,9 +313,6 @@ mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
    default: BAD_CURSOR_MODE;
    }
    DEBUG_CHECK(cursor, c);
-#if !MUSHSPACE_93
-   return ret;
-#endif
 }
 
 void mushcursor_advance(mushcursor* cursor, mushcoords delta) {

@@ -18,7 +18,7 @@ SRCFLAGS     = -Weverything -pedantic \
                -Wno-sign-conversion \
                -Wno-static-in-inline \
                -Wno-switch-enum
-MUSHSRCFLAGS = -std=c11
+MUSHSRCFLAGS = -std=c11 '-D_Noreturn=__attribute__((__noreturn__))'
 LIBSRCFLAGS  =
 
 DEFDIM  = -DMUSHSPACE_DIM=

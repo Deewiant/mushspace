@@ -38,7 +38,7 @@ static bool cheaper_to_alloc(size_t, size_t);
 
 static bool consume_and_subsume(mushspace*, mushboxen_iter, mushaabb*);
 
-int mushspace_place_box(
+bool mushspace_place_box(
    mushspace* space, mushaabb* aabb, mushcoords* reason, mushaabb** reason_box)
 {
    assert ((reason == NULL) == (reason_box == NULL));
@@ -63,8 +63,7 @@ int mushspace_place_box(
       }
    }
 
-   bool invalidate = false,
-        success    = true;
+   bool invalidate = false;
 
    void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
 
@@ -86,11 +85,7 @@ int mushspace_place_box(
       }
 
       mushaabb_finalize(box);
-      mushboxen_iter iter = really_place_box(space, box, aux);
-      if (mushboxen_iter_is_null(iter)) {
-         success = false;
-         break;
-      }
+      const mushboxen_iter iter = really_place_box(space, box, aux);
 
       invalidate = true;
 
@@ -148,15 +143,10 @@ int mushspace_place_box(
       mushbakaabb_it_stop(it);
 #endif
    }
-   if (invalidate && !mushspace_invalidate_all(space) && success)
-      return MUSHERR_INVALIDATION_FAILURE;
-   if (!success)
-      return MUSHERR_OOM;
-   return MUSHERR_NONE;
+   return invalidate && !mushspace_invalidate_all(space);
 }
 
-// Returns the placed box, which may be bigger than the given box. Returns the
-// null iterator if memory allocation failed.
+// Returns the placed box, which may be bigger than the given box.
 static mushboxen_iter really_place_box(
    mushspace* space, mushaabb* aabb, void* external_aux)
 {
@@ -230,10 +220,9 @@ static mushboxen_iter really_place_box(
       if (!mushboxen_reserve_preserve(&space->boxen, &reserved, &consumee_it))
          return mushboxen_iter_null;
 
-      const bool ok = consume_and_subsume(space, consumee_it, &consumer);
-      if (!ok) {
+      if (!consume_and_subsume(space, consumee_it, &consumer)) {
          mushboxen_unreserve(&space->boxen, &reserved);
-         return mushboxen_iter_null;
+         mushspace_signal(space, MUSHERR_OOM, space);
       }
 
       inserted = mushboxen_insert_reservation(
@@ -245,7 +234,7 @@ static mushboxen_iter really_place_box(
       // given AABB, make room for it, and add it.
 
       if (!mushaabb_alloc(aabb))
-         return mushboxen_iter_null;
+         mushspace_signal(space, MUSHERR_OOM, space);
 
       inserted = mushboxen_insert(&space->boxen, aabb, external_aux);
       if (mushboxen_iter_is_null(inserted)) {
@@ -257,7 +246,6 @@ static mushboxen_iter really_place_box(
    mushstats_add    (space->stats, MushStat_boxes_placed, 1);
    mushstats_new_max(space->stats, MushStat_max_boxes_live,
                      (uint64_t)mushboxen_count(&space->boxen));
-
    return inserted;
 }
 

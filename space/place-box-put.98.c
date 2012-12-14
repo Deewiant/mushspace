@@ -1,6 +1,6 @@
 // File created: 2012-01-28 00:01:32
 
-#include "space/place-box-for.98.h"
+#include "space/place-box-put.98.h"
 
 #include <alloca.h>
 #include <assert.h>
@@ -21,30 +21,28 @@ static bool extend_big_sequence_start_for(
 static bool extend_first_placed_big_for(
    const mushspace*, mushcoords, const mushbounds*, mushaabb*);
 
-int mushspace_place_box_for(
-   mushspace* space, mushcoords c, mushaabb** placed)
-{
-#if USE_BAKAABB
-   if (mushboxen_count(&space->boxen) >= MAX_PLACED_BOXEN)
-      return MUSHERR_OOM;
-#endif
-
+void mushspace_place_box_put(mushspace* space, mushcoords c, mushcell val) {
    mushaabb aabb;
    get_box_for(space, c, &aabb);
 
-   int err = mushspace_place_box(space, &aabb, &c, placed);
-   if (err && err != MUSHERR_INVALIDATION_FAILURE)
-      return err;
+   mushaabb *placed;
+   const bool invalidate_fail = mushspace_place_box(space, &aabb, &c, &placed);
 
-   if (!*placed)
-      *placed = mushboxen_get(&space->boxen, c);
+   // If we ended up placing multiple boxes, the pointer to the box we would
+   // want may have been invalidated by later placements, in which case we have
+   // to get it here ourselves.
+   if (!placed)
+      placed = mushboxen_get(&space->boxen, c);
 
-   assert (mushbounds_contains(&(*placed)->bounds, c));
+   assert (mushbounds_contains(&placed->bounds, c));
 
    mushmemorybuf_push(
-      &space->recent_buf, (mushmemory){.placed = (*placed)->bounds, c});
+      &space->recent_buf, (mushmemory){.placed = placed->bounds, c});
 
-   return err;
+   mushaabb_put(placed, c, val);
+
+   if (invalidate_fail)
+      mushspace_signal(space, MUSHERR_INVALIDATION_FAILURE, space);
 }
 
 static void get_box_for(mushspace* space, mushcoords c, mushaabb* aabb) {

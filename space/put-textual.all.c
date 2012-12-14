@@ -18,13 +18,8 @@ static void put_textual_page(
 static bool put_textual_add_ws(char**, size_t*, size_t*, char);
 #endif
 
-#if MUSHSPACE_93
-void
-#else
-int
-#endif
-mushspace_put_textual(
-   const mushspace* space, mushbounds bounds,
+void mushspace_put_textual(
+   mushspace* space, mushbounds bounds,
 #if !MUSHSPACE_93
    mushcell**   bufp, size_t*   buflenp,
    char    ** wsbufp, size_t* wsbuflenp,
@@ -55,7 +50,7 @@ mushspace_put_textual(
    mushcoords_min_into(&bounds.end, lbounds.end);
 
 #if !MUSHSPACE_93
-   int ret = MUSHERR_OOM;
+   bool oom = true;
 #endif
 
    mushcoords c;
@@ -128,7 +123,7 @@ mushspace_put_textual(
    put_textual_row(buf, &i, wsbuf, &w, putrow, put, pdat);
 
 #if !MUSHSPACE_93
-   ret = MUSHERR_NONE;
+   oom = false;
 end:
    if (bufp) {
       *bufp    = buf;
@@ -142,7 +137,8 @@ end:
    } else
       free(wsbuf);
 
-   return ret;
+   if (oom)
+      mushspace_signal(space, MUSHERR_OOM, space);
 #endif
 }
 

@@ -13,6 +13,10 @@ mushspace* mushspace_init(void* vp) {
       return NULL;
 
    mushcell_space(space->box.array, MUSH_ARRAY_LEN(space->box.array));
+
+#if MUSH_CAN_SIGNAL
+   space->signal = musherr_default_handler;
+#endif
    return space;
 }
 

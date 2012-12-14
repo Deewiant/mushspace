@@ -66,16 +66,16 @@ void mushcursor93_wrap(mushcursor*);
 
 extern const size_t mushcursor_sizeof;
 
-int mushcursor_init(mushcursor**, mushspace*, mushcoords
+mushcursor* mushcursor_init(void*, mushspace*, mushcoords
 #if !MUSHSPACE_93
-                   , mushcoords
+                           , mushcoords
 #endif
-                   );
-int mushcursor_copy(mushcursor**, const mushcursor*, mushspace*
+                           );
+mushcursor* mushcursor_copy(void*, const mushcursor*, mushspace*
 #if !MUSHSPACE_93
-                   , mushcoords
+                           , mushcoords
 #endif
-                   );
+                           );
 void mushcursor_free(mushcursor*);
 
 mushcoords mushcursor_get_pos(const mushcursor*);
@@ -84,13 +84,8 @@ void       mushcursor_set_pos(      mushcursor*, mushcoords);
 mushcell mushcursor_get       (mushcursor*);
 mushcell mushcursor_get_unsafe(mushcursor*);
 
-#if MUSHSPACE_93
 void mushcursor_put       (mushcursor*, mushcell);
 void mushcursor_put_unsafe(mushcursor*, mushcell);
-#else
-int mushcursor_put       (mushcursor*, mushcell);
-int mushcursor_put_unsafe(mushcursor*, mushcell);
-#endif
 
 void mushcursor_advance(mushcursor*, mushcoords);
 void mushcursor_retreat(mushcursor*, mushcoords);

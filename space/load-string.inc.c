@@ -19,10 +19,11 @@
 #define ASCII_PREV(s) (*--(s))
 #endif
 
-static void get_aabbs(
-   const void*, const void*, mushcoords tgt, bool binary, musharr_mushbounds*);
+static void get_aabbs(const void*, const void*, mushcoords tgt, bool binary,
+                      musharr_mushbounds*, mushspace*);
 
-static size_t get_aabbs_binary(const C*, const C*, mushcoords, mushbounds*);
+static size_t get_aabbs_binary(const C*, const C*, mushcoords, mushbounds*,
+                               mushspace*);
 
 static void binary_load_arr(musharr_mushcell, mushcoords, mushcoords, void*);
 static void binary_load_blank(mushcoords, mushcoords, void*);
@@ -31,46 +32,42 @@ static void load_arr(musharr_mushcell, mushcoords, mushcoords, void*,
                      uint8_t*);
 static void load_blank(mushcoords, mushcoords, void*);
 
-int MUSHSPACE_CAT(mushspace_load_string,UTF)(
+void MUSHSPACE_CAT(mushspace_load_string,UTF)(
    mushspace* space, const C* str, size_t len,
    mushcoords* end, mushcoords target, bool binary)
 {
    const C *str_end = str + len;
 
    const void *p = str;
-   int ret = load_string_generic(
+   load_string_generic(
       space, &p, str_end, end, target, binary,
       get_aabbs, load_arr, load_blank, binary_load_arr, binary_load_blank);
 
-   if (ret == MUSHERR_NONE) {
-      str = p;
-      assert (str <= str_end);
+   str = p;
+   assert (str <= str_end);
 #ifdef MUSH_ENABLE_EXPENSIVE_DEBUGGING
-      while (str < str_end) {
-         C c = ASCII_NEXT(str);
-         assert (c == ' ' || c == '\r' || c == '\n' || c == '\f');
-      }
-      assert (str == str_end);
-#elif !defined(NDEBUG)
-      // Just check one character: O(1) instead of O(n).
-      if (str < str_end) {
-         C c = ASCII_NEXT(str);
-         assert (c == ' ' || c == '\r' || c == '\n' || c == '\f');
-      }
-#endif
+   while (str < str_end) {
+      C c = ASCII_NEXT(str);
+      assert (c == ' ' || c == '\r' || c == '\n' || c == '\f');
    }
-   return ret;
+   assert (str == str_end);
+#elif !defined(NDEBUG)
+   // Just check one character: O(1) instead of O(n).
+   if (str < str_end) {
+      C c = ASCII_NEXT(str);
+      assert (c == ' ' || c == '\r' || c == '\n' || c == '\f');
+   }
+#endif
 }
 
 // Writes AABBs to bounds_out->ptr describing where the input should be loaded,
 // and sets bounds_out->len to the appropriate count. bounds_out->ptr should
 // have room for 2^dim bounds; in binary mode, at most 2.
 //
-// If nothing would be loaded, bounds_out->ptr is set to NULL and an error code
-// (an int) is written into bounds_out->len.
+// Uses the given space only for signaling errors.
 static void get_aabbs(
    const void* vstr, const void* vend, mushcoords target, bool binary,
-   musharr_mushbounds* bounds_out)
+   musharr_mushbounds* bounds_out, mushspace* space)
 {
    const C *str = vstr, *str_end = vend;
 
@@ -79,11 +76,7 @@ static void get_aabbs(
    static const size_t BOUNDS_LEN = 1 << MUSHSPACE_DIM;
 
    if (binary) {
-      size_t n = get_aabbs_binary(str, str_end, target, bounds);
-      if (n == SIZE_MAX) {
-         *bounds_out = (musharr_mushbounds){NULL, MUSHERR_NO_ROOM};
-         return;
-      }
+      const size_t n = get_aabbs_binary(str, str_end, target, bounds, space);
       assert (n <= 2);
       bounds_out->len = n;
       return;
@@ -166,10 +159,9 @@ static void get_aabbs(
 
                max_a = mush_size_t_max(max_a, a |= 0x02);
 
-            } else if (pos.y == target.y) {
-               *bounds_out = (musharr_mushbounds){NULL, MUSHERR_NO_ROOM};
-               return;
-            } else if (a & 0x01)
+            } else if (pos.y == target.y)
+               mushspace_signal(space, MUSHERR_NO_ROOM, space);
+            else if (a & 0x01)
                UPDATE_BOUNDS_WITH_LAST_NONSPACE;
             else if (found_nonspace_for == a)
                mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
@@ -220,8 +212,7 @@ static void get_aabbs(
 
          } else if (pos.x == target.x) {
             // Oops, came back to where we started. That's not good.
-            *bounds_out = (musharr_mushbounds){NULL, MUSHERR_NO_ROOM};
-            return;
+            mushspace_signal(space, MUSHERR_NO_ROOM, space);
          }
          break;
 
@@ -245,10 +236,9 @@ static void get_aabbs(
 
                max_a = mush_size_t_max(max_a, a |= 0x04);
 
-            } else if (pos.z == target.z) {
-               *bounds_out = (musharr_mushbounds){NULL, MUSHERR_NO_ROOM};
-               return;
-            } else if (a & 0x03)
+            } else if (pos.z == target.z)
+               mushspace_signal(space, MUSHERR_NO_ROOM, space);
+            else if (a & 0x03)
                UPDATE_BOUNDS_WITH_LAST_NONSPACE;
             else if (found_nonspace_for == a) {
                mushcell_max_into(&bounds[a].end.x, last_nonspace.x);
@@ -296,7 +286,8 @@ static void get_aabbs(
 }
 
 static size_t get_aabbs_binary(
-   const C* str, const C* str_end, mushcoords beg, mushbounds* bounds)
+   const C* str, const C* str_end, mushcoords beg, mushbounds* bounds,
+   mushspace* space)
 {
    const C* str_trimmed_beg = str;
    for (;;) {
@@ -363,7 +354,7 @@ static size_t get_aabbs_binary(
              (size_t)MUSHCELL_MAX - (size_t)MUSHCELL_MIN, 1))
    {
       // Oops, that's not going to fit! Bail.
-      return SIZE_MAX;
+      mushspace_signal(space, MUSHERR_NO_ROOM, space);
    }
 
    mushcoords end = beg;

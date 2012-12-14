@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "mush/bounds.h"
+#include "mush/err.h"
 #include "mush/stats.h"
 
 typedef struct mushspace1  mushspace1;
@@ -33,42 +34,51 @@ mushspace2 *mushspace2_copy(void*, const mushspace2*, mushstats*);
 mushspace3 *mushspace3_copy(void*, const mushspace3*, mushstats*);
 mushspace93 *mushspace93_copy(void*, const mushspace93*);
 
-// Returns 0 on success or one of the following possible error codes:
+void mushspace1_set_handler(mushspace1*,
+                            void (*)(musherr, void*, void*), void*);
+void mushspace2_set_handler(mushspace2*,
+                            void (*)(musherr, void*, void*), void*);
+void mushspace3_set_handler(mushspace3*,
+                            void (*)(musherr, void*, void*), void*);
+void mushspace93_set_handler(mushspace93*,
+                             void (*)(musherr, void*, void*), void*);
+
+// Can signal the following error codes:
 //
 // MUSHERR_OOM:     Ran out of memory somewhere.
 // MUSHERR_NO_ROOM: The string doesn't fit in the space, i.e. it would overlap
 //                  with itself. For instance, trying to binary-load 5
 //                  gigabytes of non-space data into a 32-bit space would
 //                  cause this error.
-int mushspace1_load_string
+void mushspace1_load_string
    (mushspace1*, const unsigned char*, size_t, mushcoords1*, mushcoords1,bool);
-int mushspace2_load_string
+void mushspace2_load_string
    (mushspace2*, const unsigned char*, size_t, mushcoords2*, mushcoords2,bool);
-int mushspace3_load_string
+void mushspace3_load_string
    (mushspace3*, const unsigned char*, size_t, mushcoords3*, mushcoords3,bool);
 void mushspace93_load_string(mushspace93*, const unsigned char*, size_t);
 
-int mushspace1_load_string_utf8
+void mushspace1_load_string_utf8
    (mushspace1*, const uint8_t*, size_t, mushcoords1*, mushcoords1, bool);
-int mushspace2_load_string_utf8
+void mushspace2_load_string_utf8
    (mushspace2*, const uint8_t*, size_t, mushcoords2*, mushcoords2, bool);
-int mushspace3_load_string_utf8
+void mushspace3_load_string_utf8
    (mushspace3*, const uint8_t*, size_t, mushcoords3*, mushcoords3, bool);
 void mushspace93_load_string_utf8(mushspace93*, const uint8_t*, size_t);
 
-int mushspace1_load_string_utf16
+void mushspace1_load_string_utf16
    (mushspace1*, const uint16_t*, size_t, mushcoords1*, mushcoords1, bool);
-int mushspace2_load_string_utf16
+void mushspace2_load_string_utf16
    (mushspace2*, const uint16_t*, size_t, mushcoords2*, mushcoords2, bool);
-int mushspace3_load_string_utf16
+void mushspace3_load_string_utf16
    (mushspace3*, const uint16_t*, size_t, mushcoords3*, mushcoords3, bool);
 void mushspace93_load_string_utf16(mushspace93*, const uint16_t*, size_t);
 
-int mushspace1_load_string_cell
+void mushspace1_load_string_cell
    (mushspace1*, const mushcell*, size_t, mushcoords1*, mushcoords1, bool);
-int mushspace2_load_string_cell
+void mushspace2_load_string_cell
    (mushspace2*, const mushcell*, size_t, mushcoords2*, mushcoords2, bool);
-int mushspace3_load_string_cell
+void mushspace3_load_string_cell
    (mushspace3*, const mushcell*, size_t, mushcoords3*, mushcoords3, bool);
 void mushspace93_load_string_cell(mushspace93*, const mushcell93*, size_t);
 
@@ -77,9 +87,9 @@ mushcell mushspace2_get(const mushspace2*, mushcoords2);
 mushcell mushspace3_get(const mushspace3*, mushcoords3);
 mushcell mushspace93_get(const mushspace93*, mushcoords93);
 
-int mushspace1_put(mushspace1*, mushcoords1, mushcell);
-int mushspace2_put(mushspace2*, mushcoords2, mushcell);
-int mushspace3_put(mushspace3*, mushcoords3, mushcell);
+void mushspace1_put(mushspace1*, mushcoords1, mushcell);
+void mushspace2_put(mushspace2*, mushcoords2, mushcell);
+void mushspace3_put(mushspace3*, mushcoords3, mushcell);
 void mushspace93_put(mushspace93*, mushcoords93, mushcell93);
 
 void mushspace1_get_loose_bounds(const mushspace1*, mushbounds1*);
@@ -114,11 +124,11 @@ void mushspace93_map_existing(
    mushspace93*, mushbounds93,
    void(*)(musharr_mushcell, void*), void(*)(size_t, void*), void*);
 
-int mushspace1_map(mushspace1*, mushbounds1,
+void mushspace1_map(mushspace1*, mushbounds1,
                    void(*)(musharr_mushcell, void*), void*);
-int mushspace2_map(mushspace2*, mushbounds2,
+void mushspace2_map(mushspace2*, mushbounds2,
                    void(*)(musharr_mushcell, void*), void*);
-int mushspace3_map(mushspace3*, mushbounds3,
+void mushspace3_map(mushspace3*, mushbounds3,
                    void(*)(musharr_mushcell, void*), void*);
 
 void mushspace1_put_binary(const mushspace1*, mushbounds1,
@@ -137,18 +147,18 @@ void mushspace93_put_binary(const mushspace93*, mushbounds93,
                             void(*)(unsigned char, void*),
                             void*);
 
-int mushspace1_put_textual(const mushspace1*, mushbounds1,
-                           mushcell**, size_t*, unsigned char**, size_t*,
-                           void(*)(const mushcell*, size_t, void*),
-                           void(*)(unsigned char, void*), void*);
-int mushspace2_put_textual(const mushspace2*, mushbounds2,
-                           mushcell**, size_t*, unsigned char**, size_t*,
-                           void(*)(const mushcell*, size_t, void*),
-                           void(*)(unsigned char, void*), void*);
-int mushspace3_put_textual(const mushspace3*, mushbounds3,
-                           mushcell**, size_t*, unsigned char**, size_t*,
-                           void(*)(const mushcell*, size_t, void*),
-                           void(*)(unsigned char, void*), void*);
+void mushspace1_put_textual(const mushspace1*, mushbounds1,
+                            mushcell**, size_t*, unsigned char**, size_t*,
+                            void(*)(const mushcell*, size_t, void*),
+                            void(*)(unsigned char, void*), void*);
+void mushspace2_put_textual(const mushspace2*, mushbounds2,
+                            mushcell**, size_t*, unsigned char**, size_t*,
+                            void(*)(const mushcell*, size_t, void*),
+                            void(*)(unsigned char, void*), void*);
+void mushspace3_put_textual(const mushspace3*, mushbounds3,
+                            mushcell**, size_t*, unsigned char**, size_t*,
+                            void(*)(const mushcell*, size_t, void*),
+                            void(*)(unsigned char, void*), void*);
 void mushspace93_put_textual(const mushspace93*, mushbounds93,
                              void(*)(const mushcell93*, size_t, void*),
                              void(*)(unsigned char, void*), void*);

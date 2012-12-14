@@ -20,13 +20,13 @@
       first_exit = pos; \
    } else if (mushcoords_equal(pos, first_exit)) { \
       mushcursor_set_nowhere_pos(cursor, pos); \
-      return MUSHERR_INFINITE_LOOP_SPACES; \
+      mushspace_signal(cursor->space, MUSHERR_INFINITE_LOOP_SPACES, cursor); \
    } \
 } while (0)
 
 #define INFLOOP_CHECK_DELTA do { \
    if (mushcoords_equal(delta, MUSHCOORDS(0,0,0))) \
-      return MUSHERR_INFINITE_LOOP_SPACES; \
+      mushspace_signal(cursor->space, MUSHERR_INFINITE_LOOP_SPACES, cursor); \
 } while (0)
 
 #else
@@ -55,7 +55,7 @@
                                  cursor->box_iter_aux)) \
       { \
          mushcursor_set_nowhere_pos(cursor, pos); \
-         return error_code; \
+         mushspace_signal(cursor->space, error_code, cursor); \
       } \
       mushcursor_tessellate(cursor, pos); \
    } \
@@ -67,10 +67,10 @@
 static bool skip_spaces_here    (mushcursor*, mushcoords, mushcell*);
 static bool skip_semicolons_here(mushcursor*, mushcoords, mushcell*, bool*);
 
-static int skip_markers_rest(mushcursor*, mushcoords, mushcell*, mushcell);
+static void skip_markers_rest(mushcursor*, mushcoords, mushcell*, mushcell);
 
 inline MUSH_ALWAYS_INLINE
-int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta, mushcell* p)
+void mushcursor_skip_markers(mushcursor* cursor, mushcoords delta, mushcell* p)
 {
    INFLOOP_CHECK_DELTA;
 
@@ -79,14 +79,14 @@ int mushcursor_skip_markers(mushcursor* cursor, mushcoords delta, mushcell* p)
       c = mushcursor_get_unsafe(cursor);
       if (c != ';' && c != ' ') {
          *p = c;
-         return MUSHERR_NONE;
+         return;
       }
    } else
       c = ' ';
-   return skip_markers_rest(cursor, delta, p, c);
+   skip_markers_rest(cursor, delta, p, c);
 }
 
-int skip_markers_rest(
+void skip_markers_rest(
    mushcursor* cursor, mushcoords delta, mushcell* p, mushcell c)
 {
    INFLOOP_DECLS;
@@ -113,10 +113,9 @@ semicolon:;
    assert (mushcursor_get_unsafe(cursor) != ' ');
    assert (mushcursor_get_unsafe(cursor) != ';');
    *p = c;
-   return MUSHERR_NONE;
 }
 
-int mushcursor_skip_spaces(mushcursor* cursor, mushcoords delta, mushcell* p) {
+void mushcursor_skip_spaces(mushcursor* cursor, mushcoords delta, mushcell* p) {
    INFLOOP_DECLS;
    INFLOOP_CHECK_DELTA;
 
@@ -130,10 +129,9 @@ int mushcursor_skip_spaces(mushcursor* cursor, mushcoords delta, mushcell* p) {
    assert (c == mushcursor_get_unsafe(cursor));
    assert (mushcursor_get_unsafe(cursor) != ' ');
    *p = c;
-   return MUSHERR_NONE;
 }
 
-int mushcursor_skip_to_last_space(
+void mushcursor_skip_to_last_space(
    mushcursor* cursor, mushcoords delta, mushcell* p)
 {
 #if !MUSHSPACE_93
@@ -156,7 +154,7 @@ int mushcursor_skip_to_last_space(
 
    mushcell c = *p = mushcursor_get_unsafe(cursor);
    if (c != ' ')
-      return MUSHERR_NONE;
+      return;
 
    for (; !skip_spaces_here(cursor, delta, &c);
           c = mushcursor_get_unsafe(cursor))
@@ -177,7 +175,7 @@ jump_to_box:
                                  cursor->box_iter_aux))
       {
          mushcursor_set_nowhere_pos(cursor, pos);
-         return MUSHERR_INFINITE_LOOP_SPACES;
+         mushspace_signal(cursor->space, MUSHERR_INFINITE_LOOP_SPACES, cursor);
       }
       mushcursor_tessellate(cursor, pos);
 #endif
@@ -186,7 +184,6 @@ jump_to_box:
    mushcursor_retreat(cursor, delta);
    assert (mushcursor_get(cursor) == ' ');
    *p = ' ';
-   return MUSHERR_NONE;
 }
 
 bool skip_spaces_here(
@@ -204,7 +201,7 @@ bool skip_spaces_here(
    return true;
 }
 
-int mushcursor_skip_semicolons(
+void mushcursor_skip_semicolons(
    mushcursor* cursor, mushcoords delta, mushcell* p)
 {
    INFLOOP_DECLS;
@@ -222,7 +219,6 @@ int mushcursor_skip_semicolons(
    assert (c == mushcursor_get_unsafe(cursor));
    assert (mushcursor_get_unsafe(cursor) != ';');
    *p = c;
-   return MUSHERR_NONE;
 }
 
 bool skip_semicolons_here(

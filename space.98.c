@@ -9,7 +9,7 @@
 #include "stdlib.any.h"
 #include "space/map-no-place.98.h"
 #include "space/place-box.98.h"
-#include "space/place-box-for.98.h"
+#include "space/place-box-put.98.h"
 
 mushspace* mushspace_init(void* vp, mushstats* stats) {
    mushspace *space = vp ? vp : malloc(sizeof *space);
@@ -54,6 +54,8 @@ mushspace* mushspace_init(void* vp, mushstats* stats) {
 
    mushcell_space(
       space->static_box.array, MUSH_ARRAY_LEN(space->static_box.array));
+
+   space->signal = musherr_default_handler;
    return space;
 }
 
@@ -126,31 +128,30 @@ mushcell mushspace_get(const mushspace* space, mushcoords c) {
    return ' ';
 }
 
-int mushspace_put(mushspace* space, mushcoords p, mushcell c) {
+void mushspace_put(mushspace* space, mushcoords p, mushcell c) {
    if (mushstaticaabb_contains(p)) {
       mushstaticaabb_put(&space->static_box, p, c);
-      return MUSHERR_NONE;
+      return;
    }
 
-   mushaabb* box;
-   int err = MUSHERR_NONE;
-   if ((box = mushboxen_get(&space->boxen, p))
-    || (err = mushspace_place_box_for(space, p, &box)) == MUSHERR_NONE
-    || err == MUSHERR_INVALIDATION_FAILURE)
-   {
+   mushaabb* box = mushboxen_get(&space->boxen, p);
+   if (box) {
       mushaabb_put(box, p, c);
-      return err;
+      return;
    }
 
 #if USE_BAKAABB
-   if (!space->bak.data && !mushbakaabb_init(&space->bak, p))
-      return MUSHERR_OOM;
-
-   if (!mushbakaabb_put(&space->bak, p, c))
-      return MUSHERR_OOM;
+   if (mushboxen_count(&space->boxen) < MAX_PLACED_BOXEN) {
 #endif
+      mushspace_place_box_put(space, p, c);
+#if USE_BAKAABB
+      return;
+   }
 
-   return MUSHERR_NONE;
+   if (!(space->bak.data || mushbakaabb_init(&space->bak, p))
+    || !mushbakaabb_put(&space->bak, p, c))
+      mushspace_signal(space, MUSHERR_OOM, space);
+#endif
 }
 
 void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
@@ -163,17 +164,14 @@ void mushspace_get_loose_bounds(const mushspace* space, mushbounds* bounds) {
 #endif
 }
 
-int mushspace_map(mushspace* space, mushbounds bounds,
-                  void(*f)(musharr_mushcell, mushcoords, mushcoords, void*),
-                  void* data)
+void mushspace_map(mushspace* space, mushbounds bounds,
+                   void(*f)(musharr_mushcell, mushcoords, mushcoords, void*),
+                   void* data)
 {
    mushaabb aabb;
    mushaabb_make(&aabb, &bounds);
-   if (!mushspace_place_box(space, &aabb, NULL, NULL))
-      return MUSHERR_OOM;
-
+   mushspace_place_box(space, &aabb, NULL, NULL);
    mushspace_map_no_place(space, &bounds, data, f, NULL);
-   return MUSHERR_NONE;
 }
 void mushspace_map_existing(
    mushspace* space, mushbounds bounds,

@@ -39,7 +39,7 @@ static size_t dummy(const void* a, const void* b, size_t c) {
 int main(int argc, char **argv) {
    // We don't check bounds here: we'd end up essentially duplicating the logic
    // from load_string, and there's little point in that.
-   tap_n(3*4 + 3*2 + 2);
+   tap_n(2*4 + 2*2 + 2);
 
    if (argc > 1) {
       long s = atol(argv[1]);
@@ -63,7 +63,6 @@ int main(int argc, char **argv) {
    mushspace *space;
 
    bool ok;
-   int err;
 
    codepoint_reader cp_reader;
 
@@ -125,19 +124,8 @@ int main(int argc, char **argv) {
       encoded_len##suf = ENCODER(data, encoded_data##suf, codepoints); \
    } \
    \
-   err = mushspace_load_string##suf( \
+   mushspace_load_string##suf( \
       space, encoded_data##suf, encoded_len##suf, &end, beg, false); \
-   \
-   if (err) { \
-      tap_not_ok("load_string" #suf " returned an error"); \
-      printf("  ---\n" \
-             "  code: %d\n" \
-             "  ...\n", \
-             err); \
-      tap_skip_remaining("load_string" #suf " failed"); \
-      return 1; \
-   } else \
-      tap_ok("load_string" #suf " returned ok"); \
    \
    if (BLOWUP) \
       free(encoded_data##suf); \
@@ -204,25 +192,8 @@ int main(int argc, char **argv) {
       GET_POS(data_cell[i]); \
       if (SAVE_POS) \
          saved_pos[i] = pos; \
-      err = mushspace_put(space, pos, data_cell[i]); \
-      if (!err) \
-         continue; \
-      \
-      tap_not_ok("put returned an error" S); \
-      printf("  ---\n" \
-             "  error code: %d\n" \
-             "  failed index: %zu\n", \
-             err, i); \
-      printf("  failed pos relative to min: ("); \
-      for (uint8_t j = 0; j < MUSHSPACE_DIM; ++j) \
-         printf(" %" MUSHCELL_PRId, mushcell_sub(pos.v[j], MUSHCELL_MIN)); \
-      printf(" )\n" \
-             "  ...\n"); \
-      tap_skip_remaining("put failed"); \
-      free(saved_pos); \
-      return 1; \
+      mushspace_put(space, pos, data_cell[i]); \
    } \
-   tap_ok("every put succeeded" S); \
    \
    ok = true; \
    POS_INIT; \

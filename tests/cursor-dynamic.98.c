@@ -28,7 +28,7 @@
 #define mushspace_load_string      CAT(mushspace,_load_string)
 
 int main(void) {
-   tap_n(3 + 5*3 + 1 + 3 + 2*(3+3)+(3+1)+2 + 1 + 1+1+2*3+1 + 1+1+2*3+1 + 1);
+   tap_n(1 + 5*2 + 1 + 3 + 2*(2+3)+(2+1)+2 + 1 + 1+2*2+1 + 1+2*2+1 + 1);
 
    static const mushcoords beg   = MUSHCOORDS_INIT(1000000,1000000,1000000),
                            delta = MUSHCOORDS_INIT(1,1,1);
@@ -41,24 +41,11 @@ int main(void) {
    }
    tap_ok("space_init succeeded");
 
-   mushcursor *cursor = NULL;
-   tap_bool(mushcursor_init(&cursor, space, beg, MUSHCOORDS(0,0,0))
-               == MUSHERR_INFINITE_LOOP_SPACES,
-            "cursor_init reported infloop",
-            "cursor_init didn't report infloop");
-
-   tap_eqcos(mushcursor_get_pos(cursor), beg,
-             "cursor_init didn't move cursor",
-             "cursor_init moved cursor");
+   mushcursor *cursor = mushcursor_init(NULL, space, beg, MUSHCOORDS(0,0,0));
 
    #define gpg(g, p) do { \
       tap_eqc(mushcursor_get(cursor), g); \
-      if (mushcursor_put(cursor, p)) { \
-         tap_not_ok("cursor_put failed"); \
-         tap_skip_remaining("cursor_put failed"); \
-         return 1; \
-      } \
-      tap_ok("cursor_put succeeded"); \
+      mushcursor_put(cursor, p); \
       tap_eqc(mushcursor_get(cursor), p); \
    } while (0)
 
@@ -129,16 +116,8 @@ int main(void) {
    // the cursor, put something next to it via the cursor, and check that both
    // remain correct. End at (beg - delta).
 
-   int load_err;
-
    static const unsigned char tiny[] = "x";
-   load_err = mushspace_load_string(space, tiny, 1, NULL, beg, false);
-   if (load_err) {
-      tap_not_ok("load_string failed");
-      tap_skip_remaining("load_string failed");
-      return 1;
-   }
-   tap_ok("load_string succeeded");
+   mushspace_load_string(space, tiny, 1, NULL, beg, false);
 
    tap_eqc(mushcursor_get(cursor), 'x');
    mushcursor_retreat(cursor, delta);
@@ -156,14 +135,8 @@ int main(void) {
    // is '0' + MUSHSPACE_DIM.
 
    static const unsigned char huge[] = "01\nv2\r\n\fpq\rr3";
-   load_err = mushspace_load_string(space, huge, 13,
-                                    NULL, mushcoords_sub(beg, delta), false);
-   if (load_err) {
-      tap_not_ok("load_string failed");
-      tap_skip_remaining("load_string failed");
-      return 1;
-   }
-   tap_ok("load_string succeeded");
+   mushspace_load_string(space, huge, 13,
+                         NULL, mushcoords_sub(beg, delta), false);
 
    tap_eqc(mushcursor_get(cursor), '0');
    mushcursor_advance(cursor, delta);
