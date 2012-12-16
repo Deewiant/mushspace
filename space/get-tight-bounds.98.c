@@ -66,31 +66,6 @@ bool mushspace_get_tight_bounds(mushspace* space, mushbounds* bounds) {
                   mushstaticaabb_getter_no_offset, &space->static_box);
    }
 
-#if USE_BAKAABB
-   if (space->bak.data && mushbakaabb_size(&space->bak) > 0) {
-      found_nonspace = true;
-
-      // We might as well tighten the approximate space->bak.bounds while we're
-      // at it.
-      mushbounds bak_bounds = {space->bak.bounds.end, space->bak.bounds.beg};
-
-      unsigned char buf[mushbakaabb_iter_sizeof];
-      mushbakaabb_iter *it = mushbakaabb_it_start(&space->bak, buf);
-
-      for (; !mushbakaabb_it_done(it, &space->bak);
-              mushbakaabb_it_next(it, &space->bak))
-      {
-         assert (mushbakaabb_it_val(it, &space->bak) != ' ');
-
-         mushcoords c = mushbakaabb_it_pos(it, &space->bak);
-         mushbounds_expand_to_cover(&bak_bounds, &(mushbounds){c,c});
-      }
-      mushbakaabb_it_stop(it);
-
-      space->bak.bounds = bak_bounds;
-      mushbounds_expand_to_cover(bounds, &bak_bounds);
-   }
-#endif
    space->last_beg = bounds->beg;
    space->last_end = bounds->end;
    if (changed) {

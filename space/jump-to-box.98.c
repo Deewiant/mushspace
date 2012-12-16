@@ -50,17 +50,6 @@ bool mushspace_jump_to_box(
       }
    }
 
-#if USE_BAKAABB
-   if (space->bak.data
-    && mushbounds_ray_intersects(*pos, delta, &space->bak.bounds, &m, &c)
-    && ((m < moves) | !moves))
-   {
-      *pos      = c;
-      *hit_type = MushCursorMode_bak;
-      return true;
-   }
-#endif
-
    if (!moves)
       return false;
 

@@ -17,7 +17,6 @@
 
 #if !MUSHSPACE_93
 #include "aabb.98.h"
-#include "bakaabb.98.h"
 #include "boxen.98.h"
 #include "memory.98.h"
 #endif
@@ -42,10 +41,6 @@ typedef struct mushspace {
 
    mushboxen boxen;
 
-#if USE_BAKAABB
-   mushbakaabb bak;
-#endif
-
    mushstaticaabb static_box;
 #endif
 
@@ -61,9 +56,6 @@ typedef enum MushCursorMode {
    MushCursorMode_static,
 #if !MUSHSPACE_93
    MushCursorMode_dynamic,
-#if USE_BAKAABB
-   MushCursorMode_bak,
-#endif
 #endif
 } MushCursorMode;
 

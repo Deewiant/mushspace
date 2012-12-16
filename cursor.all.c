@@ -128,10 +128,6 @@ mushcoords mushcursor_get_pos(const mushcursor* cursor) {
 #if !MUSHSPACE_93
    case MushCursorMode_dynamic:
       return mushcoords_add(cursor->rel_pos, cursor->obeg);
-#if USE_BAKAABB
-   case MushCursorMode_bak:
-      return cursor->actual_pos;
-#endif
 #endif
    }
    BAD_CURSOR_MODE;
@@ -146,11 +142,6 @@ void mushcursor_set_pos(mushcursor* cursor, mushcoords pos) {
    case MushCursorMode_dynamic:
       cursor->rel_pos = mushcoords_sub(pos, cursor->obeg);
       return;
-#if USE_BAKAABB
-   case MushCursorMode_bak:
-      cursor->actual_pos = pos;
-      return;
-#endif
 #endif
    }
    BAD_CURSOR_MODE;
@@ -164,11 +155,6 @@ bool mushcursor_in_box(const mushcursor* cursor) {
 #if !MUSHSPACE_93
    case MushCursorMode_dynamic:
       return mushbounds_contains(&cursor->rel_bounds, cursor->rel_pos);
-
-#if USE_BAKAABB
-   case MushCursorMode_bak:
-      return mushbounds_contains(&cursor->actual_bounds, cursor->actual_pos);
-#endif
 #endif
    }
    BAD_CURSOR_MODE;
@@ -192,13 +178,6 @@ bool mushcursor_get_box(mushcursor* cursor, mushcoords pos) {
       mushcursor_tessellate(cursor, pos);
       return true;
    }
-#if USE_BAKAABB
-   if (sp->bak.data && mushbounds_contains(&sp->bak.bounds, pos)) {
-      cursor->mode = MushCursorMode_bak;
-      mushcursor_tessellate(cursor, pos);
-      return true;
-   }
-#endif
    return false;
 }
 #endif
@@ -230,12 +209,6 @@ mushcell mushcursor_get_unsafe(mushcursor* cursor) {
    case MushCursorMode_dynamic:
       c = mushaabb_get_no_offset(cursor->box, cursor->rel_pos);
       break;
-
-#if USE_BAKAABB
-   case MushCursorMode_bak:
-      c = mushbakaabb_get(&sp->bak, cursor->actual_pos);
-      break;
-#endif
 #endif
 
    default: BAD_CURSOR_MODE;
@@ -272,12 +245,6 @@ void mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
    case MushCursorMode_dynamic:
       mushaabb_put_no_offset(cursor->box, cursor->rel_pos, c);
       break;
-
-#if USE_BAKAABB
-   case MushCursorMode_bak:
-      mushbakaabb_put(&sp->bak, cursor->actual_pos, c);
-      break;
-#endif
 #endif
 
    default: BAD_CURSOR_MODE;
@@ -286,21 +253,11 @@ void mushcursor_put_unsafe(mushcursor* cursor, mushcell c) {
 }
 
 void mushcursor_advance(mushcursor* cursor, mushcoords delta) {
-#if USE_BAKAABB
-   if (MUSHCURSOR_MODE(cursor) == MushCursorMode_bak)
-      mushcoords_add_into(&cursor->actual_pos, delta);
-   else
-#endif
-      mushcoords_add_into(&cursor->rel_pos, delta);
+   mushcoords_add_into(&cursor->rel_pos, delta);
 }
 
 void mushcursor_retreat(mushcursor* cursor, mushcoords delta) {
-#if USE_BAKAABB
-   if (MUSHCURSOR_MODE(cursor) == MushCursorMode_bak)
-      mushcoords_sub_into(&cursor->actual_pos, delta);
-   else
-#endif
-      mushcoords_sub_into(&cursor->rel_pos, delta);
+   mushcoords_sub_into(&cursor->rel_pos, delta);
 }
 
 #if !MUSHSPACE_93
@@ -338,25 +295,6 @@ void mushcursor_tessellate(mushcursor* cursor, mushcoords pos) {
    case MushCursorMode_static:
       cursor->rel_pos = mushcoords_sub(pos, MUSHSTATICAABB_BEG);
       break;
-
-#if USE_BAKAABB
-   case MushCursorMode_bak:
-      cursor->actual_pos    = pos;
-      cursor->actual_bounds = sp->bak.bounds;
-
-      // bak is the lowest, so we tessellate with all boxes.
-      mushbounds_tessellate(&cursor->actual_bounds, pos,
-                            &MUSHSTATICAABB_BOUNDS);
-
-      for (mushboxen_iter it = mushboxen_iter_init(&sp->boxen, aux);
-           !mushboxen_iter_done( it, &sp->boxen);
-            mushboxen_iter_next(&it, &sp->boxen))
-      {
-         mushbounds_tessellate(&cursor->actual_bounds, pos,
-                               &mushboxen_iter_box(it)->bounds);
-      }
-      break;
-#endif
 
    case MushCursorMode_dynamic: {
       // cursor->box now becomes only a view. it shares its data array with the

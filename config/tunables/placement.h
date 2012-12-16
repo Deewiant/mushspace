@@ -5,12 +5,6 @@
 
 #include "config/tunables/overall.h"
 
-#if USE_BAKAABB
-// Threshold for switching to mushbakaabb. Only limits mushspace_put, not
-// mushspace_load_string.
-#define MAX_PLACED_BOXEN 64
-#endif
-
 // Padding of box created by default when mushspace_putting to an unallocated
 // area. The size of the resulting box will be 2*NEWBOX_PAD+1 along each axis.
 // (Clamped to the edges of space to avoid allocating more than one box.)

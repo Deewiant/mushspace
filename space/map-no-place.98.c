@@ -74,22 +74,6 @@ void mushspace_map_no_place(
          goto next_pos;
       }
 
-#if USE_BAKAABB
-      if (space->bak.data && mushbounds_contains(&space->bak.bounds, pos)) {
-         mushcell *p = mushbakaabb_get_ptr_unsafe(&space->bak, pos);
-         f((musharr_mushcell){p,1}, pos, pos, fg);
-
-         for (mushdim i = 0; i < MUSHSPACE_DIM; ++i) {
-            if (pos.v[i] != bounds->end.v[i]) {
-               ++pos.v[i];
-               goto next_pos;
-            }
-            pos.v[i] = bounds->beg.v[i];
-         }
-         return;
-      }
-#endif
-
       // No hits for pos: find the next pos we can hit, or stop if there's
       // nothing left.
 get_next:
@@ -181,9 +165,6 @@ static bool map_in_static(
 // - Whether a new line or page was just reached, with one bit for each boolean
 //   (LSB for line, next-most for page). This may be updated by the function to
 //   reflect that it's done with the line/page.
-//
-// Does not use bakaabb, and indeed cannot due to the above data not making
-// sense with it.
 void mushspace_mapex_no_place(
    mushspace* space, const mushbounds* bounds, void* fg,
    void(*f)(musharr_mushcell, mushcoords, mushcoords, void*,
@@ -429,9 +410,6 @@ bump_z:
 // The next (linewise) allocated point after *pos which is also within the
 // given bounds. Calls g with the first two arguments being the current point
 // and the next point respectively.
-//
-// Assumes that that next point, if it exists, was allocated within some box:
-// doesn't look at bakaabb at all.
 static bool get_next_in(
    const mushspace* space, const mushbounds* bounds,
    mushcoords* pos, void* gdata, void(*g)(mushcoords, mushcoords, void*))

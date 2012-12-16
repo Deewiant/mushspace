@@ -18,29 +18,17 @@ typedef struct mushcursor {
    MushCursorMode mode;
 #endif
    mushspace *space;
-   union {
-      // For dynamic mode.
-      struct {
-         // For static mode (only rel_pos).
-         mushcoords rel_pos;
+
+   mushcoords rel_pos;
 
 #if !MUSHSPACE_93
-         mushbounds rel_bounds;
-         mushcoords obeg;
-         mushaabb      *box;
-         mushboxen_iter box_iter;
-         void          *box_iter_aux;
-         size_t         box_iter_aux_size;
+   mushbounds rel_bounds;
+   mushcoords obeg;
+   mushaabb      *box;
+   mushboxen_iter box_iter;
+   void          *box_iter_aux;
+   size_t         box_iter_aux_size;
 #endif
-      };
-#if USE_BAKAABB
-      // For bak mode.
-      struct {
-         mushcoords actual_pos;
-         mushbounds actual_bounds;
-      };
-#endif
-   };
 } mushcursor;
 
 #define mushcursor_sizeof          MUSHSPACE_CAT(mushcursor,_sizeof)

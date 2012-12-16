@@ -67,10 +67,6 @@ bool mushspace_place_box(
 
    void *aux = alloca(mushboxen_iter_aux_size(&space->boxen));
 
-#if USE_BAKAABB
-   void *aux2 = alloca(mushboxen_iter_aux_size(&space->boxen));
-#endif
-
    // Then do the actual placement.
    for (size_t b = 0; b < a; ++b) {
       mushaabb   *box    = &aabbs[b];
@@ -105,43 +101,6 @@ bool mushspace_place_box(
          // This can only happen once.
          reason = NULL;
       }
-
-#if USE_BAKAABB
-      // If it crossed bak, we need to fix things up and move any occupied
-      // cells from bak (which is below all boxen) to the appropriate box.
-      // (which may not be *box, if there are any boxes above it).
-      if (!space->bak.data || !mushbakaabb_size(&space->bak))
-         continue;
-
-      if (!mushbounds_overlaps(bounds, &space->bak.bounds))
-         continue;
-
-      const bool overlaps =
-         !mushboxen_iter_above_done(
-            mushboxen_iter_above_init(&space->boxen, iter, aux2),
-            &space->boxen);
-
-      unsigned char buf[mushbakaabb_iter_sizeof];
-      mushbakaabb_iter *it = mushbakaabb_it_start(&space->bak, buf);
-
-      for (; !mushbakaabb_it_done(it, &space->bak);
-              mushbakaabb_it_next(it, &space->bak))
-      {
-         mushcoords c = mushbakaabb_it_pos(it, &space->bak);
-         if (!mushbounds_contains(bounds, c))
-            continue;
-
-         mushcell v = mushbakaabb_it_val(it, &space->bak);
-
-         mushbakaabb_it_remove(it, &space->bak);
-
-         if (overlaps)
-            mushspace_put(space, c, v);
-         else
-            mushaabb_put(box, c, v);
-      }
-      mushbakaabb_it_stop(it);
-#endif
    }
    return invalidate && !mushspace_invalidate_all(space);
 }
