@@ -57,7 +57,8 @@ bool mushbounds_ray_intersects(
     * 1. Realize that the set of points which can actually be reached with a
     *    given delta is limited to some points near the edge of the box: if the
     *    delta is (1,0), only the leftmost edge of the box can be touched, and
-    *    thus only they need to be checked. (See the getBegEnd() helper.)
+    *    thus only they need to be checked. (See the get_hittable_range()
+    *    helper.)
     *
     *    The number of different (coordinate, move count) pairs that we have to
     *    check in this approach is:
@@ -393,8 +394,8 @@ static mushucell get_move_count_expensive(
    if (!best_move_count)
       return count;
 
-   // We have a bestMoves to stay under: reduce count to ensure that we do stay
-   // under it.
+   // We have a best_move_count to stay under: reduce count to ensure that we
+   // do stay under it.
 
    // Time for another binary search.
    for (mushucell low = 0, high = count;;) {
