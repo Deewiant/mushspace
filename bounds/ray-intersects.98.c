@@ -101,7 +101,7 @@ bool mushbounds_ray_intersects(
     *
     * min(gx*sx, gy*sy, gz*sz) > gx*|dx| + gy*|dy| + gz*|dz|
     *
-    * So let's start by checking that.
+    * So let's start with method selection by checking this last inequality.
     * }}} */
 
    // The number of (coordinate, move count) pairs we need to check in methods
@@ -125,6 +125,7 @@ bool mushbounds_ray_intersects(
       if (!delta.v[i])
          continue;
 
+      // See the long explanation above for the meanings of these variables.
       const uint_fast8_t p = mushucell_gcd_lg((mushucell)delta.v[i]);
       const mushucell    g = (mushucell)1 << p;
       const mushucell    s = end->v[i] - beg->v[i] + 1;
@@ -155,7 +156,7 @@ bool mushbounds_ray_intersects(
             axis2 = i;
          }
       } else {
-         // g*s overflows, so the minimum doesn't grow, so we can simply ignore
+         // g*s overflows, so min_pairs_2 can't possibly grow. Simply ignore
          // that case.
       }
 
