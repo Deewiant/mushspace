@@ -134,6 +134,13 @@ bool mushbounds_ray_intersects(
       // for MUSHCELL_MIN as well.
       const mushucell d = ABS(delta.v[i]);
 
+      if (d >= s) {
+         // min(s,d) on this axis equals s. Thus we have min(g*s, ...) on one
+         // side of the inequality and g*s + ... on the other. Thus min_pairs_2
+         // must be lesser than sum_pairs_1: we're done here.
+         goto method2;
+      }
+
       // The multiplications can overflow. We can check g*s quickly since we
       // have the gcd_lg:
       //
@@ -145,11 +152,11 @@ bool mushbounds_ray_intersects(
       // But if p is zero, we get 2^(sizeof(mushucell)*8) which is
       // MUSHUCELL_MAX + 1 and therefore overflows to 0. p is zero iff g is
       // one, so just use MUSHUCELL_MAX in that case.
-      const mushucell mul_max_s =
+      const mushucell max_g_multiplicand =
          p == 0 ? MUSHUCELL_MAX
                 : (mushucell)1 << (sizeof(mushucell)*8 - p);
 
-      if (s <= mul_max_s) {
+      if (s <= max_g_multiplicand) {
          const mushucell gs = g * s;
          if (gs < min_pairs_2) {
             min_pairs_2 = gs;
@@ -160,15 +167,13 @@ bool mushbounds_ray_intersects(
          // that case.
       }
 
-      // For d*s there are no special tricks that I can think of. d ≥ g holds
-      // (proof left as an exercise), so I don't think we can do better than
-      // the usual division tactic.
-      if (s <= MUSHUCELL_MAX / d) {
-         const mushucell ds = d * s;
+      // As above, but this is for g*d instead of g*s.
+      if (d <= max_g_multiplicand) {
+         const mushucell gd = g * d;
 
          // Adding the product to sum_pairs_1 might still overflow.
-         if (sum_pairs_1 <= MUSHUCELL_MAX - ds)
-            sum_pairs_1 += ds;
+         if (sum_pairs_1 <= MUSHUCELL_MAX - gd)
+            sum_pairs_1 += gd;
          else {
             // sum_pairs_1 should now exceed MUSHUCELL_MAX. Either min_pairs_2
             // is lesser, or both values are really huge. In the former case,
