@@ -45,17 +45,21 @@ size_t mush_size_t_mul_clamped(size_t a, size_t b) {
 
 #if GNU_X86_ASM && SIZE_MAX <= 0xffffffff
 
+   uint32_t unused;
+
    __asm(  "movl %1,%0; mull %2; cmovcl %3,%0"
-         : "=&a"(result)
+         : "=&a"(result), "=d"(unused)
          : "%dr"(a), "dr"(b), "r"(SIZE_MAX)
-         : "edx", "cc");
+         : "cc");
 
 #elif GNU_X86_ASM && SIZE_MAX <= 0xffffffffffffffff
 
+   uint64_t unused;
+
    __asm(  "movq %1,%0; mulq %2; cmovcq %3,%0"
-         : "=&a"(result)
+         : "=&a"(result), "=d"(unused)
          : "%dr"(a), "dr"(b), "r"(SIZE_MAX)
-         : "rdx", "cc");
+         : "cc");
 #else
    result = a > SIZE_MAX / b ? SIZE_MAX : a * b;
 #endif
