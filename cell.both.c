@@ -5,9 +5,6 @@
 #include <assert.h>
 
 #if !MUSHSPACE_93
-#define GNU_X86_ASM \
-   (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
-
 static mushucell mushucell_mod_inv(mushucell);
 #endif
 
@@ -33,48 +30,10 @@ void mushcell_sub_into(mushcell* a, mushcell b) { *a = mushcell_sub(*a, b); }
 
 #if !MUSHSPACE_93
 mushcell mushcell_add_clamped(mushcell a, mushcell b) {
-   mushcell result;
-
-#if GNU_X86_ASM && MUSHCELL_MAX < 0xffffffff
-
-   __asm(  "addl %2,%1; movl %1,%0; cmovol %3,%0"
-         : "=&r"(result), "+&%r"(a)
-         : "r"(b), "r"(MUSHCELL_MAX)
-         : "cc");
-
-#elif GNU_X86_ASM && MUSHCELL_MAX < 0xffffffffffffffff
-
-   __asm(  "addq %2,%1; movq %1,%0; cmovoq %3,%0"
-         : "=&r"(result), "+&%r"(a)
-         : "r"(b), "r"(MUSHCELL_MAX)
-         : "cc");
-
-#else
-   result = a > mushcell_sub(MUSHCELL_MAX, b) ? MUSHCELL_MAX : a + b;
-#endif
-   return result;
+   return a > mushcell_sub(MUSHCELL_MAX, b) ? MUSHCELL_MAX : a + b;
 }
 mushcell mushcell_sub_clamped(mushcell a, mushcell b) {
-   mushcell result;
-
-#if GNU_X86_ASM && MUSHCELL_MAX < 0xffffffff
-
-   __asm(  "subl %2,%1; movl %1,%0; cmovol %3,%0"
-         : "=&r"(result), "+&%r"(a)
-         : "r"(b), "r"(MUSHCELL_MIN)
-         : "cc");
-
-#elif GNU_X86_ASM && MUSHCELL_MAX < 0xffffffffffffffff
-
-   __asm(  "subq %2,%1; movq %1,%0; cmovoq %3,%0"
-         : "=&r"(result), "+&%r"(a)
-         : "r"(b), "r"(MUSHCELL_MIN)
-         : "cc");
-
-#else
-   result = a < mushcell_add(MUSHCELL_MIN, b) ? MUSHCELL_MIN : a + b;
-#endif
-   return result;
+   return a < mushcell_add(MUSHCELL_MIN, b) ? MUSHCELL_MIN : a + b;
 }
 #endif
 
