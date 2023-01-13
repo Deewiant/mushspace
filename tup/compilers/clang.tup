@@ -11,15 +11,19 @@ SHAREDLIBFLAGS = -shared
 SRCFLAGS     = -Weverything -pedantic \
                -Wno-conditional-uninitialized \
                -Wno-covered-switch-default \
+               -Wno-declaration-after-statement \
                -Wno-disabled-macro-expansion \
+               -Wno-extra-semi-stmt \
+               -Wno-implicit-fallthrough \
                -Wno-missing-prototypes \
                -Wno-packed \
                -Wno-padded \
+               -Wno-reserved-macro-identifier \
                -Wno-sign-conversion \
                -Wno-static-in-inline \
                -Wno-switch-enum
 MUSHSRCFLAGS = -std=c11 '-D_Noreturn=__attribute__((__noreturn__))'
-LIBSRCFLAGS  =
+LIBSRCFLAGS  = -Wno-reserved-macro-identifier
 
 DEFDIM  = -DMUSHSPACE_DIM=
 DEF93   = -DMUSHSPACE_93=
