@@ -26,5 +26,5 @@ DEF93   = -DMUSHSPACE_93=
 INCLUDE = -I
 
 NATIVEFLAGS = -march=native
-OPTFLAGS    = -O4
+OPTFLAGS    = -flto -O3
 DEBFLAGS    = -g
